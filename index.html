@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ND Games">
+<meta name="theme-color" content="#0f0f13">
+<meta name="description" content="ND Games — учёт дисков PS4/PS5">
+<link rel="manifest" id="manifest-placeholder">
+<title>ND Games</title>
+<style>
+:root{
+  --bg:#0f0f13;--bg2:#17171e;--bg3:#1e1e28;--bg4:#25252f;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#f0f0f5;--text2:#9090a8;--text3:#5a5a72;
+  --accent:#7c6df0;--accent2:#5a4dd4;
+  --green:#3ecf8e;--red:#f06060;--amber:#f0a832;--blue:#4da8f0;
+  --radius:12px;--radius-sm:8px;
+  --cols:1;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden}
+#root{height:100%;display:flex;flex-direction:column}
+@media (orientation:landscape){
+  #root{flex-direction:row}
+  .tab-bar{flex-direction:column !important;width:72px !important;height:100% !important;border-top:none !important;border-right:1px solid var(--border) !important;position:static !important;order:-1;padding:12px 0}
+  .tab{flex:0 0 auto !important;padding:12px 0 !important;gap:5px !important}
+  .tab span{display:block !important;font-size:9px !important}
+  #content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px 10px;flex-shrink:0}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.logo{font-size:20px;font-weight:700;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
+.logo-text span{color:var(--accent)}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn-add{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-add:active{background:var(--accent2)}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stat{background:var(--bg3);border-radius:var(--radius-sm);padding:7px 6px;text-align:center;border:1px solid var(--border)}
+.stat-num{font-size:18px;font-weight:700;line-height:1}
+.stat-lbl{font-size:10px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:0.3px}
+@media (orientation:landscape){.header{padding:8px 14px}.header-top{margin-bottom:8px}.stat{padding:5px 4px}.stat-num{font-size:16px}.stat-lbl{font-size:9px}}
+.controls{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 16px;flex-shrink:0}
+.search-wrap{position:relative;margin-bottom:8px}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:0.4;pointer-events:none}
+.search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:9px 12px 9px 36px;font-size:14px;outline:none}
+.search-wrap input:focus{border-color:var(--accent)}
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.filter-row::-webkit-scrollbar{display:none}
+.fbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s;font-weight:500}
+.fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.page{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.page::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#page-catalog{padding:12px 16px 24px}
+.games-grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:10px}
+@media (min-width:600px){:root{--cols:2}}
+@media (min-width:900px){:root{--cols:3}}
+@media (min-width:1200px){:root{--cols:4}}
+@media (orientation:landscape) and (min-width:600px){:root{--cols:2}}
+@media (orientation:landscape) and (min-width:800px){:root{--cols:3}}
+.game-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;cursor:pointer;transition:border-color .15s,transform .1s}
+.game-card:active{border-color:var(--accent);transform:scale(0.98)}
+.game-cover{width:72px;min-width:72px;height:96px;background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.game-cover img{width:72px;height:96px;object-fit:cover;display:block}
+.game-cover svg{opacity:0.18}
+.game-body{flex:1;padding:10px 12px;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.game-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.game-meta{font-size:11px;color:var(--text2);margin-bottom:4px}
+.game-row{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.game-price{font-size:15px;font-weight:700}
+.game-profit{font-size:11px;margin-top:1px}
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:0.3px;white-space:nowrap}
+.b-available{background:rgba(62,207,142,0.15);color:var(--green)}
+.b-reserved{background:rgba(240,168,50,0.15);color:var(--amber)}
+.b-sold{background:rgba(240,96,96,0.15);color:var(--red)}
+.b-exchange{background:rgba(77,168,240,0.15);color:var(--blue)}
+.b-ordered{background:rgba(124,109,240,0.15);color:var(--accent)}
+.game-person{font-size:11px;color:var(--text2);margin-top:4px;display:flex;align-items:center;gap:3px}
+.empty-state{text-align:center;padding:60px 24px;color:var(--text3)}
+@media (min-width:600px){.game-cover{width:80px;min-width:80px;height:108px}.game-cover img{width:80px;height:108px}.game-title{font-size:15px}}
+.tab-bar{background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;z-index:50}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 14px;cursor:pointer;color:var(--text3);gap:3px;background:none;border:none;transition:color .15s}
+.tab span{font-size:10px;text-transform:uppercase;letter-spacing:0.3px;font-weight:600}
+.tab.active{color:var(--accent)}
+.tab.active svg{transform:scale(1.1)}
+@media (orientation:portrait){.tab-bar{padding-bottom:env(safe-area-inset-bottom,0)}#page-catalog{padding-bottom:calc(24px + env(safe-area-inset-bottom,0))}}
+#page-stats{padding:14px 16px 24px}
+.period-row{display:flex;gap:6px;margin-bottom:16px}
+.period-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s}
+.period-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.fin-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+@media (min-width:600px){.fin-cards{grid-template-columns:repeat(4,1fr)}}
+.fin-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.fin-card-lbl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px}
+.fin-card-val{font-size:22px;font-weight:800;line-height:1}
+.fin-card-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stats-layout{display:flex;flex-direction:column;gap:14px}
+@media (min-width:700px),(orientation:landscape){.stats-layout{flex-direction:row;align-items:flex-start}.stats-layout .chart-wrap{flex:0 0 260px}.stats-layout .stats-right{flex:1;min-width:0}}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center}
+.chart-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:14px;align-self:flex-start}
+.legend{display:flex;flex-direction:column;gap:8px;margin-top:14px;width:100%}
+.legend-item{display:flex;align-items:center;justify-content:space-between}
+.legend-left{display:flex;align-items:center;gap:8px}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.legend-label{font-size:13px;color:var(--text2)}
+.legend-val{font-size:13px;font-weight:700}
+.expenses-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.exp-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.exp-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.exp-item:last-child{border-bottom:none}
+.exp-name{font-size:13px}
+.exp-amount{font-size:13px;font-weight:700;color:var(--red)}
+.btn-exp-add{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);margin-top:10px}
+#page-shipments{padding:14px 16px 24px}
+.ship-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:600px){.ship-grid{grid-template-columns:1fr 1fr}}
+.ship-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.ship-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.ship-name{font-size:15px;font-weight:700}
+.ship-date{font-size:11px;color:var(--text2);margin-top:2px}
+.ship-cost{font-size:16px;font-weight:800;color:var(--red)}
+.ship-per{font-size:11px;color:var(--text2);margin-top:1px}
+.btn-new-ship{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+@media (min-width:600px){.modal-overlay{align-items:center}.modal{border-radius:var(--radius) !important;max-height:85vh !important}}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:20px 16px 40px;border-top:1px solid var(--border2)}
+.modal::-webkit-scrollbar{display:none}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+@media (min-width:600px){.modal-handle{display:none}}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.btn-close{background:var(--bg3);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:18px;line-height:1}
+.field{margin-bottom:14px}
+.field label{font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field select option{background:var(--bg2)}
+.field textarea{resize:none;height:70px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.suggest-list{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;margin-top:6px;max-height:200px;overflow-y:auto}
+.suggest-item{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;border-bottom:1px solid var(--border)}
+.suggest-item:last-child{border-bottom:none}
+.suggest-item:active{background:var(--bg4)}
+.sug-thumb{width:34px;height:46px;object-fit:cover;border-radius:4px;background:var(--bg4);flex-shrink:0}
+.sug-name{font-size:13px;font-weight:500;line-height:1.3}
+.sug-year{font-size:11px;color:var(--text2);margin-top:2px}
+.hint{font-size:11px;color:var(--text3);margin-top:4px}
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.st-opt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 4px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:all .15s}
+.st-opt.sel{border-color:var(--accent);color:var(--accent);background:rgba(124,109,240,0.12)}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.section-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px}
+.btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:background .15s}
+.btn-primary:active{background:var(--accent2)}
+.btn-danger{width:100%;background:rgba(240,96,96,0.1);border:1px solid rgba(240,96,96,0.3);color:var(--red);border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.detail-cover{width:100%;height:160px;border-radius:var(--radius);background:var(--bg3);display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden}
+.detail-cover img{width:100%;height:160px;object-fit:cover;border-radius:var(--radius);display:block}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.info-row:last-child{border-bottom:none}
+.info-key{font-size:13px;color:var(--text2)}
+.info-val{font-size:13px;font-weight:600;text-align:right;max-width:60%}
+.quick-status{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.qs-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;cursor:pointer}
+.qs-btn:active{border-color:var(--accent)}
+.exp-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.exp-type-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 8px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2)}
+.exp-type-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(124,109,240,0.12)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:500;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@media (orientation:landscape){.toast{bottom:20px}}
+
+/* PWA Install Banner */
+#install-banner{display:none;position:fixed;bottom:72px;left:12px;right:12px;background:var(--accent);border-radius:var(--radius);padding:12px 16px;z-index:300;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 20px rgba(124,109,240,0.4)}
+#install-banner.show{display:flex}
+#install-banner p{font-size:13px;font-weight:600;color:#fff;line-height:1.3}
+#install-banner p span{font-size:11px;font-weight:400;opacity:0.8;display:block;margin-top:2px}
+.install-btns{display:flex;gap:8px;flex-shrink:0}
+.btn-install{background:#fff;color:var(--accent);border:none;border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-dismiss{background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;cursor:pointer}
+
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
+.loader-logo{font-size:34px;font-weight:800;letter-spacing:-1px}
+.loader-logo span{color:var(--accent)}
+.loader-dots{display:flex;gap:7px}
+.loader-dots i{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:dot 1.2s infinite;font-style:normal}
+.loader-dots i:nth-child(2){animation-delay:.2s}
+.loader-dots i:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{opacity:.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div id="loader">
+  <div class="loader-logo"><span>ND</span> Games</div>
+  <div class="loader-dots"><i></i><i></i><i></i></div>
+</div>
+
+<div id="root" style="display:none">
+  <div class="tab-bar" id="tab-bar">
+    <button class="tab active" id="tab-catalog" onclick="setPage('catalog')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span>Каталог</span>
+    </button>
+    <button class="tab" id="tab-shipments" onclick="setPage('shipments')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M12 12v4M10 14h4"/></svg>
+      <span>Партии</span>
+    </button>
+    <button class="tab" id="tab-stats" onclick="setPage('stats')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      <span>Финансы</span>
+    </button>
+  </div>
+
+  <div id="content-area" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">
+          <div class="logo-text"><span>ND</span> Games</div>
+          <div class="online-dot" id="online-dot"></div>
+        </div>
+        <button class="btn-add" onclick="openAdd()">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Добавить
+        </button>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+    </div>
+    <div class="controls" id="controls">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="white" stroke-width="1.5"/><path d="M10 10l3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" id="search-inp" placeholder="Поиск по названию..." oninput="renderList()">
+      </div>
+      <div class="filter-row" id="filter-row"></div>
+    </div>
+    <div id="page-catalog" class="page" style="display:none"><div class="games-grid" id="games-grid"></div></div>
+    <div id="page-stats" class="page" style="display:none"></div>
+    <div id="page-shipments" class="page" style="display:none"></div>
+  </div>
+</div>
+
+<!-- PWA Install Banner -->
+<div id="install-banner">
+  <p>Установить ND Games<span>Работает без браузера</span></p>
+  <div class="install-btns">
+    <button class="btn-install" id="btn-install-ok">Установить</button>
+    <button class="btn-dismiss" onclick="dismissInstall()">✕</button>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Inline manifest via blob
+const manifest = {
+  name: "ND Games",
+  short_name: "ND Games",
+  description: "Учёт дисков PS4/PS5",
+  start_url: "./",
+  display: "standalone",
+  orientation: "any",
+  background_color: "#0f0f13",
+  theme_color: "#0f0f13",
+  icons: [
+    {
+      src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMGYxMyIvPgogIDxyZWN0IHg9IjgwIiB5PSIxNzAiIHdpZHRoPSIzNTIiIGhlaWdodD0iMjAwIiByeD0iODAiIGZpbGw9IiM3YzZkZjAiLz4KICA8ZWxsaXBzZSBjeD0iMTMwIiBjeT0iMzQwIiByeD0iNTUiIHJ5PSI2NSIgZmlsbD0iIzdjNmRmMCIvPgogIDxlbGxpcHNlIGN4PSIzODIiIGN5PSIzNDAiIHJ4PSI1NSIgcnk9IjY1IiBmaWxsPSIjN2M2ZGYwIi8+CiAgPHJlY3QgeD0iMTU4IiB5PSIyMjAiIHdpZHRoPSIyOCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9IiMwZjBmMTMiIG9wYWNpdHk9IjAuNiIvPgogIDxyZWN0IHg9IjEzOCIgeT0iMjQwIiB3aWR0aD0iNjgiIGhlaWdodD0iMjgiIHJ4PSI4IiBmaWxsPSIjMGYwZjEzIiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSIzNDAiIGN5PSIyMzAiIHI9IjE0IiBmaWxsPSIjM2VjZjhlIiBvcGFjaXR5PSIwLjkiLz4KICA8Y2lyY2xlIGN4PSIzNzAiIGN5PSIyNTgiIHI9IjE0IiBmaWxsPSIjZjA2MDYwIiBvcGFjaXR5PSIwLjkiLz4KICA8Y2lyY2xlIGN4PSIzMTIiIGN5PSIyNTgiIHI9IjE0IiBmaWxsPSIjNGRhOGYwIiBvcGFjaXR5PSIwLjkiLz4KICA8Y2lyY2xlIGN4PSIzNDAiIGN5PSIyODYiIHI9IjE0IiBmaWxsPSIjZjBhODMyIiBvcGFjaXR5PSIwLjkiLz4KICA8cmVjdCB4PSIyMjYiIHk9IjI0OCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjE2IiByeD0iOCIgZmlsbD0iIzFlMWUyOCIvPgogIDxyZWN0IHg9IjI2MiIgeT0iMjQ4IiB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIHJ4PSI4IiBmaWxsPSIjMWUxZTI4Ii8+CiAgPHRleHQgeD0iMjU2IiB5PSI0MjAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxzYW5zLXNlcmlmIiBmb250LXNpemU9IjYwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjN2M2ZGYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjUiPk5EPC90ZXh0Pgo8L3N2Zz4=",
+      sizes: "512x512",
+      type: "image/svg+xml",
+      purpose: "any maskable"
+    }
+  ]
+};
+const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const manifestUrl = URL.createObjectURL(manifestBlob);
+document.getElementById('manifest-placeholder').href = manifestUrl;
+
+// Service Worker
+if('serviceWorker' in navigator){
+  const swCode = `
+    const CACHE = 'nd-games-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+  `;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+// PWA Install prompt
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if(!localStorage.getItem('install-dismissed')){
+    document.getElementById('install-banner').classList.add('show');
+  }
+});
+document.getElementById('btn-install-ok').onclick = async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const {outcome} = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').classList.remove('show');
+};
+window.dismissInstall = () => {
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('install-dismissed','1');
+};
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('show');
+});
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAkIxx4M7IISPWUEP4vMnQaaYazC8KGxiI",
+  authDomain: "nd-games.firebaseapp.com",
+  databaseURL: "https://nd-games-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "nd-games",
+  storageBucket: "nd-games.firebasestorage.app",
+  messagingSenderId: "447616051556",
+  appId: "1:447616051556:web:c96fb5818cdf5ab7363271"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const S = {
+  games:{},shipments:{},expenses:{},
+  filter:'all',page:'catalog',
+  selStatus:'available',selExpType:'shipping',
+  statPeriod:'month',suggestResults:[],suggestTimer:null
+};
+window._S = S;
+const STATUSES = {
+  available:{label:'В наличии',badge:'b-available'},
+  reserved: {label:'Резерв',   badge:'b-reserved'},
+  sold:     {label:'Продан',   badge:'b-sold'},
+  exchange: {label:'Обмен',    badge:'b-exchange'},
+  ordered:  {label:'Заказан',  badge:'b-ordered'}
+};
+const PLATFORMS = ['PS5','PS4','PS4/PS5'];
+
+onValue(ref(db,'games'), s=>{S.games=s.val()||{};renderStats();renderList();});
+onValue(ref(db,'shipments'), s=>{S.shipments=s.val()||{};if(S.page==='shipments')renderShipments();});
+onValue(ref(db,'expenses'), s=>{S.expenses=s.val()||{};if(S.page==='stats')renderStatsPage();});
+onValue(ref(db,'.info/connected'), s=>{
+  const d=document.getElementById('online-dot');
+  if(d) d.style.background=s.val()?'var(--green)':'var(--red)';
+});
+
+document.getElementById('loader').style.display='none';
+document.getElementById('root').style.display='flex';
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function gelAmount(a,c){return parseFloat(a||0)*({'₾':1,'$':2.7,'€':2.95}[c]||1)}
+
+window.renderStats=function(){
+  const g=Object.values(S.games),c={total:g.length,available:0,reserved:0,sold:0};
+  g.forEach(x=>{if(x.status==='available')c.available++;if(x.status==='reserved')c.reserved++;if(x.status==='sold')c.sold++;});
+  const r=document.getElementById('stats-row');
+  if(r) r.innerHTML=`<div class="stat"><div class="stat-num">${c.total}</div><div class="stat-lbl">Всего</div></div><div class="stat"><div class="stat-num" style="color:var(--green)">${c.available}</div><div class="stat-lbl">Наличие</div></div><div class="stat"><div class="stat-num" style="color:var(--amber)">${c.reserved}</div><div class="stat-lbl">Резерв</div></div><div class="stat"><div class="stat-num" style="color:var(--red)">${c.sold}</div><div class="stat-lbl">Продано</div></div>`;
+};
+window.setFilter=function(f){S.filter=f;renderFilters();renderList();};
+function renderFilters(){
+  const f=[{id:'all',l:'Все'},{id:'available',l:'В наличии'},{id:'reserved',l:'Резерв'},{id:'sold',l:'Продано'},{id:'exchange',l:'Обмен'},{id:'ordered',l:'Заказан'},{id:'PS5',l:'PS5'},{id:'PS4',l:'PS4'}];
+  const r=document.getElementById('filter-row');
+  if(r) r.innerHTML=f.map(x=>`<button class="fbtn${S.filter===x.id?' active':''}" onclick="setFilter('${x.id}')">${x.l}</button>`).join('');
+}
+window.renderList=function(){
+  renderStats();
+  let g=Object.entries(S.games).map(([id,x])=>({...x,id}));
+  const q=(document.getElementById('search-inp')||{}).value||'';
+  if(q) g=g.filter(x=>x.title&&x.title.toLowerCase().includes(q.toLowerCase()));
+  if(S.filter!=='all'){
+    if(['PS4','PS5'].includes(S.filter)) g=g.filter(x=>x.platform&&x.platform.includes(S.filter));
+    else g=g.filter(x=>x.status===S.filter);
+  }
+  g.sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
+  const grid=document.getElementById('games-grid');
+  if(!grid) return;
+  if(!g.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><p style="margin-top:12px">Нет дисков</p></div>`;return;}
+  grid.innerHTML=g.map(x=>{
+    const st=STATUSES[x.status]||STATUSES.available;
+    const cover=x.cover?`<img src="${x.cover}" alt="" loading="lazy" onerror="this.style.display='none'">`:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`;
+    const price=parseFloat(x.price||0),cost=gelAmount(x.cost,x.costCurrency||'₾'),delC=parseFloat(x.deliveryCost||0),shipC=x.shipmentId&&S.shipments[x.shipmentId]?parseFloat(S.shipments[x.shipmentId].perDisc||0):0,profit=price-(cost+delC+shipC);
+    const profitHtml=price>0?`<div class="game-profit" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} ₾</div>`:'';
+    const personHtml=x.person?`<div class="game-person"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>${x.person}</div>`:'';
+    return `<div class="game-card" onclick="openDetail('${x.id}')"><div class="game-cover">${cover}</div><div class="game-body"><div><div class="game-title">${x.title||'—'}</div><div class="game-meta">${x.platform||'PS4/PS5'}${x.region?' · '+x.region:''}</div></div><div><div class="game-row"><div><div class="game-price">${x.price?x.price+' ₾':'—'}</div>${profitHtml}</div><span class="badge ${st.badge}">${st.label}</span></div>${personHtml}</div></div></div>`;
+  }).join('');
+};
+window.setPage=function(page){
+  S.page=page;
+  ['catalog','stats','shipments'].forEach(p=>{document.getElementById('page-'+p).style.display=p===page?'block':'none';document.getElementById('tab-'+p).classList.toggle('active',p===page);});
+  document.getElementById('controls').style.display=page==='catalog'?'block':'none';
+  if(page==='stats') renderStatsPage();
+  if(page==='shipments') renderShipments();
+};
+setPage('catalog');renderFilters();renderList();
+
+window.setStatPeriod=function(p){S.statPeriod=p;renderStatsPage();};
+window.renderStatsPage=function(){
+  const page=document.getElementById('page-stats');if(!page) return;
+  const now=new Date(),games=Object.values(S.games),expenses=Object.values(S.expenses);
+  function inPeriod(ts){if(!ts) return false;const d=new Date(ts);if(S.statPeriod==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();if(S.statPeriod==='week') return d>=(new Date(now-7*86400000));return d.getFullYear()===now.getFullYear();}
+  const sold=games.filter(g=>g.status==='sold'&&inPeriod(g.soldAt||g.addedAt));
+  const revenue=sold.reduce((s,g)=>s+parseFloat(g.price||0),0);
+  let cogs=0;sold.forEach(g=>{cogs+=gelAmount(g.cost,g.costCurrency||'₾');cogs+=parseFloat(g.deliveryCost||0);if(g.shipmentId&&S.shipments[g.shipmentId])cogs+=parseFloat(S.shipments[g.shipmentId].perDisc||0);});
+  const periodExp=expenses.filter(e=>inPeriod(e.date));
+  const extraExp=periodExp.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+  const profit=revenue-(cogs+extraExp);
+  const dd=[{label:'Выручка',value:revenue,color:'#3ecf8e'},{label:'Себестоимость',value:cogs,color:'#f06060'},{label:'Доп. расходы',value:extraExp,color:'#f0a832'}];
+  const pl={month:'Месяц',week:'Неделя',year:'Год'};
+  page.innerHTML=`<div class="period-row">${['month','week','year'].map(p=>`<button class="period-btn${S.statPeriod===p?' active':''}" onclick="setStatPeriod('${p}')">${pl[p]}</button>`).join('')}</div>
+    <div class="fin-cards"><div class="fin-card"><div class="fin-card-lbl">Выручка</div><div class="fin-card-val" style="color:var(--green)">${revenue.toFixed(0)} ₾</div><div class="fin-card-sub">${sold.length} продаж</div></div><div class="fin-card"><div class="fin-card-lbl">Прибыль</div><div class="fin-card-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} ₾</div><div class="fin-card-sub">Чистая</div></div><div class="fin-card"><div class="fin-card-lbl">Себестоимость</div><div class="fin-card-val" style="color:var(--red)">${cogs.toFixed(0)} ₾</div><div class="fin-card-sub">Проданных</div></div><div class="fin-card"><div class="fin-card-lbl">Доп. расходы</div><div class="fin-card-val" style="color:var(--amber)">${extraExp.toFixed(0)} ₾</div><div class="fin-card-sub">За период</div></div></div>
+    <div class="stats-layout"><div class="chart-wrap"><div class="chart-title">Структура</div><canvas id="donut" width="160" height="160"></canvas><div class="legend">${dd.map(d=>`<div class="legend-item"><div class="legend-left"><div class="legend-dot" style="background:${d.color}"></div><div class="legend-label">${d.label}</div></div><div class="legend-val" style="color:${d.color}">${d.value.toFixed(0)} ₾</div></div>`).join('')}<div class="legend-item" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><div class="legend-left"><div class="legend-dot" style="background:var(--accent)"></div><div class="legend-label">Прибыль</div></div><div class="legend-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} ₾</div></div></div></div>
+    <div class="stats-right"><div class="expenses-section"><div class="exp-title">Дополнительные расходы</div>${periodExp.length?periodExp.map(e=>`<div class="exp-item"><div><div class="exp-name">${e.name}</div><div style="font-size:11px;color:var(--text3)">${e.type==='shipping'?'Доставка партии':'Прочее'} · ${new Date(e.date).toLocaleDateString('ru-RU')}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="exp-amount">-${e.amount} ₾</div><button onclick="deleteExpense('${e.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;line-height:1">×</button></div></div>`).join(''):`<div style="font-size:13px;color:var(--text3);text-align:center;padding:14px 0">Нет расходов за период</div>`}<button class="btn-exp-add" onclick="openAddExpense()">+ Добавить расход</button></div></div></div>`;
+  drawDonut(dd);
+};
+function drawDonut(data){
+  const canvas=document.getElementById('donut');if(!canvas) return;
+  const ctx=canvas.getContext('2d'),total=data.reduce((s,d)=>s+d.value,0);
+  if(total===0){ctx.clearRect(0,0,160,160);return;}
+  const segs=data.filter(d=>d.value>0);
+  function draw(p){ctx.clearRect(0,0,160,160);let s=-Math.PI/2;segs.forEach(d=>{const end=s+d.value/total*2*Math.PI*p;ctx.beginPath();ctx.moveTo(80,80);ctx.arc(80,80,66,s,end);ctx.closePath();ctx.fillStyle=d.color;ctx.fill();s=end;});ctx.beginPath();ctx.arc(80,80,40,0,2*Math.PI);ctx.fillStyle='#17171e';ctx.fill();ctx.fillStyle='#f0f0f5';ctx.font='bold 14px -apple-system,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('₾'+Math.round(total*p),80,80);}
+  const t0=performance.now();
+  (function anim(now){const p=Math.min((now-t0)/900,1);draw(1-Math.pow(1-p,3));if(p<1) requestAnimationFrame(anim);})(t0);
+}
+window.renderShipments=function(){
+  const page=document.getElementById('page-shipments');if(!page||S.page!=='shipments') return;
+  const ships=Object.entries(S.shipments).map(([id,s])=>({...s,id})).sort((a,b)=>(b.date||0)-(a.date||0));
+  page.innerHTML=`<button class="btn-new-ship" onclick="openAddShipment()">+ Новая партия</button><div class="ship-grid">${!ships.length?'<div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:32px 0">Нет партий</div>':ships.map(s=>`<div class="ship-card"><div class="ship-header"><div><div class="ship-name">${s.name||'Партия'}</div><div class="ship-date">${s.source||''} · ${s.date?new Date(s.date).toLocaleDateString('ru-RU'):''}</div></div><div style="text-align:right"><div class="ship-cost">${s.totalCost} ₾</div><div class="ship-per">~${parseFloat(s.perDisc||0).toFixed(1)} ₾/диск</div></div></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:var(--text2)">${s.discCount||0} дисков</span><button onclick="deleteShipment('${s.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px">Удалить</button></div></div>`).join('')}</div>`;
+};
+window.openAddShipment=function(){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title">Новая партия <button class="btn-close" onclick="closeModalForce()">×</button></div><div class="field"><label>Название</label><input id="sh-name" type="text" placeholder="Дубай апрель 2025"></div><div class="field"><label>Откуда</label><input id="sh-source" type="text" placeholder="Дубай / Турция / eBay UK"></div><div class="row2"><div class="field"><label>Дата</label><input id="sh-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Кол-во дисков</label><input id="sh-count" type="number" placeholder="20"></div></div><div class="field"><label>Общая стоимость доставки (₾)</label><input id="sh-cost" type="number" placeholder="150"></div><div class="field"><label>Заметки</label><textarea id="sh-notes" placeholder="Детали партии..."></textarea></div><button class="btn-primary" onclick="saveShipment()">Сохранить</button></div></div>`;
+};
+window.saveShipment=function(){
+  const name=document.getElementById('sh-name').value.trim(),source=document.getElementById('sh-source').value.trim(),date=new Date(document.getElementById('sh-date').value).getTime(),discCount=parseInt(document.getElementById('sh-count').value)||1,totalCost=parseFloat(document.getElementById('sh-cost').value)||0,notes=document.getElementById('sh-notes').value.trim(),id=uid();
+  set(ref(db,'shipments/'+id),{id,name,source,date,discCount,totalCost,perDisc:totalCost/discCount,notes});
+  showToast('Партия добавлена');closeModalForce();
+};
+window.deleteShipment=function(id){if(!confirm('Удалить партию?')) return;remove(ref(db,'shipments/'+id));};
+window.openAdd=function(editId){
+  const isEdit=!!editId,ex=isEdit?(S.games[editId]||{}):{};
+  S.selStatus=ex.status||'available';
+  const ships=Object.entries(S.shipments).map(([id,s])=>({...s,id}));
+  document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title">${isEdit?'Редактировать':'Добавить диск'} <button class="btn-close" onclick="closeModalForce()">×</button></div><div class="field"><label>Название игры</label><input id="inp-title" type="text" placeholder="Начните вводить для поиска обложки..." value="${ex.title||''}" oninput="onTitleInput(this.value)"><div id="suggest-box"></div><div class="hint" id="cover-hint"></div></div><div class="field"><label>URL обложки</label><input id="inp-cover" type="text" placeholder="Авто или вручную" value="${ex.cover||''}"></div><div class="row2"><div class="field"><label>Платформа</label><select id="inp-platform">${PLATFORMS.map(p=>`<option${ex.platform===p?' selected':''}>${p}</option>`).join('')}</select></div><div class="field"><label>Регион</label><input id="inp-region" type="text" placeholder="EU / RU / US" value="${ex.region||''}"></div></div><div class="divider"></div><div class="section-label">Цены</div><div class="row2"><div class="field"><label>Цена продажи (₾)</label><input id="inp-price" type="number" placeholder="45" value="${ex.price||''}"></div><div class="field"><label>Себестоимость</label><div style="display:flex;gap:6px"><input id="inp-cost" type="number" placeholder="15" value="${ex.cost||''}" style="flex:1"><select id="inp-cost-cur" style="width:62px;padding:10px 4px">${['₾','$','€'].map(c=>`<option${(ex.costCurrency||'₾')===c?' selected':''}>${c}</option>`).join('')}</select></div></div></div><div class="row2"><div class="field"><label>Доставка клиенту (₾)</label><input id="inp-delcost" type="number" placeholder="0" value="${ex.deliveryCost||''}"></div><div class="field"><label>Привязать к партии</label><select id="inp-shipment"><option value="">— без партии —</option>${ships.map(s=>`<option value="${s.id}"${ex.shipmentId===s.id?' selected':''}>${s.name||s.source} (~${parseFloat(s.perDisc||0).toFixed(1)}₾)</option>`).join('')}</select></div></div><div class="divider"></div><div class="section-label">Статус</div><div class="status-grid">${Object.entries(STATUSES).map(([k,v])=>`<div class="st-opt${S.selStatus===k?' sel':''}" onclick="selStatus('${k}')" id="st-${k}">${v.label}</div>`).join('')}</div><div class="divider"></div><div class="section-label">Клиент</div><div class="row2"><div class="field"><label>Имя</label><input id="inp-person" type="text" placeholder="Иван Иванов" value="${ex.person||''}"></div><div class="field"><label>Телефон</label><input id="inp-phone" type="tel" placeholder="+995..." value="${ex.phone||''}"></div></div><div class="field"><label>Заметки</label><textarea id="inp-notes">${ex.notes||''}</textarea></div><button class="btn-primary" onclick="${isEdit?`saveEdit('${editId}')`:'addGame()'}">${isEdit?'Сохранить':'Добавить диск'}</button>${isEdit?`<button class="btn-danger" onclick="deleteGame('${editId}')">Удалить диск</button>`:''}</div></div>`;
+};
+window.selStatus=function(k){S.selStatus=k;document.querySelectorAll('.st-opt').forEach(el=>el.classList.remove('sel'));const el=document.getElementById('st-'+k);if(el) el.classList.add('sel');};
+window.onTitleInput=function(val){clearTimeout(S.suggestTimer);if(!val||val.length<2){document.getElementById('suggest-box').innerHTML='';return;}document.getElementById('cover-hint').textContent='Ищем...';S.suggestTimer=setTimeout(()=>fetchSuggestions(val),600);};
+async function fetchSuggestions(q){try{const r=await fetch(`https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search=${encodeURIComponent(q)}&page_size=5&platforms=18,187`);const data=await r.json();S.suggestResults=data.results||[];const h=document.getElementById('cover-hint');if(h) h.textContent='';const box=document.getElementById('suggest-box');if(!box) return;if(!S.suggestResults.length){box.innerHTML='';return;}box.innerHTML=`<div class="suggest-list">${S.suggestResults.map((g,i)=>`<div class="suggest-item" onclick="selectSuggest(${i})">${g.background_image?`<img class="sug-thumb" src="${g.background_image}" alt="" loading="lazy">`:`<div class="sug-thumb"></div>`}<div><div class="sug-name">${g.name}</div><div class="sug-year">${g.released?g.released.slice(0,4):''}</div></div></div>`).join('')}</div>`;}catch(e){const h=document.getElementById('cover-hint');if(h) h.textContent='Нет соединения — введите URL вручную';const b=document.getElementById('suggest-box');if(b) b.innerHTML='';}}
+window.selectSuggest=function(i){const g=S.suggestResults[i];if(!g) return;const t=document.getElementById('inp-title');if(t) t.value=g.name;const c=document.getElementById('inp-cover');if(c) c.value=g.background_image||'';const h=document.getElementById('cover-hint');if(h) h.textContent='Обложка найдена ✓';document.getElementById('suggest-box').innerHTML='';};
+function getFormData(){return{title:document.getElementById('inp-title').value.trim(),cover:document.getElementById('inp-cover').value.trim(),platform:document.getElementById('inp-platform').value,region:document.getElementById('inp-region').value.trim(),price:document.getElementById('inp-price').value,cost:document.getElementById('inp-cost').value,costCurrency:document.getElementById('inp-cost-cur').value,deliveryCost:document.getElementById('inp-delcost').value,shipmentId:document.getElementById('inp-shipment').value,status:S.selStatus||'available',person:document.getElementById('inp-person').value.trim(),phone:document.getElementById('inp-phone').value.trim(),notes:document.getElementById('inp-notes').value.trim()};}
+window.addGame=function(){const d=getFormData();if(!d.title){showToast('Введите название');return;}const id=uid();set(ref(db,'games/'+id),{...d,id,addedAt:Date.now(),soldAt:d.status==='sold'?Date.now():null});showToast('Диск добавлен');closeModalForce();};
+window.saveEdit=function(id){const d=getFormData();if(!d.title){showToast('Введите название');return;}const prev=S.games[id]||{};update(ref(db,'games/'+id),{...d,soldAt:d.status==='sold'?(prev.soldAt||Date.now()):null});showToast('Сохранено');closeModalForce();};
+window.deleteGame=function(id){if(!confirm('Удалить диск?')) return;remove(ref(db,'games/'+id));showToast('Удалено');closeModalForce();};
+window.openDetail=function(id){
+  const g=S.games[id];if(!g) return;
+  const st=STATUSES[g.status]||STATUSES.available,price=parseFloat(g.price||0),cost=gelAmount(g.cost,g.costCurrency||'₾'),delC=parseFloat(g.deliveryCost||0),ship=g.shipmentId?S.shipments[g.shipmentId]:null,shipC=ship?parseFloat(ship.perDisc||0):0,profit=price-(cost+delC+shipC);
+  document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-handle"></div>${g.cover?`<div class="detail-cover"><img src="${g.cover}" alt="${g.title}"></div>`:`<div class="detail-cover"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>`}<div class="modal-title" style="font-size:16px">${g.title} <button class="btn-close" onclick="closeModalForce()">×</button></div><div><div class="info-row"><span class="info-key">Платформа</span><span class="info-val">${g.platform||'—'}${g.region?' · '+g.region:''}</span></div><div class="info-row"><span class="info-key">Статус</span><span class="info-val"><span class="badge ${st.badge}">${st.label}</span></span></div><div class="info-row"><span class="info-key">Цена продажи</span><span class="info-val" style="color:var(--green)">${g.price?g.price+' ₾':'—'}</span></div><div class="info-row"><span class="info-key">Себестоимость</span><span class="info-val">${g.cost?g.cost+' '+(g.costCurrency||'₾'):' —'}${g.costCurrency&&g.costCurrency!=='₾'?' (≈'+cost.toFixed(0)+'₾)':''}</span></div>${delC>0?`<div class="info-row"><span class="info-key">Доставка клиенту</span><span class="info-val">${delC} ₾</span></div>`:''}${ship?`<div class="info-row"><span class="info-key">Доля доставки партии</span><span class="info-val">${shipC.toFixed(1)} ₾ (${ship.name||ship.source})</span></div>`:''}${price>0?`<div class="info-row"><span class="info-key">Прибыль</span><span class="info-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} ₾</span></div>`:''}${g.person?`<div class="info-row"><span class="info-key">Клиент</span><span class="info-val">${g.person}</span></div>`:''}${g.phone?`<div class="info-row"><span class="info-key">Телефон</span><span class="info-val"><a href="tel:${g.phone}" style="color:var(--accent)">${g.phone}</a></span></div>`:''}${g.notes?`<div class="info-row"><span class="info-key">Заметки</span><span class="info-val">${g.notes}</span></div>`:''}  <div class="info-row"><span class="info-key">Добавлен</span><span class="info-val">${new Date(g.addedAt||Date.now()).toLocaleDateString('ru-RU')}</span></div></div><div class="section-label" style="margin-top:14px">Быстрая смена статуса</div><div class="quick-status">${Object.entries(STATUSES).filter(([k])=>k!==g.status).map(([k,v])=>`<div class="qs-btn" onclick="quickStatus('${id}','${k}')"><span class="badge ${v.badge}">${v.label}</span></div>`).join('')}</div><button class="btn-primary" style="margin-top:12px" onclick="closeModalForce();openAdd('${id}')">Редактировать</button></div></div>`;
+};
+window.quickStatus=function(id,status){const prev=S.games[id]||{};update(ref(db,'games/'+id),{status,soldAt:status==='sold'?(prev.soldAt||Date.now()):null});showToast('Статус изменён');closeModalForce();};
+window.openAddExpense=function(){
+  S.selExpType='shipping';
+  document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-handle"></div><div class="modal-title">Добавить расход <button class="btn-close" onclick="closeModalForce()">×</button></div><div class="field"><label>Тип</label><div class="exp-type-grid"><div class="exp-type-btn sel" id="et-shipping" onclick="selExpType('shipping')">Доставка партии</div><div class="exp-type-btn" id="et-other" onclick="selExpType('other')">Прочее</div></div></div><div class="field"><label>Описание</label><input id="exp-name" type="text" placeholder="Карго из Дубая, апрель"></div><div class="row2"><div class="field"><label>Сумма (₾)</label><input id="exp-amount" type="number" placeholder="120"></div><div class="field"><label>Дата</label><input id="exp-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div></div><button class="btn-primary" onclick="saveExpense()">Сохранить</button></div></div>`;
+};
+window.selExpType=function(t){S.selExpType=t;document.querySelectorAll('.exp-type-btn').forEach(el=>el.classList.remove('sel'));const el=document.getElementById('et-'+t);if(el) el.classList.add('sel');};
+window.saveExpense=function(){const name=document.getElementById('exp-name').value.trim(),amount=parseFloat(document.getElementById('exp-amount').value)||0,date=new Date(document.getElementById('exp-date').value).getTime();if(!name||!amount){showToast('Заполните все поля');return;}const id=uid();set(ref(db,'expenses/'+id),{id,name,amount,date,type:S.selExpType});showToast('Расход добавлен');closeModalForce();if(S.page==='stats') renderStatsPage();};
+window.deleteExpense=function(id){if(!confirm('Удалить расход?')) return;remove(ref(db,'expenses/'+id));showToast('Удалено');if(S.page==='stats') renderStatsPage();};
+window.closeModal=function(e){if(e.target===e.currentTarget) closeModalForce();};
+window.closeModalForce=function(){document.getElementById('modal-root').innerHTML='';};
+</script>
+</body>
+</html>
