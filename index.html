@@ -817,6 +817,15 @@ function deleteGame(id){
 }
 
 
+function selectSugg(i){
+  const g=S.sugg[i];if(!g)return;
+  const ti=document.getElementById('inp-title');if(ti)ti.value=g.name;
+  const ci=document.getElementById('inp-cover');if(ci)ci.value=g.cover||'';
+  const h=document.getElementById('cover-hint');if(h)h.textContent=g.cover?t('cover_found'):'';
+  document.getElementById('suggest-box').innerHTML='';
+}
+
+
 async function fetchSugg(q){
   try{
     const r=await fetch(`https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search=${encodeURIComponent(q)}&page_size=6`);
