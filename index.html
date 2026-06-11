@@ -768,6 +768,55 @@ function onTitleInput(val){
   document.getElementById('cover-hint').textContent=t('searching');
   S.suggTimer=setTimeout(()=>fetchSugg(val),600);
 }
+function getForm(){
+  return{
+    title:document.getElementById('inp-title').value.trim(),
+    cover:document.getElementById('inp-cover').value.trim(),
+    platform:document.getElementById('inp-platform').value,
+    region:document.getElementById('inp-region').value.trim(),
+    qty:S.qty,condition:S.selCond,
+    price:document.getElementById('inp-price').value,
+    cost:document.getElementById('inp-cost').value,
+    costCurrency:document.getElementById('inp-cost-cur').value,
+    deliveryCost:document.getElementById('inp-delcost').value,
+    shipmentId:document.getElementById('inp-shipment').value,
+    status:S.selStatus||'available',
+    person:document.getElementById('inp-person').value.trim(),
+    phone:document.getElementById('inp-phone').value.trim(),
+    notes:document.getElementById('inp-notes').value.trim()
+  };
+}
+
+function addGame(){
+  const d=getForm();
+  if(!d.title){showToast(t('game_name'));return;}
+  const id=uid();
+  db.ref('games/'+id).set({...d,id,addedAt:Date.now(),soldAt:null,exchangedAt:null});
+  showToast(t('disc_added'));
+  closeModalForce();
+}
+
+function saveEdit(id){
+  const d=getForm();
+  if(!d.title){showToast(t('game_name'));return;}
+  const prev=S.games[id]||{};
+  db.ref('games/'+id).update({
+    ...d,
+    soldAt:d.status==='sold'?(prev.soldAt||Date.now()):null,
+    exchangedAt:d.status==='exchange'?(prev.exchangedAt||Date.now()):null
+  });
+  showToast(t('saved'));
+  closeModalForce();
+}
+
+function deleteGame(id){
+  if(!confirm(t('del_disc')))return;
+  db.ref('games/'+id).remove();
+  showToast(t('deleted'));
+  closeModalForce();
+}
+
+
 async function fetchSugg(q){
   try{
     const r=await fetch(`https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search=${encodeURIComponent(q)}&page_size=6`);
@@ -1257,7 +1306,7 @@ function closeModal(e){if(e.target===e.currentTarget)closeModalForce();}
 function closeModalForce(){document.getElementById('modal-root').innerHTML='';}
 
 // EXPOSE GLOBALS
-window.setPage=setPage;window.openAdd=openAdd;window.openDetail=openDetail;
+window.setPage=setPage;window.openAdd=openAdd;window.getForm=getForm;window.addGame=addGame;window.saveEdit=saveEdit;window.deleteGame=deleteGame;window.openDetail=openDetail;
 window.quickStatus=quickStatus;window.openSellPopup=openSellPopup;window.openSellOnePopup=openSellOnePopup;
 window.confirmSell=confirmSell;window.confirmSellOne=confirmSellOne;
 window.changeQty=changeQty;window.selCond=selCond;window.selStatus=selStatus;
@@ -1268,7 +1317,7 @@ window.onShipCountChange=onShipCountChange;window.saveShipment=saveShipment;wind
 window.setStatPeriod=setStatPeriod;window.openAddExpense=openAddExpense;
 window.selExpType=selExpType;window.saveExpense=saveExpense;window.deleteExpense=deleteExpense;
 window.calcConvert=calcConvert;window.setCalcAmount=setCalcAmount;
-window.renderShipments=renderShipments;window.setShipStatus=setShipStatus;window.addShipToExpenses=addShipToExpenses;window.openAddShipment=openAddShipment;window.openEditShipment=openEditShipment;window.onSlotTitleInput=onSlotTitleInput;window.saveShipmentEdit=saveShipmentEdit;window.openDetail=openDetail;window.quickStatus=quickStatus;window.openSellPopup=openSellPopup;window.openSellOnePopup=openSellOnePopup;window.confirmSell=confirmSell;window.confirmSellOne=confirmSellOne;window.closeModal=closeModal;window.closeModalForce=closeModalForce;
+window.renderShipments=renderShipments;window.setShipStatus=setShipStatus;window.addShipToExpenses=addShipToExpenses;window.openAddShipment=openAddShipment;window.openEditShipment=openEditShipment;window.onSlotTitleInput=onSlotTitleInput;window.saveShipmentEdit=saveShipmentEdit;window.getForm=getForm;window.addGame=addGame;window.saveEdit=saveEdit;window.deleteGame=deleteGame;window.openDetail=openDetail;window.quickStatus=quickStatus;window.openSellPopup=openSellPopup;window.openSellOnePopup=openSellOnePopup;window.confirmSell=confirmSell;window.confirmSellOne=confirmSellOne;window.closeModal=closeModal;window.closeModalForce=closeModalForce;
 window.toggleLang=toggleLang;window.renderList=renderList;
 window.dismissInstall=dismissInstall;
 </script>
