@@ -259,9 +259,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <div class="stats-row" id="stats-row"></div>
     </div>
     <div class="type-switcher">
-      <button class="type-btn active" id="ttype-disc" onclick="setItemType('disc')">&#x1F4BF; Диски</button>
-      <button class="type-btn" id="ttype-steelbook" onclick="setItemType('steelbook')">&#x1F4E6; Стилбуки</button>
-      <button class="type-btn" id="ttype-accessory" onclick="setItemType('accessory')">&#x1F3A8; Аксессуары</button>
+      <button class="type-btn active" id="ttype-disc" onclick="setItemType('disc')"><span id="tltype-disc">&#x1F4BF; Диски</span></button>
+      <button class="type-btn" id="ttype-steelbook" onclick="setItemType('steelbook')"><span id="tltype-steelbook">&#x1F4E6; Стилбуки</span></button>
+      <button class="type-btn" id="ttype-accessory" onclick="setItemType('accessory')"><span id="tltype-accessory">&#x1F3A8; Аксессуары</span></button>
     </div>
     <div class="controls" id="controls">
       <div class="search-wrap">
@@ -312,7 +312,10 @@ var TR={
 ru:{add:'Добавить',addexp:'Расход',search:'Поиск по названию...',total:'Всего',instock:'Наличие',reserves:'Резерв',sold_s:'Продано',transit_c:'В пути',
 tl_available:'Наличие',tl_transit:'В пути',tl_reserved:'Резервы',tl_sold:'Продажи',tl_exchange:'Обмен',tl_shipments:'Партии',tl_stats:'Финансы',tl_calc:'Курс',
 st_available:'В наличии',st_reserved:'Резерв',st_reserved_exchange:'Рез/Обмен',st_sold:'Продан',st_exchange:'Обменян',st_ordered:'Заказан',st_transit:'В пути',
-no_discs:'Нет дисков',add_disc:'Добавить диск',edit_disc:'Редактировать',game_name:'Название игры',
+no_discs:'Нет дисков',add_disc:'Добавить диск',edit_item:'Редактировать',add_item:'Добавить товар',no_items:'Нет товаров',
+item_name:'Название',
+type_disc:'&#x1F4BF; Диски',type_steelbook:'&#x1F4E6; Стилбуки',type_accessory:'&#x1F3A8; Аксессуары',
+has_game:'С игрой',edit_disc:'Редактировать',game_name:'Название игры',
 searching:'Ищем...',cover_found:'Обложка найдена ✓',no_conn:'Нет соединения — введите URL вручную',
 cover_url:'URL обложки',platform:'Платформа',region:'Регион (необязательно)',quantity:'Количество',
 cond_label:'Состояние',cond_new:'Новый',cond_used:'Б/У',prices:'Цены',
@@ -349,7 +352,10 @@ received_msg:'Получено, диски в наличии'},
 ka:{add:'დამატება',addexp:'ხარჯი',search:'ძებნა სახელით...',total:'სულ',instock:'მარაგი',reserves:'რეზერვი',sold_s:'გაყიდული',transit_c:'გზაში',
 tl_available:'მარაგი',tl_transit:'გზაში',tl_reserved:'რეზერვი',tl_sold:'გაყიდვები',tl_exchange:'გაცვლა',tl_shipments:'პარტიები',tl_stats:'ფინანსები',tl_calc:'კურსი',
 st_available:'მარაგშია',st_reserved:'რეზერვი',st_reserved_exchange:'რეზ/გაცვლა',st_sold:'გაიყიდა',st_exchange:'გაიცვალა',st_ordered:'შეკვეთილია',st_transit:'გზაშია',
-no_discs:'დისკი არ არის',add_disc:'დისკის დამატება',edit_disc:'რედაქტირება',game_name:'თამაშის სახელი',
+no_discs:'დისკი არ არის',add_disc:'დისკის დამატება',edit_item:'რედაქტირება',add_item:'საქონრის დამატება',no_items:'საქონარი არ არის',
+item_name:'სახელი',
+type_disc:'&#x1F4BF; დისკები',type_steelbook:'&#x1F4E6; სტილბუკები',type_accessory:'&#x1F3A8; აკსესუარები',
+has_game:'თამაშით',edit_disc:'რედაქტირება',game_name:'თამაშის სახელი',
 searching:'ვეძებთ...',cover_found:'ყდა ნაპოვნია ✓',no_conn:'კავშირი არ არის — URL ხელით',
 cover_url:'ყდის URL',platform:'პლატფორმა',region:'რეგიონი (არასავალდებულო)',quantity:'რაოდენობა',
 cond_label:'მდგომარეობა',cond_new:'ახალი',cond_used:'მეორადი',prices:'ფასები',
@@ -414,6 +420,11 @@ function applyLang(){
   var ha=document.getElementById('hl-add');if(ha)ha.textContent=t('add');
   var he=document.getElementById('hl-addexp');if(he)he.textContent=t('addexp');
   var ib=document.getElementById('ib-sub');if(ib)ib.textContent=t('ib_sub');
+  // Update type switcher labels
+  ['disc','steelbook','accessory'].forEach(function(tp){
+    var el=document.getElementById('tltype-'+tp);
+    if(el)el.innerHTML=t('type_'+tp);
+  });
   ['available','transit','reserved','sold','exchange','shipments','stats','calc'].forEach(function(p){
     var el=document.getElementById('tl-'+p);if(el)el.textContent=t('tl_'+p);
   });
@@ -487,7 +498,8 @@ function renderList(){
     if(q)g=g.filter(function(x){return x.title&&x.title.toLowerCase().includes(q.toLowerCase());});
     g.sort(function(a,b){return (b.addedAt||0)-(a.addedAt||0);});
     var grid=document.getElementById('grid-'+pid);if(!grid)return;
-    if(!g.length){grid.innerHTML='<div class="empty-state"><p style="margin-top:10px">'+t('no_discs')+'</p></div>';return;}
+    if(!g.length){var noItemsLabel=S.itemType==='disc'?t('no_discs'):S.itemType==='steelbook'?(lang==='ka'?'სტილბუკი არ არის':'Нет стилбуков'):(lang==='ka'?'აკსესუარი არ არის':'Нет аксессуаров');
+    grid.innerHTML='<div class="empty-state"><p style="margin-top:10px">'+noItemsLabel+'</p></div>';return;}
     // Group by title
     var groups={};
     g.forEach(function(x){
@@ -579,9 +591,9 @@ function openAdd(editId){
   document.getElementById('modal-root').innerHTML=
     '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
     +'<div class="modal-handle"></div>'
-    +'<div class="modal-title">'+(isEdit?t('edit_disc'):t('add_disc'))+' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
-    +'<div class="field"><label>'+t('game_name')+'</label>'
-    +'<input id="inp-title" type="text" placeholder="'+t('game_name')+'..." value="'+(ex.title||'')+'" oninput="onTitleInput(this.value)">'
+    +'<div class="modal-title">'+(isEdit?t('edit_disc'):t('add_disc'))+(S.itemType!=='disc'?' — '+(S.itemType==='steelbook'?(lang==='ka'?'სტილბუკი':'Стилбук'):(lang==='ka'?'აკსესუარი':'Аксессуар')):'')+ ' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
+    +'<div class="field"><label>'+(S.itemType==='disc'?t('game_name'):t('item_name'))+'</label>'
+    +'<input id="inp-title" type="text" placeholder="'+(S.itemType==='disc'?t('game_name'):t('item_name'))+'..." value="'+(ex.title||'')+'" oninput="onTitleInput(this.value)">'
     +'<div id="suggest-box"></div><div class="hint" id="cover-hint"></div></div>'
     +'<div class="field"><label>'+t('cover_url')+'</label><input id="inp-cover" type="text" placeholder="https://..." value="'+(ex.cover||'')+'"></div>'
     +'<div class="row2"><div class="field"><label>'+t('platform')+'</label><select id="inp-platform">'+PLATFORMS.map(function(p){return '<option'+(( ex.platform||'PS5')===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select></div>'
