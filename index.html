@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ND Games">
+<meta name="theme-color" content="#0f0f13">
+<link rel="manifest" id="manifest-ph">
+<title>ND Games</title>
+<style>
+:root{--bg:#0f0f13;--bg2:#17171e;--bg3:#1e1e28;--bg4:#25252f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--text:#f0f0f5;--text2:#9090a8;--text3:#5a5a72;--accent:#7c6df0;--accent2:#5a4dd4;--green:#3ecf8e;--red:#f06060;--amber:#f0a832;--blue:#4da8f0;--radius:12px;--radius-sm:8px;--cols:1}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden}
+#root{height:100%;display:flex;flex-direction:column}
+@media(orientation:landscape){#root{flex-direction:row}.tab-bar{flex-direction:column!important;width:70px!important;height:100%!important;border-top:none!important;border-right:1px solid var(--border)!important;position:static!important;order:-1;padding:8px 0;overflow-y:auto}.tab{flex:0 0 auto!important;padding:9px 0!important;gap:3px!important;min-height:52px}.tab span{display:block!important;font-size:7px!important}#content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px 10px;flex-shrink:0}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.logo{font-size:20px;font-weight:700;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
+.logo span{color:var(--accent)}
+.logo-right{display:flex;align-items:center;gap:6px}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.lang-btn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;color:var(--text2)}
+.btn-add{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:7px 11px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.btn-add:active{background:var(--accent2)}
+.btn-add-exp{background:var(--bg3);color:var(--red);border:1px solid rgba(240,96,96,0.3);border-radius:var(--radius-sm);padding:7px 11px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.stat{background:var(--bg3);border-radius:var(--radius-sm);padding:6px 4px;text-align:center;border:1px solid var(--border);cursor:pointer}
+.stat-num{font-size:16px;font-weight:700;line-height:1}
+.stat-lbl{font-size:9px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:0.3px}
+.controls{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 16px;flex-shrink:0}
+.search-wrap{position:relative}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:0.4;pointer-events:none}
+.search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:9px 12px 9px 36px;font-size:14px;outline:none}
+.search-wrap input:focus{border-color:var(--accent)}
+.page{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:12px 16px 16px}
+.page::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.games-grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:10px}
+@media(min-width:600px){:root{--cols:2}}@media(min-width:900px){:root{--cols:3}}@media(min-width:1200px){:root{--cols:4}}
+@media(orientation:landscape)and(min-width:600px){:root{--cols:2}}@media(orientation:landscape)and(min-width:820px){:root{--cols:3}}
+.game-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;cursor:pointer;transition:border-color .15s,transform .1s}
+.game-card:active{border-color:var(--accent);transform:scale(0.98)}
+.game-cover{width:70px;min-width:70px;height:100px;background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;position:relative}
+.game-cover img{width:70px;height:100px;object-fit:cover;display:block}
+.game-cover svg{opacity:0.18}
+.qty-badge{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.78);color:#fff;font-size:10px;font-weight:800;padding:2px 5px;border-radius:5px;line-height:1.3}
+.cond-badge{position:absolute;bottom:4px;left:4px;font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;line-height:1.3}
+.cond-new{background:rgba(62,207,142,0.85);color:#000}
+.cond-used{background:rgba(255,255,255,0.18);color:#fff}
+.game-body{flex:1;padding:9px 11px;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.game-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.game-meta{font-size:11px;color:var(--text2);margin-bottom:4px}
+.game-row{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.game-price{font-size:15px;font-weight:700}
+.game-profit{font-size:11px;margin-top:1px}
+.game-person{font-size:11px;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:3px}
+.game-time{font-size:10px;color:var(--text3);margin-top:5px;display:flex;align-items:center;gap:4px;padding-top:5px;border-top:1px solid var(--border)}
+@media(min-width:600px){.game-cover{width:78px;min-width:78px;height:108px}.game-cover img{width:78px;height:108px}}
+.badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:0.3px;white-space:nowrap}
+.b-available{background:rgba(62,207,142,0.15);color:var(--green)}
+.b-reserved{background:rgba(240,168,50,0.15);color:var(--amber)}
+.b-reserved_exchange{background:rgba(77,168,240,0.15);color:var(--blue)}
+.b-sold{background:rgba(240,96,96,0.15);color:var(--red)}
+.b-exchange{background:rgba(124,109,240,0.15);color:var(--accent)}
+.b-ordered{background:rgba(240,168,50,0.1);color:#d4a030}
+.b-transit{background:rgba(77,168,240,0.15);color:var(--blue)}
+.empty-state{text-align:center;padding:60px 24px;color:var(--text3);grid-column:1/-1}
+.tab-bar{background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;z-index:50}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 1px 10px;cursor:pointer;color:var(--text3);gap:2px;background:none;border:none;transition:color .15s;min-width:0}
+.tab span{font-size:7.5px;text-transform:uppercase;letter-spacing:0.2px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tab.active{color:var(--accent)}
+@media(orientation:portrait){.tab-bar{padding-bottom:env(safe-area-inset-bottom,0)}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+@media(min-width:600px){.modal-overlay{align-items:center}.modal{border-radius:var(--radius)!important;max-height:88vh!important}}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;padding:20px 16px 40px;border-top:1px solid var(--border2)}
+.modal::-webkit-scrollbar{display:none}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+@media(min-width:600px){.modal-handle{display:none}}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.btn-close{background:var(--bg3);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:18px}
+.field{margin-bottom:13px}
+.field label{font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field select option{background:var(--bg2)}
+.field textarea{resize:none;height:68px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt-label{font-size:11px;color:var(--text3);margin-top:3px}
+.suggest-list{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;margin-top:6px;max-height:190px;overflow-y:auto}
+.suggest-item{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;border-bottom:1px solid var(--border)}
+.suggest-item:last-child{border-bottom:none}
+.suggest-item:active{background:var(--bg4)}
+.sug-thumb{width:32px;height:44px;object-fit:cover;border-radius:4px;background:var(--bg4);flex-shrink:0}
+.sug-name{font-size:13px;font-weight:500;line-height:1.3}
+.sug-year{font-size:11px;color:var(--text2);margin-top:1px}
+.hint{font-size:11px;color:var(--text3);margin-top:4px}
+.status-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.st-opt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 4px;text-align:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);transition:all .15s;line-height:1.3}
+.st-opt.sel{border-color:var(--accent);color:var(--accent);background:rgba(124,109,240,0.12)}
+.cond-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cond-opt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all .15s}
+.cond-opt.sel{border-color:var(--accent);color:var(--accent);background:rgba(124,109,240,0.12)}
+.divider{height:1px;background:var(--border);margin:13px 0}
+.sec-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:9px}
+.btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+.btn-primary:active{background:var(--accent2)}
+.btn-danger{width:100%;background:rgba(240,96,96,0.1);border:1px solid rgba(240,96,96,0.3);color:var(--red);border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-secondary{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:12px;font-size:14px;cursor:pointer;margin-top:8px}
+.qty-ctrl{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg3);width:fit-content}
+.qty-btn{background:none;border:none;color:var(--text);font-size:20px;font-weight:300;padding:8px 16px;cursor:pointer;line-height:1}
+.qty-btn:active{background:var(--bg4)}
+.qty-val{font-size:16px;font-weight:700;min-width:40px;text-align:center}
+.detail-cover{width:100%;height:155px;border-radius:var(--radius);background:var(--bg3);display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden}
+.detail-cover img{width:100%;height:155px;object-fit:cover;border-radius:var(--radius);display:block}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.info-row:last-child{border-bottom:none}
+.info-key{font-size:13px;color:var(--text2)}
+.info-val{font-size:13px;font-weight:600;text-align:right;max-width:60%}
+.quick-status{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.qs-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 4px;text-align:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--text2)}
+.qs-btn:active{border-color:var(--accent)}
+.sell-popup{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:24px 16px 40px;border-top:1px solid var(--border2)}
+.sell-popup h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.sell-popup p{font-size:13px;color:var(--text2);margin-bottom:18px}
+.sell-input-wrap{position:relative;margin-bottom:16px}
+.sell-input-wrap input{width:100%;background:var(--bg3);border:2px solid var(--accent);border-radius:var(--radius-sm);color:var(--text);padding:14px 44px 14px 14px;font-size:22px;font-weight:700;outline:none}
+.sell-input-wrap span{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:var(--text2)}
+.period-row{display:flex;gap:6px;margin-bottom:14px}
+.period-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2)}
+.period-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.fin-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+@media(min-width:600px){.fin-cards{grid-template-columns:repeat(4,1fr)}}
+.fin-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px}
+.fin-card-lbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:5px}
+.fin-card-val{font-size:21px;font-weight:800;line-height:1}
+.fin-card-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.stats-layout{display:flex;flex-direction:column;gap:12px}
+@media(min-width:700px),(orientation:landscape){.stats-layout{flex-direction:row;align-items:flex-start}.stats-layout .chart-wrap{flex:0 0 240px}.stats-layout .stats-right{flex:1;min-width:0}}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center}
+.chart-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:12px;align-self:flex-start}
+.legend{display:flex;flex-direction:column;gap:7px;margin-top:12px;width:100%}
+.legend-item{display:flex;align-items:center;justify-content:space-between}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-right:8px}
+.legend-label{font-size:12px;color:var(--text2)}
+.legend-val{font-size:12px;font-weight:700}
+.expenses-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px}
+.exp-title{font-size:14px;font-weight:700;margin-bottom:10px}
+.exp-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.exp-item:last-child{border-bottom:none}
+.exp-amount{font-size:13px;font-weight:700;color:var(--red)}
+.btn-exp-add{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);margin-top:9px}
+.ship-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:600px){.ship-grid{grid-template-columns:1fr 1fr}}
+.ship-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px}
+.ship-status-row{display:flex;gap:6px;margin-bottom:10px}
+.ship-status-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 4px;text-align:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--text2)}
+.ship-status-btn.active-transit{border-color:var(--blue);color:var(--blue);background:rgba(77,168,240,0.1)}
+.ship-status-btn.active-received{border-color:var(--green);color:var(--green);background:rgba(62,207,142,0.1)}
+.btn-new-ship{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}
+.exp-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.exp-type-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 8px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2)}
+.exp-type-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(124,109,240,0.12)}
+.disc-slot{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px}
+.disc-slot-num{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px}
+.disc-slot-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.disc-slot input,.disc-slot select{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none}
+.disc-slot input:focus,.disc-slot select:focus{border-color:var(--accent)}
+.calc-wrap{max-width:440px;margin:0 auto}
+.calc-title{font-size:20px;font-weight:800;margin-bottom:4px}
+.calc-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
+.rates-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px}
+.rates-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.rates-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px}
+.rates-time{font-size:11px;color:var(--text3)}
+.rate-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.rate-row:last-child{border-bottom:none}
+.rate-left{display:flex;align-items:center;gap:10px}
+.rate-flag{font-size:20px}
+.rate-name{font-size:14px;font-weight:600}
+.rate-code{font-size:11px;color:var(--text2)}
+.rate-val{font-size:16px;font-weight:800;color:var(--accent)}
+.calc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.calc-top{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:16px}
+.calc-arrow{font-size:22px;text-align:center;padding-bottom:8px;color:var(--text2)}
+.flabel{font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px}
+.calc-big{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:11px 12px;font-size:20px;font-weight:700;outline:none}
+.calc-big:focus{border-color:var(--accent)}
+.calc-sel{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:11px 12px;font-size:14px;font-weight:600;outline:none;margin-top:6px}
+.calc-result-box{background:var(--bg3);border-radius:var(--radius-sm);padding:16px;text-align:center}
+.calc-result-num{font-size:28px;font-weight:800;color:var(--green)}
+.calc-result-lbl{font-size:12px;color:var(--text2);margin-top:4px}
+.calc-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.calc-qbtn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 4px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2)}
+.calc-qbtn:active{background:var(--bg4);border-color:var(--accent)}
+.rates-loading{text-align:center;padding:20px;color:var(--text3);font-size:13px}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:500;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@media(orientation:landscape){.toast{bottom:16px}}
+#install-banner{display:none;position:fixed;bottom:72px;left:12px;right:12px;background:var(--accent);border-radius:var(--radius);padding:12px 14px;z-index:300;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 20px rgba(124,109,240,0.4)}
+#install-banner.show{display:flex}
+#install-banner p{font-size:13px;font-weight:600;color:#fff;line-height:1.3}
+#install-banner p span{font-size:11px;font-weight:400;opacity:0.8;display:block;margin-top:1px}
+.install-btns{display:flex;gap:7px;flex-shrink:0}
+.btn-install{background:#fff;color:var(--accent);border:none;border-radius:var(--radius-sm);padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-dismiss{background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;cursor:pointer}
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
+.loader-logo{font-size:34px;font-weight:800;letter-spacing:-1px}
+.loader-logo span{color:var(--accent)}
+.loader-dots{display:flex;gap:7px}
+.loader-dots i{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:dot 1.2s infinite;font-style:normal}
+.loader-dots i:nth-child(2){animation-delay:.2s}
+.loader-dots i:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{opacity:.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div id="loader"><div class="loader-logo"><span>ND</span> Games</div><div class="loader-dots"><i></i><i></i><i></i></div></div>
+
+<div id="root" style="display:none">
+  <div class="tab-bar">
+    <button class="tab active" id="tab-available" onclick="setPage('available')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span id="tl-available">Наличие</span></button>
+    <button class="tab" id="tab-transit" onclick="setPage('transit')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg><span id="tl-transit">В пути</span></button>
+    <button class="tab" id="tab-reserved" onclick="setPage('reserved')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="tl-reserved">Резервы</span></button>
+    <button class="tab" id="tab-sold" onclick="setPage('sold')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 12h.01"/></svg><span id="tl-sold">Продажи</span></button>
+    <button class="tab" id="tab-exchange" onclick="setPage('exchange')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg><span id="tl-exchange">Обмен</span></button>
+    <button class="tab" id="tab-shipments" onclick="setPage('shipments')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span id="tl-shipments">Партии</span></button>
+    <button class="tab" id="tab-stats" onclick="setPage('stats')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span id="tl-stats">Финансы</span></button>
+    <button class="tab" id="tab-calc" onclick="setPage('calc')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/></svg><span id="tl-calc">Курс</span></button>
+  </div>
+
+  <div id="content-area" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo"><span>ND</span> Games <div class="online-dot" id="online-dot"></div></div>
+        <div class="logo-right">
+          <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">ქარ</button>
+          <button class="btn-add-exp" onclick="openAddExpense()">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span id="hl-addexp">Расход</span>
+          </button>
+          <button class="btn-add" onclick="openAdd()">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span id="hl-add">Добавить</span>
+          </button>
+        </div>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="white" stroke-width="1.5"/><path d="M10 10l3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" id="search-inp" oninput="renderList()">
+      </div>
+    </div>
+
+    <div id="page-available" class="page" style="display:none"><div class="games-grid" id="grid-available"></div></div>
+    <div id="page-transit" class="page" style="display:none"><div class="games-grid" id="grid-transit"></div></div>
+    <div id="page-reserved" class="page" style="display:none"><div class="games-grid" id="grid-reserved"></div></div>
+    <div id="page-sold" class="page" style="display:none"><div class="games-grid" id="grid-sold"></div></div>
+    <div id="page-exchange" class="page" style="display:none"><div class="games-grid" id="grid-exchange"></div></div>
+    <div id="page-shipments" class="page" style="display:none"></div>
+    <div id="page-stats" class="page" style="display:none"></div>
+    <div id="page-calc" class="page" style="display:none"></div>
+  </div>
+</div>
+
+<div id="install-banner">
+  <p>ND Games <span id="ib-sub">Установить как приложение</span></p>
+  <div class="install-btns">
+    <button class="btn-install" id="btn-inst">Установить</button>
+    <button class="btn-dismiss" onclick="dismissInstall()">&#x2715;</button>
+  </div>
+</div>
+<div id="modal-root"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAkIxx4M7IISPWUEP4vMnQaaYazC8KGxiI",authDomain:"nd-games.firebaseapp.com",databaseURL:"https://nd-games-default-rtdb.europe-west1.firebasedatabase.app",projectId:"nd-games",storageBucket:"nd-games.firebasestorage.app",messagingSenderId:"447616051556",appId:"1:447616051556:web:c96fb5818cdf5ab7363271"});
+const db=firebase.database();
+
+// MANIFEST
+const mf={name:"ND Games",short_name:"ND Games",start_url:"./",display:"standalone",orientation:"any",background_color:"#0f0f13",theme_color:"#0f0f13",icons:[{src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzBmMGYxMyIvPjxyZWN0IHg9IjgwIiB5PSIxNzAiIHdpZHRoPSIzNTIiIGhlaWdodD0iMjAwIiByeD0iODAiIGZpbGw9IiM3YzZkZjAiLz48ZWxsaXBzZSBjeD0iMTMwIiBjeT0iMzQwIiByeD0iNTUiIHJ5PSI2NSIgZmlsbD0iIzdjNmRmMCIvPjxlbGxpcHNlIGN4PSIzODIiIGN5PSIzNDAiIHJ4PSI1NSIgcnk9IjY1IiBmaWxsPSIjN2M2ZGYwIi8+PHJlY3QgeD0iMTU4IiB5PSIyMjAiIHdpZHRoPSIyOCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9IiMwZjBmMTMiIG9wYWNpdHk9Ii42Ii8+PHJlY3QgeD0iMTM4IiB5PSIyNDAiIHdpZHRoPSI2OCIgaGVpZ2h0PSIyOCIgcng9IjgiIGZpbGw9IiMwZjBmMTMiIG9wYWNpdHk9Ii42Ii8+PGNpcmNsZSBjeD0iMzQwIiBjeT0iMjMwIiByPSIxNCIgZmlsbD0iIzNlY2Y4ZSIgb3BhY2l0eT0iLjkiLz48Y2lyY2xlIGN4PSIzNzAiIGN5PSIyNTgiIHI9IjE0IiBmaWxsPSIjZjA2MDYwIiBvcGFjaXR5PSIuOSIvPjxjaXJjbGUgY3g9IjMxMiIgY3k9IjI1OCIgcj0iMTQiIGZpbGw9IiM0ZGE4ZjAiIG9wYWNpdHk9Ii45Ii8+PGNpcmNsZSBjeD0iMzQwIiBjeT0iMjg2IiByPSIxNCIgZmlsbD0iI2YwYTgzMiIgb3BhY2l0eT0iLjkiLz48cmVjdCB4PSIyMjYiIHk9IjI0OCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjE2IiByeD0iOCIgZmlsbD0iIzFlMWUyOCIvPjxyZWN0IHg9IjI2MiIgeT0iMjQ4IiB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIHJ4PSI4IiBmaWxsPSIjMWUxZTI4Ii8+PC9zdmc+",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
+document.getElementById('manifest-ph').href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/json'}));
+
+// PWA
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(!localStorage.getItem('ib-d'))document.getElementById('install-banner').classList.add('show');});
+document.getElementById('btn-inst').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('install-banner').classList.remove('show');};
+window.dismissInstall=()=>{document.getElementById('install-banner').classList.remove('show');localStorage.setItem('ib-d','1');};
+window.addEventListener('appinstalled',()=>document.getElementById('install-banner').classList.remove('show'));
+
+// TRANSLATIONS (abbreviated keys)
+const TR={
+  ru:{
+    add:'Добавить',addexp:'Расход',search:'Поиск...',
+    total:'Всего',instock:'Наличие',reserves:'Резерв',sold_s:'Продано',transit_c:'В пути',
+    tl_available:'Наличие',tl_transit:'В пути',tl_reserved:'Резервы',tl_sold:'Продажи',
+    tl_exchange:'Обмен',tl_shipments:'Партии',tl_stats:'Финансы',tl_calc:'Курс',
+    st_available:'В наличии',st_reserved:'Резерв',st_reserved_exchange:'Рез/Обмен',
+    st_sold:'Продан',st_exchange:'Обменян',st_ordered:'Заказан',st_transit:'В пути',
+    no_discs:'Нет дисков',add_disc:'Добавить диск',edit_disc:'Редактировать',
+    game_name:'Название игры',searching:'Ищем...',cover_found:'Обложка найдена ✓',
+    no_conn:'Нет соединения — введите URL вручную',cover_url:'URL обложки',
+    platform:'Платформа',region:'Регион (необязательно)',quantity:'Количество',
+    cond_label:'Состояние',cond_new:'Новый',cond_used:'Б/У',
+    prices:'Цены',sale_price:'Цена продажи (₾)',cost:'Себестоимость',
+    cost_hint:'Оставьте пустым если неизвестна',client_delivery:'Доставка клиенту (₾)',
+    shipment_link:'Партия',no_shipment:'— без партии —',status:'Статус',
+    client:'Клиент',fname:'Имя',phone:'Телефон',notes:'Заметки',
+    save:'Сохранить',delete_disc:'Удалить диск',
+    platform_l:'Платформа',region_l:'Регион',qty_l:'Количество',cond_l:'Состояние',
+    status_l:'Статус',sale_price_l:'Цена продажи',cost_l:'Себестоимость',
+    delivery_l:'Доставка клиенту',ship_part:'Доля доставки партии',profit_l:'Прибыль',
+    client_l:'Клиент',phone_l:'Телефон',notes_l:'Заметки',
+    added_l:'Добавлен',sold_l:'Продан',exchanged_l:'Обменян',
+    quick_status:'Быстрый статус',edit_btn:'Редактировать',
+    sell_title:'Финальная цена',sell_sub:'Укажите реальную сумму',
+    sell_confirm:'Подтвердить продажу',sell_cancel:'Отмена',
+    disc_added:'Диск добавлен',saved:'Сохранено',deleted:'Удалено',
+    status_changed:'Статус изменён',sold_ok:'Продажа записана',
+    new_ship:'Новая партия',ship_transit:'В пути',ship_received:'Получена',
+    ship_name:'Название партии',ship_source:'Откуда',ship_date:'Дата',
+    ship_count:'Кол-во дисков',ship_purchase:'Закупка (₾)',ship_delivery:'Доставка (₾)',
+    ship_discs:'Диски в партии',ship_notes:'Заметки',
+    per_disc:'₾/диск',discs:'дисков',del:'Удалить',no_ships:'Нет партий',
+    pm:'Месяц',pw:'Неделя',py:'Год',
+    revenue:'Выручка',profit:'Прибыль',cogs:'Себестоимость',extra_exp:'Расходы',
+    sales_n:'продаж',net:'Чистая',of_sold:'Проданных',period:'За период',
+    structure:'Структура',add_exp:'+ Добавить расход',no_exp:'Нет расходов',
+    exp_title:'Расходы',exp_type:'Тип расхода',exp_ship:'Доставка партии',
+    exp_other:'Прочее / Личное',exp_desc:'Описание',exp_to:'Куда потрачено',
+    exp_amount:'Сумма (₾)',exp_date:'Дата',fill_all:'Заполните все поля',
+    exp_added:'Расход добавлен',del_disc:'Удалить диск?',del_ship:'Удалить партию?',
+    del_exp:'Удалить расход?',ib_sub:'Установить как приложение',
+    purchase_c:'Закупка',delivery_c:'Доставка',
+    added_at:'добавлен',sold_at:'продан',exchanged_at:'обменян',
+    calc_title:'Калькулятор валют',calc_sub:'Курс НБГ (официальный)',
+    rates_title:'Текущие курсы',from_cur:'Из',to_gel:'В лари',
+    result_sub:'по курсу НБГ',quick_amounts:'Быстрый расчёт',
+    loading_rates:'Загрузка курсов...',disc_title:'Название',
+    ship_exp_added:'Партия добавлена, расход записан',to_expenses:'В расходы'
+  },
+  ka:{
+    add:'დამატება',addexp:'ხარჯი',search:'ძებნა...',
+    total:'სულ',instock:'მარაგი',reserves:'რეზერვი',sold_s:'გაყიდული',transit_c:'გზაში',
+    tl_available:'მარაგი',tl_transit:'გზაში',tl_reserved:'რეზერვი',tl_sold:'გაყიდვები',
+    tl_exchange:'გაცვლა',tl_shipments:'პარტიები',tl_stats:'ფინანსები',tl_calc:'კურსი',
+    st_available:'მარაგშია',st_reserved:'რეზერვი',st_reserved_exchange:'რეზ/გაცვლა',
+    st_sold:'გაიყიდა',st_exchange:'გაიცვალა',st_ordered:'შეკვეთილია',st_transit:'გზაშია',
+    no_discs:'დისკი არ არის',add_disc:'დისკის დამატება',edit_disc:'რედაქტირება',
+    game_name:'თამაშის სახელი',searching:'ვეძებთ...',cover_found:'ყდა ნაპოვნია ✓',
+    no_conn:'კავშირი არ არის — URL ხელით შეიყვანეთ',cover_url:'ყდის URL',
+    platform:'პლატფორმა',region:'რეგიონი (არასავალდებულო)',quantity:'რაოდენობა',
+    cond_label:'მდგომარეობა',cond_new:'ახალი',cond_used:'მეორადი',
+    prices:'ფასები',sale_price:'გაყიდვის ფასი (₾)',cost:'თვითღირებულება',
+    cost_hint:'დატოვეთ ცარიელი თუ უცნობია',client_delivery:'კლიენტამდე მიტანა (₾)',
+    shipment_link:'პარტია',no_shipment:'— პარტიის გარეშე —',status:'სტატუსი',
+    client:'კლიენტი',fname:'სახელი',phone:'ტელეფონი',notes:'შენიშვნები',
+    save:'შენახვა',delete_disc:'დისკის წაშლა',
+    platform_l:'პლატფორმა',region_l:'რეგიონი',qty_l:'რაოდენობა',cond_l:'მდგომარეობა',
+    status_l:'სტატუსი',sale_price_l:'გაყიდვის ფასი',cost_l:'თვითღირებულება',
+    delivery_l:'კლიენტამდე მიტანა',ship_part:'პარტიის მიტანის წილი',profit_l:'მოგება',
+    client_l:'კლიენტი',phone_l:'ტელეფონი',notes_l:'შენიშვნები',
+    added_l:'დამატებულია',sold_l:'გაიყიდა',exchanged_l:'გაიცვალა',
+    quick_status:'სწრაფი სტატუსი',edit_btn:'რედაქტირება',
+    sell_title:'საბოლოო ფასი',sell_sub:'მიუთითეთ რეალური თანხა',
+    sell_confirm:'გაყიდვის დადასტურება',sell_cancel:'გაუქმება',
+    disc_added:'დისკი დამატებულია',saved:'შენახულია',deleted:'წაშლილია',
+    status_changed:'სტატუსი შეცვლილია',sold_ok:'გაყიდვა ჩაწერილია',
+    new_ship:'ახალი პარტია',ship_transit:'გზაშია',ship_received:'მიღებულია',
+    ship_name:'პარტიის სახელი',ship_source:'საიდან',ship_date:'თარიღი',
+    ship_count:'დისკების რაოდენობა',ship_purchase:'შესყიდვა (₾)',ship_delivery:'მიტანა (₾)',
+    ship_discs:'დისკები პარტიაში',ship_notes:'შენიშვნები',
+    per_disc:'₾/დისკი',discs:'დისკი',del:'წაშლა',no_ships:'პარტია არ არის',
+    pm:'თვე',pw:'კვირა',py:'წელი',
+    revenue:'შემოსავალი',profit:'მოგება',cogs:'თვითღირებულება',extra_exp:'ხარჯები',
+    sales_n:'გაყიდვა',net:'წმინდა',of_sold:'გაყიდულთა',period:'პერიოდისთვის',
+    structure:'სტრუქტურა',add_exp:'+ ხარჯის დამატება',no_exp:'ხარჯი არ არის',
+    exp_title:'ხარჯები',exp_type:'ხარჯის ტიპი',exp_ship:'პარტიის მიტანა',
+    exp_other:'სხვა / პირადი',exp_desc:'აღწერა',exp_to:'სად დაიხარჯა',
+    exp_amount:'თანხა (₾)',exp_date:'თარიღი',fill_all:'შეავსეთ ყველა ველი',
+    exp_added:'ხარჯი დამატებულია',del_disc:'წავშალოთ დისკი?',del_ship:'წავშალოთ პარტია?',
+    del_exp:'წავშალოთ ხარჯი?',ib_sub:'დააინსტალირეთ როგორც აპი',
+    purchase_c:'შესყიდვა',delivery_c:'მიტანა',
+    added_at:'დამატებულია',sold_at:'გაიყიდა',exchanged_at:'გაიცვალა',
+    calc_title:'ვალუტის კალკულატორი',calc_sub:'NBG კურსი (ოფიციალური)',
+    rates_title:'მიმდინარე კურსები',from_cur:'საიდან',to_gel:'ლარში',
+    result_sub:'NBG კურსით',quick_amounts:'სწრაფი გამოთვლა',
+    loading_rates:'კურსის ჩატვირთვა...',disc_title:'სახელი',
+    ship_exp_added:'პარტია დამატებულია',to_expenses:'ხარჯებში'
+  }
+};
+let lang=localStorage.getItem('nd-lang')||'ru';
+function t(k){return(TR[lang]||TR.ru)[k]||k;}
+function toggleLang(){
+  lang=lang==='ru'?'ka':'ru';
+  localStorage.setItem('nd-lang',lang);
+  document.getElementById('lang-toggle').textContent=lang==='ru'?'ქარ':'Рус';
+  applyLang();renderStats();renderList();
+  if(S.page==='stats')renderStatsPage();
+  if(S.page==='shipments')renderShipments();
+  if(S.page==='calc')renderCalc();
+}
+function applyLang(){
+  const si=document.getElementById('search-inp');if(si)si.placeholder=t('search');
+  const ha=document.getElementById('hl-add');if(ha)ha.textContent=t('add');
+  const he=document.getElementById('hl-addexp');if(he)he.textContent=t('addexp');
+  const ib=document.getElementById('ib-sub');if(ib)ib.textContent=t('ib_sub');
+  ['available','transit','reserved','sold','exchange','shipments','stats','calc'].forEach(p=>{
+    const el=document.getElementById('tl-'+p);if(el)el.textContent=t('tl_'+p);
+  });
+}
+
+// STATE
+const S={games:{},shipments:{},expenses:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1};
+const STATUSES={available:{badge:'b-available'},transit:{badge:'b-transit'},reserved:{badge:'b-reserved'},reserved_exchange:{badge:'b-reserved_exchange'},sold:{badge:'b-sold'},exchange:{badge:'b-exchange'},ordered:{badge:'b-ordered'}};
+const PLATFORMS=['PS5','PS4','PS4/PS5'];
+const PAGE_ST={available:['available'],transit:['transit','ordered'],reserved:['reserved','reserved_exchange'],sold:['sold'],exchange:['exchange']};
+
+// FIREBASE
+db.ref('games').on('value',s=>{S.games=s.val()||{};renderStats();renderList();});
+db.ref('shipments').on('value',s=>{S.shipments=s.val()||{};if(S.page==='shipments')renderShipments();});
+db.ref('expenses').on('value',s=>{S.expenses=s.val()||{};if(S.page==='stats')renderStatsPage();});
+db.ref('.info/connected').on('value',s=>{const d=document.getElementById('online-dot');if(d)d.style.background=s.val()?'var(--green)':'var(--red)';});
+
+document.getElementById('loader').style.display='none';
+document.getElementById('root').style.display='flex';
+applyLang();setPage('available');
+
+// HELPERS
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
+function gel(a,c){const rates={'₾':1,'$':2.7,'€':2.95};return parseFloat(a||0)*(rates[c]||1);}
+function calcProfit(g){
+  const price=parseFloat(g.price||0);if(!price)return null;
+  const cost=g.cost?gel(g.cost,g.costCurrency||'₾'):0;
+  const delC=parseFloat(g.deliveryCost||0);
+  const shipC=g.shipmentId&&S.shipments[g.shipmentId]?parseFloat(S.shipments[g.shipmentId].perDisc||0):0;
+  if(!g.cost)return price;
+  return price-(cost+delC+shipC);
+}
+function fmtDate(ts){
+  if(!ts)return'';
+  const d=new Date(ts),now=new Date();
+  const time=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  if(d.toDateString()===now.toDateString())return time;
+  if(d.toDateString()===new Date(now-86400000).toDateString())return(lang==='ka'?'გუშინ':'вчера')+' '+time;
+  return d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})+' '+time;
+}
+
+// STATS BAR
+function renderStats(){
+  const g=Object.values(S.games),c={total:0,av:0,tr:0,sold:0};
+  g.forEach(x=>{const q=parseInt(x.qty||1);c.total+=q;if(x.status==='available')c.av+=q;if(['transit','ordered'].includes(x.status))c.tr+=q;if(x.status==='sold')c.sold++;});
+  const r=document.getElementById('stats-row');
+  if(!r)return;
+  r.innerHTML=`
+    <div class="stat" onclick="setPage('available')"><div class="stat-num">${c.total}</div><div class="stat-lbl">${t('total')}</div></div>
+    <div class="stat" onclick="setPage('available')"><div class="stat-num" style="color:var(--green)">${c.av}</div><div class="stat-lbl">${t('instock')}</div></div>
+    <div class="stat" onclick="setPage('transit')"><div class="stat-num" style="color:var(--blue)">${c.tr}</div><div class="stat-lbl">${t('transit_c')}</div></div>
+    <div class="stat" onclick="setPage('sold')"><div class="stat-num" style="color:var(--red)">${c.sold}</div><div class="stat-lbl">${t('sold_s')}</div></div>`;
+}
+
+// RENDER GAME LIST (grouped by title)
+function renderList(){
+  renderStats();
+  const q=(document.getElementById('search-inp')||{}).value||'';
+  ['available','transit','reserved','sold','exchange'].forEach(pid=>{
+    let g=Object.entries(S.games).map(([id,x])=>({...x,id})).filter(x=>PAGE_ST[pid].includes(x.status));
+    if(q)g=g.filter(x=>x.title&&x.title.toLowerCase().includes(q.toLowerCase()));
+    g.sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
+    const grid=document.getElementById('grid-'+pid);if(!grid)return;
+    if(!g.length){grid.innerHTML='<div class="empty-state"><p style="margin-top:10px">'+t('no_discs')+'</p></div>';return;}
+
+    // Group by title
+    const groups={};
+    g.forEach(x=>{
+      const key=(x.title||'').toLowerCase().trim().replace(/\s+/g,' ')||x.id;
+      if(!groups[key]){groups[key]={items:[],cover:x.cover||'',title:x.title||'\u2014',latestAt:0};}
+      groups[key].items.push(x);
+      if((x.addedAt||0)>groups[key].latestAt){groups[key].latestAt=x.addedAt||0;if(x.cover)groups[key].cover=x.cover;}
+    });
+
+    const cards=Object.values(groups).sort((a,b)=>b.latestAt-a.latestAt);
+
+    function makeCover(cover){
+      return cover
+        ?'<img src="'+cover+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+        :'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>';
+    }
+
+    grid.innerHTML=cards.map(grp=>{
+      const items=grp.items;
+
+      if(items.length===1){
+        const x=items[0];
+        const st=STATUSES[x.status]||STATUSES.available;
+        const qty=parseInt(x.qty||1);
+        const qtyBadge=qty>1?'<div class="qty-badge">\xd7'+qty+'</div>':'';
+        const condBadge=x.condition?'<div class="cond-badge '+(x.condition==='new'?'cond-new':'cond-used')+'">'+(x.condition==='new'?t('cond_new'):t('cond_used'))+'</div>':'';
+        const profit=calcProfit(x);
+        const profHtml=profit!==null?'<div class="game-profit" style="color:'+(profit>=0?'var(--green)':'var(--red)')+'\">'+(profit>=0?'+':'')+profit.toFixed(0)+' \u20be</div>':'';
+        const perHtml=x.person?'<div class="game-person">\ud83d\udc64 '+x.person+'</div>':'';
+        let tsLabel='',tsVal=0;
+        if(x.status==='sold'&&x.soldAt){tsLabel=t('sold_at');tsVal=x.soldAt;}
+        else if(x.status==='exchange'&&x.exchangedAt){tsLabel=t('exchanged_at');tsVal=x.exchangedAt;}
+        else if(x.addedAt){tsLabel=t('added_at');tsVal=x.addedAt;}
+        const timeHtml=tsVal?'<div class="game-time">\u23f0 '+tsLabel+' '+fmtDate(tsVal)+'</div>':'';
+        return '<div class="game-card" onclick="openDetail(\''+x.id+'\')">'
+          +'<div class="game-cover">'+makeCover(grp.cover)+qtyBadge+condBadge+'</div>'
+          +'<div class="game-body"><div>'
+          +'<div class="game-title">'+(x.title||'\u2014')+'</div>'
+          +'<div class="game-meta">'+(x.platform||'PS4/PS5')+(x.region?' \xb7 '+x.region:'')+'</div>'
+          +'</div><div>'
+          +'<div class="game-row"><div><div class="game-price">'+(x.price?x.price+' \u20be':'\u2014')+'</div>'+profHtml+'</div>'
+          +'<span class="badge '+st.badge+'">'+t('st_'+x.status)+'</span></div>'
+          +perHtml+timeHtml
+          +'</div></div></div>';
+      }
+
+      // Grouped card
+      let totalQty=0,minPrice=null,maxPrice=null;
+      const breakdown={};
+      items.forEach(x=>{
+        const qty=parseInt(x.qty||1);totalQty+=qty;
+        const p=parseFloat(x.price||0);
+        if(p>0){if(minPrice===null||p<minPrice)minPrice=p;if(maxPrice===null||p>maxPrice)maxPrice=p;}
+        const bk=(x.platform||'')+'|'+(x.condition||'');
+        if(!breakdown[bk])breakdown[bk]={platform:x.platform||'',condition:x.condition||'',qty:0};
+        breakdown[bk].qty+=qty;
+      });
+
+      const bdTags=Object.values(breakdown).map(b=>{
+        const cLabel=b.condition?(' '+(b.condition==='new'?t('cond_new'):t('cond_used'))):'';
+        return '<span style="font-size:10px;font-weight:700;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 5px;margin-right:3px;white-space:nowrap">'+b.platform+cLabel+' \xd7'+b.qty+'</span>';
+      }).join('');
+
+      const priceStr=minPrice!==null?(minPrice===maxPrice?minPrice+' \u20be':minPrice+'\u2013'+maxPrice+' \u20be'):'\u2014';
+
+      const itemsList=items.map(x=>{
+        const st=STATUSES[x.status]||STATUSES.available;
+        const qty=parseInt(x.qty||1);
+        const condLabel=x.condition?' \xb7 '+(x.condition==='new'?t('cond_new'):t('cond_used')):'';
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-top:1px solid var(--border);cursor:pointer" onclick="event.stopPropagation();openDetail(\''+x.id+'\')">'
+          +'<span style="font-size:12px;color:var(--text2)">'+(x.platform||'')+condLabel+(qty>1?' \xd7'+qty:'')+'</span>'
+          +'<div style="display:flex;align-items:center;gap:6px">'
+          +(x.price?'<span style="font-size:12px;font-weight:700">'+x.price+' \u20be</span>':'')
+          +'<span class="badge '+st.badge+'" style="font-size:9px">'+t('st_'+x.status)+'</span>'
+          +'</div></div>';
+      }).join('');
+
+      return '<div class="game-card" style="flex-direction:column;cursor:default">'
+        +'<div style="display:flex">'
+        +'<div class="game-cover">'+makeCover(grp.cover)+'<div class="qty-badge">\xd7'+totalQty+'</div></div>'
+        +'<div class="game-body"><div>'
+        +'<div class="game-title">'+grp.title+'</div>'
+        +'<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:2px">'+bdTags+'</div>'
+        +'</div>'
+        +'<div class="game-price" style="margin-top:6px">'+priceStr+'</div>'
+        +'</div></div>'
+        +'<div style="padding:0 11px 8px">'+itemsList+'</div>'
+        +'</div>';
+    }).join('');
+  });
+}
+// PAGE NAVIGATION
+function setPage(page){
+  S.page=page;
+  ['available','transit','reserved','sold','exchange','shipments','stats','calc'].forEach(p=>{
+    const pg=document.getElementById('page-'+p);if(pg)pg.style.display=p===page?'block':'none';
+    const tb=document.getElementById('tab-'+p);if(tb)tb.classList.toggle('active',p===page);
+  });
+  const showSearch=['available','transit','reserved','sold','exchange'].includes(page);
+  document.getElementById('controls').style.display=showSearch?'block':'none';
+  if(page==='stats')renderStatsPage();
+  if(page==='shipments')renderShipments();
+  if(page==='calc')renderCalc();
+}
+
+// ADD/EDIT DISC
+function openAdd(editId){
+  const isEdit=!!editId,ex=isEdit?(S.games[editId]||{}):{};
+  S.selStatus=ex.status||'available';
+  S.selCond=ex.condition||'used';
+  S.qty=parseInt(ex.qty||1);
+  const ships=Object.entries(S.shipments).map(([id,s])=>({...s,id}));
+  const shipOpts=ships.map(s=>`<option value="${s.id}"${ex.shipmentId===s.id?' selected':''}>${s.name||s.source} (~${parseFloat(s.perDisc||0).toFixed(1)}\u20be)</option>`).join('');
+  const statusOpts=Object.keys(STATUSES).map(k=>`<div class="st-opt${S.selStatus===k?' sel':''}" onclick="selStatus('${k}')" id="st-${k}">${t('st_'+k)}</div>`).join('');
+  document.getElementById('modal-root').innerHTML=`
+    <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">${isEdit?t('edit_disc'):t('add_disc')} <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>
+    <div class="field"><label>${t('game_name')}</label>
+      <input id="inp-title" type="text" placeholder="${t('game_name')}..." value="${ex.title||''}" oninput="onTitleInput(this.value)">
+      <div id="suggest-box"></div><div class="hint" id="cover-hint"></div>
+    </div>
+    <div class="field"><label>${t('cover_url')}</label><input id="inp-cover" type="text" placeholder="https://..." value="${ex.cover||''}"></div>
+    <div class="row2">
+      <div class="field"><label>${t('platform')}</label><select id="inp-platform">${PLATFORMS.map(p=>`<option${(ex.platform||'PS5')===p?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="field"><label>${t('region')}</label><input id="inp-region" type="text" placeholder="EU/RU/US" value="${ex.region||''}"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>${t('quantity')}</label>
+        <div class="qty-ctrl"><button class="qty-btn" onclick="changeQty(-1)">\u2212</button><div class="qty-val" id="qty-display">${S.qty}</div><button class="qty-btn" onclick="changeQty(1)">+</button></div>
+      </div>
+      <div class="field"><label>${t('cond_label')}</label>
+        <div class="cond-grid">
+          <div class="cond-opt${S.selCond==='new'?' sel':''}" id="cond-new" onclick="selCond('new')">${t('cond_new')}</div>
+          <div class="cond-opt${S.selCond==='used'?' sel':''}" id="cond-used" onclick="selCond('used')">${t('cond_used')}</div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div><div class="sec-label">${t('prices')}</div>
+    <div class="row2">
+      <div class="field"><label>${t('sale_price')}</label><input id="inp-price" type="number" placeholder="45" value="${ex.price||''}"></div>
+      <div class="field"><label>${t('cost')}</label>
+        <div style="display:flex;gap:6px">
+          <input id="inp-cost" type="number" placeholder="\u2014" value="${ex.cost||''}" style="flex:1">
+          <select id="inp-cost-cur" style="width:60px;padding:10px 4px">${['\u20be','$','\u20ac'].map(c=>`<option${(ex.costCurrency||'\u20be')===c?' selected':''}>${c}</option>`).join('')}</select>
+        </div>
+        <div class="opt-label">${t('cost_hint')}</div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>${t('client_delivery')}</label><input id="inp-delcost" type="number" placeholder="\u2014" value="${ex.deliveryCost||''}"></div>
+      <div class="field"><label>${t('shipment_link')}</label>
+        <select id="inp-shipment"><option value="">${t('no_shipment')}</option>${shipOpts}</select>
+      </div>
+    </div>
+    <div class="divider"></div><div class="sec-label">${t('status')}</div>
+    <div class="status-grid">${statusOpts}</div>
+    <div class="divider"></div><div class="sec-label">${t('client')}</div>
+    <div class="row2">
+      <div class="field"><label>${t('fname')}</label><input id="inp-person" type="text" placeholder="..." value="${ex.person||''}"></div>
+      <div class="field"><label>${t('phone')}</label><input id="inp-phone" type="tel" placeholder="+995..." value="${ex.phone||''}"></div>
+    </div>
+    <div class="field"><label>${t('notes')}</label><textarea id="inp-notes">${ex.notes||''}</textarea></div>
+    <button class="btn-primary" onclick="${isEdit?`saveEdit('${editId}')`:' addGame()'}">${isEdit?t('save'):t('add_disc')}</button>
+    ${isEdit?`<button class="btn-danger" onclick="deleteGame('${editId}')">${t('delete_disc')}</button>`:''}
+    </div></div>`;
+}
+
+function changeQty(d){S.qty=Math.max(1,S.qty+d);const el=document.getElementById('qty-display');if(el)el.textContent=S.qty;}
+function selCond(c){S.selCond=c;document.querySelectorAll('.cond-opt').forEach(el=>el.classList.remove('sel'));const el=document.getElementById('cond-'+c);if(el)el.classList.add('sel');}
+function selStatus(k){S.selStatus=k;document.querySelectorAll('.st-opt').forEach(el=>el.classList.remove('sel'));const el=document.getElementById('st-'+k);if(el)el.classList.add('sel');}
+
+// DETAIL MODAL
+function openDetail(id){
+  const g=S.games[id];if(!g)return;
+  const st=STATUSES[g.status]||STATUSES.available;
+  const cost=gel(g.cost,g.costCurrency||'\u20be');
+  const delC=parseFloat(g.deliveryCost||0);
+  const ship=g.shipmentId?S.shipments[g.shipmentId]:null;
+  const shipC=ship?parseFloat(ship.perDisc||0):0;
+  const profit=calcProfit(g);
+  const qty=parseInt(g.qty||1);
+  const others=Object.keys(STATUSES).filter(k=>k!==g.status);
+  const coverHtml=g.cover
+    ?`<div class="detail-cover"><img src="${g.cover}" alt="${g.title}"></div>`
+    :`<div class="detail-cover"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>`;
+  document.getElementById('modal-root').innerHTML=`
+    <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    ${coverHtml}
+    <div class="modal-title" style="font-size:16px">${g.title} <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>
+    <div>
+      <div class="info-row"><span class="info-key">${t('platform_l')}</span><span class="info-val">${g.platform||'\u2014'}${g.region?' \xb7 '+g.region:''}</span></div>
+      <div class="info-row"><span class="info-key">${t('cond_l')}</span><span class="info-val">${g.condition?`<span class="badge ${g.condition==='new'?'b-available':'b-sold'}">${g.condition==='new'?t('cond_new'):t('cond_used')}</span>`:'\u2014'}</span></div>
+      <div class="info-row"><span class="info-key">${t('qty_l')}</span><span class="info-val" style="color:var(--accent)">${qty} ${t('discs')}</span></div>
+      <div class="info-row"><span class="info-key">${t('status_l')}</span><span class="info-val"><span class="badge ${st.badge}">${t('st_'+g.status)}</span></span></div>
+      <div class="info-row"><span class="info-key">${t('sale_price_l')}</span><span class="info-val" style="color:var(--green)">${g.price?g.price+' \u20be':'\u2014'}</span></div>
+      ${g.cost?`<div class="info-row"><span class="info-key">${t('cost_l')}</span><span class="info-val">${g.cost} ${g.costCurrency||'\u20be'}${g.costCurrency&&g.costCurrency!=='\u20be'?' (\u2248'+cost.toFixed(0)+'\u20be)':''}</span></div>`:''}
+      ${delC>0?`<div class="info-row"><span class="info-key">${t('delivery_l')}</span><span class="info-val">${delC} \u20be</span></div>`:''}
+      ${ship?`<div class="info-row"><span class="info-key">${t('ship_part')}</span><span class="info-val">${shipC.toFixed(2)} \u20be (${ship.name||ship.source})</span></div>`:''}
+      ${profit!==null?`<div class="info-row"><span class="info-key">${t('profit_l')}</span><span class="info-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} \u20be${!g.cost?' *':''}</span></div>`:''}
+      ${g.person?`<div class="info-row"><span class="info-key">${t('client_l')}</span><span class="info-val">${g.person}</span></div>`:''}
+      ${g.phone?`<div class="info-row"><span class="info-key">${t('phone_l')}</span><span class="info-val"><a href="tel:${g.phone}" style="color:var(--accent)">${g.phone}</a></span></div>`:''}
+      ${g.notes?`<div class="info-row"><span class="info-key">${t('notes_l')}</span><span class="info-val">${g.notes}</span></div>`:''}
+      ${g.addedAt?`<div class="info-row"><span class="info-key">${t('added_l')}</span><span class="info-val">${new Date(g.addedAt).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
+      ${g.soldAt?`<div class="info-row"><span class="info-key">${t('sold_l')}</span><span class="info-val">${new Date(g.soldAt).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
+      ${g.exchangedAt?`<div class="info-row"><span class="info-key">${t('exchanged_l')}</span><span class="info-val">${new Date(g.exchangedAt).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
+    </div>
+    <div class="sec-label" style="margin-top:14px">${t('quick_status')}</div>
+    <div class="quick-status">${others.map(k=>`<div class="qs-btn" onclick="quickStatus('${id}','${k}')">${t('st_'+k)}</div>`).join('')}</div>
+    <button class="btn-primary" style="margin-top:12px" onclick="closeModalForce();openAdd('${id}')">${t('edit_btn')}</button>
+    </div></div>`;
+}
+
+function quickStatus(id,status){
+  if(status==='sold'){
+    const g=S.games[id];
+    if(g&&parseInt(g.qty||1)>1)openSellOnePopup(id);
+    else openSellPopup(id);
+  } else {
+    const upd={status,soldAt:null,exchangedAt:status==='exchange'?Date.now():null};
+    db.ref('games/'+id).update(upd);
+    showToast(t('status_changed'));closeModalForce();
+  }
+}
+
+function openSellOnePopup(id){
+  const g=S.games[id];if(!g)return;
+  closeModalForce();
+  const rem=parseInt(g.qty||1)-1;
+  document.getElementById('modal-root').innerHTML=`
+    <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="sell-popup" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3>${t('sell_title')}</h3>
+    <p>${t('sell_sub')} \xb7 ${lang==='ka'?'\u10e0\u10e9\u10d4\u10d1\u10d0':'\u041e\u0441\u0442\u0430\u0442\u043e\u043a'}: ${rem} ${t('discs')}</p>
+    <div class="sell-input-wrap"><input id="sell-price-inp" type="number" value="${g.price||''}" placeholder="0"><span>\u20be</span></div>
+    <button class="btn-primary" onclick="confirmSellOne('${id}')">${t('sell_confirm')}</button>
+    <button class="btn-secondary" onclick="closeModalForce()">${t('sell_cancel')}</button>
+    </div></div>`;
+  setTimeout(()=>{const inp=document.getElementById('sell-price-inp');if(inp){inp.focus();inp.select();}},100);
+}
+
+function confirmSellOne(id){
+  const g=S.games[id];if(!g)return;
+  const inp=document.getElementById('sell-price-inp');
+  const price=inp?inp.value:g.price||'';
+  const newQty=parseInt(g.qty||1)-1;
+  if(newQty<=0){
+    db.ref('games/'+id).update({status:'sold',price,soldAt:Date.now(),qty:0});
+  } else {
+    db.ref('games/'+id).update({qty:newQty});
+    const sid=uid();
+    db.ref('games/'+sid).set({...g,id:sid,qty:1,status:'sold',price,soldAt:Date.now()});
+  }
+  showToast(t('sold_ok'));closeModalForce();
+}
+
+function openSellPopup(id){
+  const g=S.games[id];if(!g)return;
+  closeModalForce();
+  document.getElementById('modal-root').innerHTML=`
+    <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="sell-popup" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3>${t('sell_title')}</h3><p>${t('sell_sub')}</p>
+    <div class="sell-input-wrap"><input id="sell-price-inp" type="number" value="${g.price||''}" placeholder="0"><span>\u20be</span></div>
+    <button class="btn-primary" onclick="confirmSell('${id}')">${t('sell_confirm')}</button>
+    <button class="btn-secondary" onclick="closeModalForce()">${t('sell_cancel')}</button>
+    </div></div>`;
+  setTimeout(()=>{const inp=document.getElementById('sell-price-inp');if(inp){inp.focus();inp.select();}},100);
+}
+
+function confirmSell(id){
+  const inp=document.getElementById('sell-price-inp');
+  const price=inp?inp.value:(S.games[id]&&S.games[id].price)||'';
+  db.ref('games/'+id).update({status:'sold',price,soldAt:Date.now()});
+  showToast(t('sold_ok'));closeModalForce();
+}
+
+
+function onTitleInput(val){
+  clearTimeout(S.suggTimer);
+  if(!val||val.length<2){document.getElementById('suggest-box').innerHTML='';return;}
+  document.getElementById('cover-hint').textContent=t('searching');
+  S.suggTimer=setTimeout(()=>fetchSugg(val),600);
+}
+async function fetchSugg(q){
+  try{
+    const r=await fetch(`https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search=${encodeURIComponent(q)}&page_size=6`);
+    const data=await r.json();
+    S.sugg=(data.results||[]).map(g=>({name:g.name,cover:g.background_image||'',year:g.released?g.released.slice(0,4):''}));
+    const h=document.getElementById('cover-hint');if(h)h.textContent='';
+    const box=document.getElementById('suggest-box');if(!box)return;
+    if(!S.sugg.length){box.innerHTML='';return;}
+    box.innerHTML=`<div class="suggest-list">${S.sugg.map((g,i)=>`
+      <div class="suggest-item" onclick="selectSugg(${i})">
+        ${g.cover?`<img class="sug-thumb" src="${g.cover}" alt="" loading="lazy">`:`<div class="sug-thumb"></div>`}
+        <div><div class="sug-name">${g.name}</div><div class="sug-year">${g.year}</div></div>
+      </div>`).join('')}</div>`;
+  }catch(e){
+    const h=document.getElementById('cover-hint');if(h)h.textContent=t('no_conn');
+    const b=document.getElementById('suggest-box');if(b)b.innerHTML='';
+  }
+}
+
+async function fetchSlotSugg(idx,q){
+  try{
+    const r=await fetch(`https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search=${encodeURIComponent(q)}&page_size=5`);
+    const data=await r.json();
+    const results=(data.results||[]).map(g=>({name:g.name,cover:g.background_image||''}));
+    const box=document.getElementById('slot-sugg-'+idx);if(!box)return;
+    if(!results.length){box.innerHTML='';return;}
+    box.innerHTML=`<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;max-height:180px;overflow-y:auto">
+      ${results.map(g=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--border)" onclick="selectSlotSugg(${idx},'${g.name.replace(/'/g,"\\'")}','${(g.cover||'').replace(/'/g,"\\'")}')">
+        ${g.cover?`<img src="${g.cover}" style="width:28px;height:38px;object-fit:cover;border-radius:3px;flex-shrink:0">`:'<div style="width:28px;height:38px;background:var(--bg4);border-radius:3px"></div>'}
+        <div style="font-size:12px">${g.name}</div>
+      </div>`).join('')}
+    </div>`;
+  }catch(e){
+    const box=document.getElementById('slot-sugg-'+idx);if(box)box.innerHTML='';
+  }
+}
+
+function selectSlotSugg(idx,name,cover){
+  const slot=document.getElementById('slot-'+idx);if(!slot)return;
+  const titleEl=slot.querySelector('.slot-title');if(titleEl)titleEl.value=name;
+  const coverEl=slot.querySelector('.slot-cover');if(coverEl)coverEl.value=cover;
+  const thumbEl=document.getElementById('slot-thumb-'+idx);
+  if(thumbEl)thumbEl.outerHTML=cover?`<img src="${cover}" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="slot-thumb-${idx}">`:`<div id="slot-thumb-${idx}"></div>`;
+  const box=document.getElementById('slot-sugg-'+idx);if(box)box.innerHTML='';
+}
+
+function onShipCountChange(val){
+  const n=Math.max(1,Math.min(50,parseInt(val)||1));
+  // Save current slot data before re-render
+  saveSlotData();
+  S.shipSlots=n;
+  const isEdit=!!S._editShipId;
+  const ex=isEdit?(S.shipments[S._editShipId]||{}):{};
+  const container=document.getElementById('ship-slots');if(!container)return;
+  let html='';
+  for(let i=0;i<n;i++){
+    const saved=S._slotData&&S._slotData[i]||{};
+    html+=`<div class="disc-slot" id="slot-${i}">
+      <div class="disc-slot-num">${lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u0441\u043a'} ${i+1}</div>
+      <div style="position:relative;margin-bottom:6px">
+        <input class="slot-title" type="text" placeholder="${t('disc_title')}..." value="${saved.title||''}"
+          oninput="onSlotTitleInput(${i},this.value)"
+          style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none">
+        <div id="slot-sugg-${i}"></div>
+        ${saved.cover?`<img src="${saved.cover}" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="slot-thumb-${i}">`:`<div id="slot-thumb-${i}"></div>`}
+        <input type="hidden" class="slot-cover" value="${saved.cover||''}">
+      </div>
+      <div class="disc-slot-row">
+        <select class="slot-plat">${['PS5','PS4','PS4/PS5'].map(p=>`<option${(saved.plat||'PS5')===p?' selected':''}>${p}</option>`).join('')}</select>
+        <select class="slot-cond"><option value="used"${(saved.cond||'used')==='used'?' selected':''}>${t('cond_used')}</option><option value="new"${(saved.cond||'used')==='new'?' selected':''}>${t('cond_new')}</option></select>
+      </div>
+    </div>`;
+  }
+  container.innerHTML=html;
+}
+
+function saveSlotData(){
+  const slots=document.querySelectorAll('.disc-slot');
+  S._slotData={};
+  slots.forEach((sl,i)=>{
+    S._slotData[i]={
+      title:sl.querySelector('.slot-title')?.value||'',
+      cover:sl.querySelector('.slot-cover')?.value||'',
+      plat:sl.querySelector('.slot-plat')?.value||'PS5',
+      cond:sl.querySelector('.slot-cond')?.value||'used'
+    };
+  });
+}
+
+function saveShipment(){
+  saveSlotData();
+  const name=document.getElementById('sh-name').value.trim();
+  const source=document.getElementById('sh-source').value.trim();
+  const date=new Date(document.getElementById('sh-date').value).getTime();
+  const discCount=parseInt(document.getElementById('sh-count').value)||1;
+  const purchaseCost=parseFloat(document.getElementById('sh-purchase').value)||0;
+  const deliveryCostVal=parseFloat(document.getElementById('sh-delivery').value)||0;
+  const notes=document.getElementById('sh-notes').value.trim();
+  const totalCost=purchaseCost+deliveryCostVal;
+  const perDisc=discCount>0?totalCost/discCount:0;
+  const id=uid();
+
+  db.ref('shipments/'+id).set({id,name,source,date,discCount,purchaseCost,deliveryCostVal,totalCost,perDisc,notes,shipStatus:'transit',inExpenses:totalCost>0});
+
+  if(totalCost>0){
+    const eid=uid();
+    db.ref('expenses/'+eid).set({id:eid,name:name||(lang==='ka'?'\u10de\u10d0\u10e0\u10e2\u10d8\u10d0':'\u041f\u0430\u0440\u0442\u0438\u044f'),to:source,amount:totalCost,date,type:'shipping'});
+  }
+
+  // Add discs from slots
+  const n=S.shipSlots||1;
+  for(let i=0;i<n;i++){
+    const d=S._slotData&&S._slotData[i];
+    const title=d?.title?.trim();
+    if(!title)continue;
+    const gid=uid();
+    db.ref('games/'+gid).set({id:gid,title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null});
+  }
+
+  S._slotData={};S.shipSlots=1;
+  showToast(t('ship_exp_added'));closeModalForce();
+}
+
+function saveShipmentEdit(id){
+  saveSlotData();
+  const name=document.getElementById('sh-name').value.trim();
+  const source=document.getElementById('sh-source').value.trim();
+  const date=new Date(document.getElementById('sh-date').value).getTime();
+  const discCount=parseInt(document.getElementById('sh-count').value)||1;
+  const purchaseCost=parseFloat(document.getElementById('sh-purchase').value)||0;
+  const deliveryCostVal=parseFloat(document.getElementById('sh-delivery').value)||0;
+  const notes=document.getElementById('sh-notes').value.trim();
+  const totalCost=purchaseCost+deliveryCostVal;
+  const perDisc=discCount>0?totalCost/discCount:0;
+  db.ref('shipments/'+id).update({name,source,date,discCount,purchaseCost,deliveryCostVal,totalCost,perDisc,notes});
+  showToast(t('saved'));closeModalForce();
+}
+
+// SHIPMENTS RENDER
+function renderShipments(){
+  const page=document.getElementById('page-shipments');
+  if(!page||S.page!=='shipments')return;
+  // Auto-add old shipments to expenses if missing
+  Object.entries(S.shipments).forEach(([id,s])=>{
+    if(!s.inExpenses){
+      const total=parseFloat(s.purchaseCost||0)+parseFloat(s.deliveryCostVal||0);
+      if(total>0){
+        const eid=uid();
+        db.ref('expenses/'+eid).set({id:eid,name:s.name||t('new_ship'),to:s.source||'',amount:total,date:s.date||Date.now(),type:'shipping'});
+        db.ref('shipments/'+id).update({inExpenses:true});
+      } else {
+        db.ref('shipments/'+id).update({inExpenses:true});
+      }
+    }
+  });
+  const ships=Object.entries(S.shipments).map(([id,s])=>({...s,id})).sort((a,b)=>(b.date||0)-(a.date||0));
+  const cardsHtml=!ships.length
+    ?`<div style="color:var(--text3);font-size:14px;text-align:center;padding:40px 0;grid-column:1/-1">${t('no_ships')}</div>`
+    :ships.map(s=>{
+      const isT=s.shipStatus!=='received';
+      const purchase=parseFloat(s.purchaseCost||0);
+      const delivery=parseFloat(s.deliveryCostVal||0);
+      const total=purchase+delivery;
+      const count=parseInt(s.discCount)||1;
+      const perDisc=count>0?total/count:0;
+      return `<div class="ship-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div>
+            <div class="ship-name">${s.name||t('new_ship')}</div>
+            <div class="ship-date">${s.source||''} \xb7 ${s.date?new Date(s.date).toLocaleDateString('ru-RU'):''}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="ship-cost">${total.toFixed(2)} \u20be</div>
+            <div class="ship-per">${perDisc>0?'~'+perDisc.toFixed(2)+' '+t('per_disc'):'—'}</div>
+          </div>
+        </div>
+        <div class="ship-status-row">
+          <div class="ship-status-btn${isT?' active-transit':''}" onclick="setShipStatus('${s.id}','transit')">\ud83d\ude9a ${t('ship_transit')}</div>
+          <div class="ship-status-btn${!isT?' active-received':''}" onclick="setShipStatus('${s.id}','received')">\u2713 ${t('ship_received')}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">${count} ${t('discs')} \xb7 ${t('purchase_c')}: ${purchase.toFixed(2)}\u20be \xb7 ${t('delivery_c')}: ${delivery.toFixed(2)}\u20be</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button onclick="openEditShipment('${s.id}')" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);padding:6px;font-size:12px;cursor:pointer">\u270f\ufe0f ${t('edit_btn')}</button>
+          
+          <button onclick="deleteShipment('${s.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:6px">${t('del')}</button>
+        </div>
+      </div>`;
+    }).join('');
+  page.innerHTML=`<button class="btn-new-ship" onclick="openAddShipment()">+ ${t('new_ship')}</button><div class="ship-grid">${cardsHtml}</div>`;
+}
+
+function setShipStatus(id,status){
+  db.ref('shipments/'+id).update({shipStatus:status});
+  // If received — move all linked transit/ordered games to available
+  if(status==='received'){
+    Object.entries(S.games).forEach(([gid,g])=>{
+      if(g.shipmentId===id&&(g.status==='transit'||g.status==='ordered')){
+        db.ref('games/'+gid).update({status:'available'});
+      }
+    });
+    showToast(lang==='ka'?'მიღებულია, დისკები მარაგშია':'Получено, диски в наличии');
+  } else {
+    // transit — move available games back if they came from this shipment
+    showToast(t('saved'));
+  }
+}
+
+function addShipToExpenses(id){
+  const s=S.shipments[id];if(!s)return;
+  const total=parseFloat(s.purchaseCost||0)+parseFloat(s.deliveryCostVal||0);
+  if(total<=0){showToast(lang==='ka'?'\u10d7\u10d0\u10dc\u10ee\u10d0 0':'\u0421\u0443\u043c\u043c\u0430 0');return;}
+  const eid=uid();
+  db.ref('expenses/'+eid).set({id:eid,name:s.name||t('new_ship'),to:s.source||'',amount:total,date:s.date||Date.now(),type:'shipping'});
+  db.ref('shipments/'+id).update({inExpenses:true});
+  showToast(t('exp_added'));
+}
+
+function openAddShipment(){openShipmentModal(null);}
+function openEditShipment(id){openShipmentModal(id);}
+
+function openShipmentModal(editId){
+  const isEdit=!!editId;
+  const ex=isEdit?(S.shipments[editId]||{}):{};
+  S.shipSlots=parseInt(ex.discCount)||1;
+  S._slotData={};
+  S._editShipId=editId||null;
+  renderShipModal(isEdit,editId||'',ex);
+}
+
+function buildSlotHtml(i,saved){
+  saved=saved||{};
+  return `<div class="disc-slot" id="slot-${i}">
+    <div class="disc-slot-num">${lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u0441\u043a'} ${i+1}</div>
+    <div style="position:relative;margin-bottom:6px">
+      <input class="slot-title" type="text" placeholder="${t('disc_title')}..." value="${saved.title||''}"
+        oninput="onSlotTitleInput(${i},this.value)"
+        style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none">
+      <div id="slot-sugg-${i}"></div>
+      ${saved.cover?`<img src="${saved.cover}" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="slot-thumb-${i}">`:`<div id="slot-thumb-${i}"></div>`}
+      <input type="hidden" class="slot-cover" value="${saved.cover||''}">
+    </div>
+    <div class="disc-slot-row">
+      <select class="slot-plat">${['PS5','PS4','PS4/PS5'].map(p=>`<option${(saved.plat||'PS5')===p?' selected':''}>${p}</option>`).join('')}</select>
+      <select class="slot-cond">
+        <option value="used"${(saved.cond||'used')==='used'?' selected':''}>${t('cond_used')}</option>
+        <option value="new"${(saved.cond||'used')==='new'?' selected':''}>${t('cond_new')}</option>
+      </select>
+    </div>
+  </div>`;
+}
+
+function renderShipModal(isEdit,editId,ex){
+  const n=S.shipSlots;
+  let slotsHtml='';
+  for(let i=0;i<n;i++) slotsHtml+=buildSlotHtml(i,S._slotData[i]);
+  document.getElementById('modal-root').innerHTML=`
+    <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">${isEdit?t('edit_btn'):t('new_ship')} <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>
+    <div class="field"><label>${t('ship_name')}</label><input id="sh-name" type="text" placeholder="Dubai April 2025" value="${ex.name||''}"></div>
+    <div class="field"><label>${t('ship_source')}</label><input id="sh-source" type="text" placeholder="Dubai / Turkey / eBay UK" value="${ex.source||''}"></div>
+    <div class="row2">
+      <div class="field"><label>${t('ship_date')}</label><input id="sh-date" type="date" value="${ex.date?new Date(ex.date).toISOString().slice(0,10):new Date().toISOString().slice(0,10)}"></div>
+      <div class="field"><label>${t('ship_count')}</label><input id="sh-count" type="number" value="${n}" oninput="onShipCountChange(this.value)"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>${t('ship_purchase')}</label><input id="sh-purchase" type="number" placeholder="0" value="${ex.purchaseCost||''}"></div>
+      <div class="field"><label>${t('ship_delivery')}</label><input id="sh-delivery" type="number" placeholder="0" value="${ex.deliveryCostVal||''}"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="sec-label">${t('ship_discs')}</div>
+    <div id="ship-slots">${slotsHtml}</div>
+    <div class="field"><label>${t('ship_notes')}</label><textarea id="sh-notes">${ex.notes||''}</textarea></div>
+    <button class="btn-primary" onclick="${isEdit?`saveShipmentEdit('${editId}')`:' saveShipment()'}">${t('save')}</button>
+    </div></div>`;
+}
+
+const slotSuggTimers={};
+function onSlotTitleInput(idx,val){
+  clearTimeout(slotSuggTimers[idx]);
+  const box=document.getElementById('slot-sugg-'+idx);
+  if(!val||val.length<2){if(box)box.innerHTML='';return;}
+  slotSuggTimers[idx]=setTimeout(()=>fetchSlotSugg(idx,val),600);
+}
+
+
+function deleteShipment(id){if(!confirm(t('del_ship')))return;db.ref('shipments/'+id).remove();}
+
+
+// STATS
+function setStatPeriod(p){S.statPeriod=p;renderStatsPage();}
+function renderStatsPage(){
+  const page=document.getElementById('page-stats');if(!page)return;
+  const now=new Date(),games=Object.values(S.games),expenses=Object.values(S.expenses);
+  function inP(ts){
+    if(!ts)return false;const d=new Date(ts);
+    if(S.statPeriod==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(S.statPeriod==='week')return d>=(new Date(now-7*86400000));
+    return d.getFullYear()===now.getFullYear();
+  }
+  const sold=games.filter(g=>g.status==='sold'&&inP(g.soldAt||g.addedAt));
+  const revenue=sold.reduce((s,g)=>s+parseFloat(g.price||0),0);
+  let cogs=0;
+  sold.forEach(g=>{
+    if(g.cost)cogs+=gel(g.cost,g.costCurrency||'\u20be');
+    cogs+=parseFloat(g.deliveryCost||0);
+    if(g.shipmentId&&S.shipments[g.shipmentId])cogs+=parseFloat(S.shipments[g.shipmentId].perDisc||0);
+  });
+  const pExp=expenses.filter(e=>inP(e.date));
+  const extraExp=pExp.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+  const profit=revenue-(cogs+extraExp);
+  const dd=[{label:t('revenue'),value:revenue,color:'#3ecf8e'},{label:t('cogs'),value:cogs,color:'#f06060'},{label:t('extra_exp'),value:extraExp,color:'#f0a832'}];
+  const periodBtns=['month','week','year'].map(p=>`<button class="period-btn${S.statPeriod===p?' active':''}" onclick="setStatPeriod('${p}')">${t('p'+p.charAt(0))}</button>`).join('');
+  const legendHtml=dd.map(d=>`<div class="legend-item"><div style="display:flex;align-items:center"><div class="legend-dot" style="background:${d.color}"></div><div class="legend-label">${d.label}</div></div><div class="legend-val" style="color:${d.color}">${d.value.toFixed(0)} \u20be</div></div>`).join('')+`<div class="legend-item" style="border-top:1px solid var(--border);padding-top:7px;margin-top:4px"><div style="display:flex;align-items:center"><div class="legend-dot" style="background:var(--accent)"></div><div class="legend-label">${t('profit')}</div></div><div class="legend-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} \u20be</div></div>`;
+  const expHtml=pExp.length
+    ?pExp.sort((a,b)=>(b.date||0)-(a.date||0)).map(e=>`<div class="exp-item"><div><div style="font-size:13px;font-weight:600">${e.name}</div>${e.to?`<div style="font-size:11px;color:var(--text2)">${t('exp_to')}: ${e.to}</div>`:''}<div style="font-size:11px;color:var(--text3)">${e.type==='shipping'?t('exp_ship'):t('exp_other')} \xb7 ${fmtDate(e.date)}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="exp-amount">-${e.amount} \u20be</div><button onclick="deleteExpense('${e.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;line-height:1">\xd7</button></div></div>`).join('')
+    :`<div style="font-size:13px;color:var(--text3);text-align:center;padding:14px 0">${t('no_exp')}</div>`;
+  page.innerHTML=`
+    <div class="period-row">${periodBtns}</div>
+    <div class="fin-cards">
+      <div class="fin-card"><div class="fin-card-lbl">${t('revenue')}</div><div class="fin-card-val" style="color:var(--green)">${revenue.toFixed(0)} \u20be</div><div class="fin-card-sub">${sold.length} ${t('sales_n')}</div></div>
+      <div class="fin-card"><div class="fin-card-lbl">${t('profit')}</div><div class="fin-card-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} \u20be</div><div class="fin-card-sub">${t('net')}</div></div>
+      <div class="fin-card"><div class="fin-card-lbl">${t('cogs')}</div><div class="fin-card-val" style="color:var(--red)">${cogs.toFixed(0)} \u20be</div><div class="fin-card-sub">${t('of_sold')}</div></div>
+      <div class="fin-card"><div class="fin-card-lbl">${t('extra_exp')}</div><div class="fin-card-val" style="color:var(--amber)">${extraExp.toFixed(0)} \u20be</div><div class="fin-card-sub">${t('period')}</div></div>
+    </div>
+    <div class="stats-layout">
+      <div class="chart-wrap">
+        <div class="chart-title">${t('structure')}</div>
+        <canvas id="donut" width="155" height="155"></canvas>
+        <div class="legend">${legendHtml}</div>
+      </div>
+      <div class="stats-right">
+        <div class="expenses-section">
+          <div class="exp-title">${t('exp_title')}</div>
+          ${expHtml}
+          <button class="btn-exp-add" onclick="openAddExpense()">${t('add_exp')}</button>
+        </div>
+      </div>
+    </div>`;
+  drawDonut(dd);
+}
+function drawDonut(data){
+  const canvas=document.getElementById('donut');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const total=data.reduce((s,d)=>s+d.value,0);
+  if(total===0){ctx.clearRect(0,0,155,155);return;}
+  const segs=data.filter(d=>d.value>0);
+  function draw(p){
+    ctx.clearRect(0,0,155,155);
+    let s=-Math.PI/2;
+    segs.forEach(d=>{
+      const end=s+d.value/total*2*Math.PI*p;
+      ctx.beginPath();ctx.moveTo(77,77);ctx.arc(77,77,63,s,end);ctx.closePath();
+      ctx.fillStyle=d.color;ctx.fill();s=end;
+    });
+    ctx.beginPath();ctx.arc(77,77,38,0,2*Math.PI);ctx.fillStyle='#17171e';ctx.fill();
+    ctx.fillStyle='#f0f0f5';ctx.font='bold 13px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('\u20be'+Math.round(total*p),77,77);
+  }
+  const t0=performance.now();
+  (function anim(now){const p=Math.min((now-t0)/900,1);draw(1-Math.pow(1-p,3));if(p<1)requestAnimationFrame(anim);})(t0);
+}
+
+// EXPENSES
+function openAddExpense(){
+  S.selExpType='other';
+  document.getElementById('modal-root').innerHTML=`
+    <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">${t('add_exp')} <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>
+    <div class="field"><label>${t('exp_type')}</label>
+      <div class="exp-type-grid">
+        <div class="exp-type-btn" id="et-shipping" onclick="selExpType('shipping')">${t('exp_ship')}</div>
+        <div class="exp-type-btn sel" id="et-other" onclick="selExpType('other')">${t('exp_other')}</div>
+      </div>
+    </div>
+    <div class="field"><label>${t('exp_desc')}</label><input id="exp-name" type="text" placeholder="..."></div>
+    <div class="field"><label>${t('exp_to')}</label><input id="exp-to" type="text" placeholder="..."></div>
+    <div class="row2">
+      <div class="field"><label>${t('exp_amount')}</label><input id="exp-amount" type="number" placeholder="0"></div>
+      <div class="field"><label>${t('exp_date')}</label><input id="exp-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+    </div>
+    <button class="btn-primary" onclick="saveExpense()">${t('save')}</button>
+    </div></div>`;
+}
+function selExpType(tp){S.selExpType=tp;document.querySelectorAll('.exp-type-btn').forEach(el=>el.classList.remove('sel'));const el=document.getElementById('et-'+tp);if(el)el.classList.add('sel');}
+function saveExpense(){
+  const name=document.getElementById('exp-name').value.trim();
+  const to=document.getElementById('exp-to').value.trim();
+  const amount=parseFloat(document.getElementById('exp-amount').value)||0;
+  const date=new Date(document.getElementById('exp-date').value).getTime();
+  if(!name||!amount){showToast(t('fill_all'));return;}
+  const id=uid();
+  db.ref('expenses/'+id).set({id,name,to,amount,date,type:S.selExpType});
+  showToast(t('exp_added'));closeModalForce();
+  if(S.page==='stats')renderStatsPage();
+}
+function deleteExpense(id){
+  if(!confirm(t('del_exp')))return;
+  db.ref('expenses/'+id).remove();showToast(t('deleted'));
+  if(S.page==='stats')renderStatsPage();
+}
+
+// CALCULATOR
+async function renderCalc(){
+  const page=document.getElementById('page-calc');if(!page)return;
+  page.innerHTML=`
+    <div class="calc-wrap">
+      <div class="calc-title">${t('calc_title')}</div>
+      <div class="calc-sub">${t('calc_sub')}</div>
+      <div class="rates-card">
+        <div class="rates-header">
+          <span class="rates-title">${t('rates_title')}</span>
+          <span class="rates-time" id="rates-time"></span>
+        </div>
+        <div id="rates-list"><div class="rates-loading">${t('loading_rates')}</div></div>
+      </div>
+      <div class="calc-card">
+        <div class="calc-top">
+          <div>
+            <label class="flabel">${t('from_cur')}</label>
+            <input type="number" id="calc-amount" value="100" oninput="calcConvert()" class="calc-big">
+            <select id="calc-cur" onchange="calcConvert()" class="calc-sel">
+              <option value="USD">USD $</option>
+              <option value="EUR">EUR \u20ac</option>
+              <option value="GBP">GBP \xa3</option>
+              <option value="RUB">RUB \u20bd</option>
+              <option value="TRY">TRY \u20ba</option>
+            </select>
+          </div>
+          <div class="calc-arrow">\u2192</div>
+          <div>
+            <label class="flabel">${t('to_gel')}</label>
+            <div class="calc-result-box">
+              <div class="calc-result-num" id="calc-result">\u2014</div>
+              <div class="calc-result-lbl">${t('result_sub')}</div>
+            </div>
+          </div>
+        </div>
+        <div class="sec-label">${t('quick_amounts')}</div>
+        <div class="calc-quick">
+          ${[10,50,100,500].map(a=>`<div class="calc-qbtn" onclick="setCalcAmount(${a})">${a}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  await loadRates();
+  calcConvert();
+}
+async function loadRates(){
+  try{
+    const r=await fetch('https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json');
+    const data=await r.json();
+    const currencies=data[0]?.currencies||[];
+    const wanted={USD:{flag:'\ud83c\uddfa\ud83c\uddf8',name:'US Dollar'},EUR:{flag:'\ud83c\uddea\ud83c\uddfa',name:'Euro'},GBP:{flag:'\ud83c\uddec\ud83c\udde7',name:'Pound Sterling'},RUB:{flag:'\ud83c\uddf7\ud83c\uddfa',name:'\u0420\u043e\u0441. \u0440\u0443\u0431\u043b\u044c'},TRY:{flag:'\ud83c\uddf9\ud83c\uddf7',name:'\u0422\u0443\u0440. \u043b\u0438\u0440\u0430'}};
+    S.rates={};
+    currencies.forEach(c=>{if(wanted[c.code])S.rates[c.code]=c.rate/c.quantity;});
+    const list=document.getElementById('rates-list');
+    const timeEl=document.getElementById('rates-time');
+    if(timeEl)timeEl.textContent=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+    if(list){
+      list.innerHTML=Object.entries(wanted).filter(([k])=>S.rates[k]).map(([code,info])=>`
+        <div class="rate-row">
+          <div class="rate-left"><span class="rate-flag">${info.flag}</span><div><div class="rate-name">${code}</div><div class="rate-code">${info.name}</div></div></div>
+          <div class="rate-val">1 ${code} = ${(S.rates[code]||0).toFixed(4)} \u20be</div>
+        </div>`).join('');
+    }
+  }catch(e){
+    const list=document.getElementById('rates-list');
+    if(list)list.innerHTML=`<div class="rates-loading" style="color:var(--red)">\u041e\u0448\u0438\u0431\u043a\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438 \u043a\u0443\u0440\u0441\u043e\u0432</div>`;
+  }
+}
+function calcConvert(){
+  const amount=parseFloat(document.getElementById('calc-amount')?.value)||0;
+  const cur=document.getElementById('calc-cur')?.value||'USD';
+  const rate=S.rates[cur]||0;
+  const el=document.getElementById('calc-result');
+  if(el)el.textContent=rate>0?(amount*rate).toFixed(2)+' \u20be':'\u2014';
+}
+function setCalcAmount(a){
+  const el=document.getElementById('calc-amount');if(el){el.value=a;calcConvert();}
+}
+
+function closeModal(e){if(e.target===e.currentTarget)closeModalForce();}
+function closeModalForce(){document.getElementById('modal-root').innerHTML='';}
+
+// EXPOSE GLOBALS
+window.setPage=setPage;window.openAdd=openAdd;window.openDetail=openDetail;
+window.quickStatus=quickStatus;window.openSellPopup=openSellPopup;window.openSellOnePopup=openSellOnePopup;
+window.confirmSell=confirmSell;window.confirmSellOne=confirmSellOne;
+window.changeQty=changeQty;window.selCond=selCond;window.selStatus=selStatus;
+window.onTitleInput=onTitleInput;window.selectSugg=selectSugg;
+window.addGame=addGame;window.saveEdit=saveEdit;window.deleteGame=deleteGame;
+window.setShipStatus=setShipStatus;window.addShipToExpenses=addShipToExpenses;window.openAddShipment=openAddShipment;window.openEditShipment=openEditShipment;window.selectSlotSugg=selectSlotSugg;window.onSlotTitleInput=onSlotTitleInput;window.saveShipmentEdit=saveShipmentEdit;
+window.onShipCountChange=onShipCountChange;window.saveShipment=saveShipment;window.deleteShipment=deleteShipment;
+window.setStatPeriod=setStatPeriod;window.openAddExpense=openAddExpense;
+window.selExpType=selExpType;window.saveExpense=saveExpense;window.deleteExpense=deleteExpense;
+window.calcConvert=calcConvert;window.setCalcAmount=setCalcAmount;
+window.renderShipments=renderShipments;window.setShipStatus=setShipStatus;window.addShipToExpenses=addShipToExpenses;window.openAddShipment=openAddShipment;window.openEditShipment=openEditShipment;window.onSlotTitleInput=onSlotTitleInput;window.saveShipmentEdit=saveShipmentEdit;window.openDetail=openDetail;window.quickStatus=quickStatus;window.openSellPopup=openSellPopup;window.openSellOnePopup=openSellOnePopup;window.confirmSell=confirmSell;window.confirmSellOne=confirmSellOne;window.closeModal=closeModal;window.closeModalForce=closeModalForce;
+window.toggleLang=toggleLang;window.renderList=renderList;
+window.dismissInstall=dismissInstall;
+</script>
+</body>
+</html>
