@@ -873,369 +873,39 @@ function openAddShipment(){
 }
 function renderShipModal(){
   const n=S.shipSlots;
+  const ex=S._editShipId?(S.shipments[S._editShipId]||{}):{};
   let slotsHtml='';
-  for(let i=0;i<n;i++){
-    slotsHtml+=`<div class="disc-slot">
-      <div class="disc-slot-num">${lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u10e1\u043a'} ${i+1}</div>
-      <div class="field" style="margin-bottom:6px"><input class="slot-title" type="text" placeholder="${t('disc_title')}..."></div>
-      <div class="disc-slot-row">
-        <select class="slot-plat">${PLATFORMS.map(p=>`<option>${p}</option>`).join('')}</select>
-        <select class="slot-cond"><option value="used">${t('cond_used')}</option><option value="new">${t('cond_new')}</option></select>
-      </div>
-    </div>`;
-  }
-  document.getElementById('modal-root').innerHTML=`
-    <div class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-title">${t('new_ship')} <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>
-    <div class="field"><label>${t('ship_name')}</label><input id="sh-name" type="text" placeholder="Dubai April 2025"></div>
-    <div class="field"><label>${t('ship_source')}</label><input id="sh-source" type="text" placeholder="Dubai / Turkey / eBay UK"></div>
-    <div class="row2">
-      <div class="field"><label>${t('ship_date')}</label><input id="sh-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
-      <div class="field"><label>${t('ship_count')}</label><input id="sh-count" type="number" value="${n}" oninput="onShipCountChange(this.value)"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>${t('ship_purchase')}</label><input id="sh-purchase" type="number" placeholder="500"></div>
-      <div class="field"><label>${t('ship_delivery')}</label><input id="sh-delivery" type="number" placeholder="\u2014"></div>
-    </div>
-    <div class="divider"></div>
-    <div class="sec-label">${t('ship_discs')}</div>
-    <div id="ship-slots">${slotsHtml}</div>
-    <div class="field"><label>${t('ship_notes')}</label><textarea id="sh-notes" placeholder="..."></textarea></div>
-    <button class="btn-primary" onclick="saveShipment()">${t('save')}</button>
-    </div></div>`;
+  for(let i=0;i<n;i++) slotsHtml+=buildSlotHtml(i,S._slotData&&S._slotData[i]);
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)">'
+    +'<div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">'+(S._editShipId?t('edit_btn'):t('new_ship'))+' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
+    +'<div class="field"><label>'+t('ship_name')+'</label><input id="sh-name" type="text" placeholder="Dubai April 2025" value="'+(ex.name||'')+'"></div>'
+    +'<div class="field"><label>'+t('ship_source')+'</label><input id="sh-source" type="text" placeholder="Dubai / Turkey / eBay UK" value="'+(ex.source||'')+'"></div>'
+    +'<div class="row2">'
+    +'<div class="field"><label>'+t('ship_date')+'</label><input id="sh-date" type="date" value="'+(ex.date?new Date(ex.date).toISOString().slice(0,10):new Date().toISOString().slice(0,10))+'"></div>'
+    +'<div class="field"><label>'+t('ship_count')+'</label><input id="sh-count" type="number" value="'+n+'" oninput="onShipCountChange(this.value)"></div>'
+    +'</div>'
+    +'<div class="row2">'
+    +'<div class="field"><label>'+t('ship_purchase')+'</label><input id="sh-purchase" type="number" placeholder="0" value="'+(ex.purchaseCost||'')+'"></div>'
+    +'<div class="field"><label>'+t('ship_delivery')+'</label><input id="sh-delivery" type="number" placeholder="0" value="'+(ex.deliveryCostVal||'')+'"></div>'
+    +'</div>'
+    +'<div class="divider"></div>'
+    +'<div class="sec-label">'+t('ship_discs')+'</div>'
+    +'<div id="ship-slots">'+slotsHtml+'</div>'
+    +'<div class="field"><label>'+t('ship_notes')+'</label><textarea id="sh-notes">'+(ex.notes||'')+'</textarea></div>'
+    +'<button class="btn-primary" onclick="'+(S._editShipId?'saveShipmentEdit(\''+S._editShipId+'\')':'saveShipment()')+'">'+t('save')+'</button>'
+    +'</div></div>';
 }
-
-function saveSlotData(){
-  const slots=document.querySelectorAll('.disc-slot');
-  S._slotData=S._slotData||{};
-  slots.forEach(function(sl,i){
-    S._slotData[i]={
-      title:sl.querySelector('.slot-title')?.value||'',
-      cover:sl.querySelector('.slot-cover')?.value||'',
-      plat:sl.querySelector('.slot-plat')?.value||'PS5',
-      cond:sl.querySelector('.slot-cond')?.value||'used'
-    };
-  });
-}
-
-
-async function fetchSlotSugg(idx,q){
-  try{
-    const r=await fetch('https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search='+encodeURIComponent(q)+'&page_size=5');
-    const data=await r.json();
-    const results=data.results||[];
-    const box=document.getElementById('slot-sugg-'+idx);if(!box)return;
-    if(!results.length){box.innerHTML='';return;}
-    let h='<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;max-height:180px;overflow-y:auto">';
-    results.forEach(function(g){
-      const sn=g.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      const sc=(g.background_image||'').replace(/'/g,"\\'");
-      h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--border)" onclick="selectSlotSugg('+idx+',\''+sn+'\',\''+sc+'\')">';
-      h+=g.background_image?'<img src="'+g.background_image+'" style="width:28px;height:38px;object-fit:cover;border-radius:3px;flex-shrink:0">':'<div style="width:28px;height:38px;background:var(--bg4);border-radius:3px"></div>';
-      h+='<div style="font-size:12px">'+g.name+'</div></div>';
-    });
-    h+='</div>';
-    box.innerHTML=h;
-  }catch(e){
-    const box=document.getElementById('slot-sugg-'+idx);if(box)box.innerHTML='';
-  }
-}
-
-function selectSlotSugg(idx,name,cover){
-  const slot=document.getElementById('slot-'+idx);if(!slot)return;
-  const titleEl=slot.querySelector('.slot-title');if(titleEl)titleEl.value=name;
-  const coverEl=slot.querySelector('.slot-cover');if(coverEl)coverEl.value=cover;
-  if(cover){
-    const thumbEl=document.getElementById('slot-thumb-'+idx);
-    if(thumbEl)thumbEl.outerHTML='<img src="'+cover+'" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="slot-thumb-'+idx+'">';
-  }
-  const box=document.getElementById('slot-sugg-'+idx);if(box)box.innerHTML='';
-}
-
 
 function onShipCountChange(val){
   const n=Math.max(1,Math.min(50,parseInt(val)||1));
+  saveSlotData();
   S.shipSlots=n;
-  // preserve existing values
-  const existing=document.querySelectorAll('.disc-slot');
-  const saved=[];
-  existing.forEach(sl=>{
-    saved.push({
-      title:sl.querySelector('.slot-title')?.value||'',
-      plat:sl.querySelector('.slot-plat')?.value||'PS5',
-      cond:sl.querySelector('.slot-cond')?.value||'used'
-    });
-  });
+  const container=document.getElementById('ship-slots');if(!container)return;
   let html='';
-  for(let i=0;i<n;i++){
-    const prev=saved[i]||{title:'',plat:'PS5',cond:'used'};
-    html+=`<div class="disc-slot">
-      <div class="disc-slot-num">${lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u0441\u043a'} ${i+1}</div>
-      <div class="field" style="margin-bottom:6px"><input class="slot-title" type="text" placeholder="${t('disc_title')}..." value="${prev.title}"></div>
-      <div class="disc-slot-row">
-        <select class="slot-plat">${PLATFORMS.map(p=>`<option${p===prev.plat?' selected':''}>${p}</option>`).join('')}</select>
-        <select class="slot-cond"><option value="used"${prev.cond==='used'?' selected':''}>${t('cond_used')}</option><option value="new"${prev.cond==='new'?' selected':''}>${t('cond_new')}</option></select>
-      </div>
-    </div>`;
-  }
-  const container=document.getElementById('ship-slots');
-  if(container)container.innerHTML=html;
+  for(let i=0;i<n;i++) html+=buildSlotHtml(i,S._slotData&&S._slotData[i]);
+  container.innerHTML=html;
 }
-
-function saveShipment(){
-  const name=document.getElementById('sh-name').value.trim();
-  const source=document.getElementById('sh-source').value.trim();
-  const date=new Date(document.getElementById('sh-date').value).getTime();
-  const discCount=parseInt(document.getElementById('sh-count').value)||1;
-  const purchaseCost=parseFloat(document.getElementById('sh-purchase').value)||0;
-  const deliveryCostVal=parseFloat(document.getElementById('sh-delivery').value)||0;
-  const notes=document.getElementById('sh-notes').value.trim();
-  const totalCost=purchaseCost+deliveryCostVal;
-  const perDisc=discCount>0?deliveryCostVal/discCount:0;
-  const id=uid();
-
-  db.ref('shipments/'+id).set({id,name,source,date,discCount,purchaseCost,deliveryCostVal,totalCost,perDisc,notes,shipStatus:'transit',inExpenses:totalCost>0});
-  if(totalCost>0){
-    const eid=uid();
-    db.ref('expenses/'+eid).set({id:eid,name:name||(lang==='ka'?'პარტია':'Партия'),to:source,amount:totalCost,date:date,type:'shipping'});
-  }
-
-  // Auto-expense
-  if(totalCost>0){
-    const eid=uid();
-    db.ref('expenses/'+eid).set({id:eid,name:name||(lang==='ka'?'\u10de\u10d0\u10e0\u10e2\u10d8\u10d0':'\u041f\u0430\u0440\u0442\u0438\u044f'),to:source,amount:totalCost,date,type:'shipping'});
-  }
-
-  // Add discs from slots
-  const slots=document.querySelectorAll('.disc-slot');
-  slots.forEach((sl,i)=>{
-    const title=sl.querySelector('.slot-title')?.value.trim();
-    if(!title)return;
-    const platform=sl.querySelector('.slot-plat')?.value||'PS5';
-    const condition=sl.querySelector('.slot-cond')?.value||'used';
-    const gid=uid();
-    db.ref('games/'+gid).set({id:gid,title,platform,condition,qty:1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null,cover:''});
-  });
-
-  showToast(t('ship_exp_added'));closeModalForce();
-}
-function deleteShipment(id){if(!confirm(t('del_ship')))return;db.ref('shipments/'+id).remove();}
-
-// STATS
-function setStatPeriod(p){S.statPeriod=p;renderStatsPage();}
-function renderStatsPage(){
-  const page=document.getElementById('page-stats');if(!page)return;
-  const now=new Date(),games=Object.values(S.games),expenses=Object.values(S.expenses);
-  function inP(ts){
-    if(!ts)return false;const d=new Date(ts);
-    if(S.statPeriod==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-    if(S.statPeriod==='week')return d>=(new Date(now-7*86400000));
-    return d.getFullYear()===now.getFullYear();
-  }
-  const sold=games.filter(g=>g.status==='sold'&&inP(g.soldAt||g.addedAt));
-  const revenue=sold.reduce((s,g)=>s+parseFloat(g.price||0),0);
-  let cogs=0;
-  sold.forEach(g=>{
-    if(g.cost)cogs+=gel(g.cost,g.costCurrency||'\u20be');
-    cogs+=parseFloat(g.deliveryCost||0);
-    if(g.shipmentId&&S.shipments[g.shipmentId])cogs+=parseFloat(S.shipments[g.shipmentId].perDisc||0);
-  });
-  const pExp=expenses.filter(e=>inP(e.date));
-  const extraExp=pExp.reduce((s,e)=>s+parseFloat(e.amount||0),0);
-  const profit=revenue-(cogs+extraExp);
-  const dd=[{label:t('revenue'),value:revenue,color:'#3ecf8e'},{label:t('cogs'),value:cogs,color:'#f06060'},{label:t('extra_exp'),value:extraExp,color:'#f0a832'}];
-  const periodBtns=['month','week','year'].map(p=>`<button class="period-btn${S.statPeriod===p?' active':''}" onclick="setStatPeriod('${p}')">${t('p'+p.charAt(0))}</button>`).join('');
-  const legendHtml=dd.map(d=>`<div class="legend-item"><div style="display:flex;align-items:center"><div class="legend-dot" style="background:${d.color}"></div><div class="legend-label">${d.label}</div></div><div class="legend-val" style="color:${d.color}">${d.value.toFixed(0)} \u20be</div></div>`).join('')+`<div class="legend-item" style="border-top:1px solid var(--border);padding-top:7px;margin-top:4px"><div style="display:flex;align-items:center"><div class="legend-dot" style="background:var(--accent)"></div><div class="legend-label">${t('profit')}</div></div><div class="legend-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} \u20be</div></div>`;
-  const expHtml=pExp.length
-    ?pExp.sort((a,b)=>(b.date||0)-(a.date||0)).map(e=>`<div class="exp-item"><div><div style="font-size:13px;font-weight:600">${e.name}</div>${e.to?`<div style="font-size:11px;color:var(--text2)">${t('exp_to')}: ${e.to}</div>`:''}<div style="font-size:11px;color:var(--text3)">${e.type==='shipping'?t('exp_ship'):t('exp_other')} \xb7 ${fmtDate(e.date)}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="exp-amount">-${e.amount} \u20be</div><button onclick="deleteExpense('${e.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;line-height:1">\xd7</button></div></div>`).join('')
-    :`<div style="font-size:13px;color:var(--text3);text-align:center;padding:14px 0">${t('no_exp')}</div>`;
-  page.innerHTML=`
-    <div class="period-row">${periodBtns}</div>
-    <div class="fin-cards">
-      <div class="fin-card"><div class="fin-card-lbl">${t('revenue')}</div><div class="fin-card-val" style="color:var(--green)">${revenue.toFixed(0)} \u20be</div><div class="fin-card-sub">${sold.length} ${t('sales_n')}</div></div>
-      <div class="fin-card"><div class="fin-card-lbl">${t('profit')}</div><div class="fin-card-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}${profit.toFixed(0)} \u20be</div><div class="fin-card-sub">${t('net')}</div></div>
-      <div class="fin-card"><div class="fin-card-lbl">${t('cogs')}</div><div class="fin-card-val" style="color:var(--red)">${cogs.toFixed(0)} \u20be</div><div class="fin-card-sub">${t('of_sold')}</div></div>
-      <div class="fin-card"><div class="fin-card-lbl">${t('extra_exp')}</div><div class="fin-card-val" style="color:var(--amber)">${extraExp.toFixed(0)} \u20be</div><div class="fin-card-sub">${t('period')}</div></div>
-    </div>
-    <div class="stats-layout">
-      <div class="chart-wrap">
-        <div class="chart-title">${t('structure')}</div>
-        <canvas id="donut" width="155" height="155"></canvas>
-        <div class="legend">${legendHtml}</div>
-      </div>
-      <div class="stats-right">
-        <div class="expenses-section">
-          <div class="exp-title">${t('exp_title')}</div>
-          ${expHtml}
-          <button class="btn-exp-add" onclick="openAddExpense()">${t('add_exp')}</button>
-        </div>
-      </div>
-    </div>`;
-  drawDonut(dd);
-}
-function drawDonut(data){
-  const canvas=document.getElementById('donut');if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const total=data.reduce((s,d)=>s+d.value,0);
-  if(total===0){ctx.clearRect(0,0,155,155);return;}
-  const segs=data.filter(d=>d.value>0);
-  function draw(p){
-    ctx.clearRect(0,0,155,155);
-    let s=-Math.PI/2;
-    segs.forEach(d=>{
-      const end=s+d.value/total*2*Math.PI*p;
-      ctx.beginPath();ctx.moveTo(77,77);ctx.arc(77,77,63,s,end);ctx.closePath();
-      ctx.fillStyle=d.color;ctx.fill();s=end;
-    });
-    ctx.beginPath();ctx.arc(77,77,38,0,2*Math.PI);ctx.fillStyle='#17171e';ctx.fill();
-    ctx.fillStyle='#f0f0f5';ctx.font='bold 13px -apple-system,sans-serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('\u20be'+Math.round(total*p),77,77);
-  }
-  const t0=performance.now();
-  (function anim(now){const p=Math.min((now-t0)/900,1);draw(1-Math.pow(1-p,3));if(p<1)requestAnimationFrame(anim);})(t0);
-}
-
-// EXPENSES
-function openAddExpense(){
-  S.selExpType='other';
-  document.getElementById('modal-root').innerHTML=`
-    <div class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-title">${t('add_exp')} <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>
-    <div class="field"><label>${t('exp_type')}</label>
-      <div class="exp-type-grid">
-        <div class="exp-type-btn" id="et-shipping" onclick="selExpType('shipping')">${t('exp_ship')}</div>
-        <div class="exp-type-btn sel" id="et-other" onclick="selExpType('other')">${t('exp_other')}</div>
-      </div>
-    </div>
-    <div class="field"><label>${t('exp_desc')}</label><input id="exp-name" type="text" placeholder="..."></div>
-    <div class="field"><label>${t('exp_to')}</label><input id="exp-to" type="text" placeholder="..."></div>
-    <div class="row2">
-      <div class="field"><label>${t('exp_amount')}</label><input id="exp-amount" type="number" placeholder="0"></div>
-      <div class="field"><label>${t('exp_date')}</label><input id="exp-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
-    </div>
-    <button class="btn-primary" onclick="saveExpense()">${t('save')}</button>
-    </div></div>`;
-}
-function selExpType(tp){S.selExpType=tp;document.querySelectorAll('.exp-type-btn').forEach(el=>el.classList.remove('sel'));const el=document.getElementById('et-'+tp);if(el)el.classList.add('sel');}
-function saveExpense(){
-  const name=document.getElementById('exp-name').value.trim();
-  const to=document.getElementById('exp-to').value.trim();
-  const amount=parseFloat(document.getElementById('exp-amount').value)||0;
-  const date=new Date(document.getElementById('exp-date').value).getTime();
-  if(!name||!amount){showToast(t('fill_all'));return;}
-  const id=uid();
-  db.ref('expenses/'+id).set({id,name,to,amount,date,type:S.selExpType});
-  showToast(t('exp_added'));closeModalForce();
-  if(S.page==='stats')renderStatsPage();
-}
-function deleteExpense(id){
-  if(!confirm(t('del_exp')))return;
-  db.ref('expenses/'+id).remove();showToast(t('deleted'));
-  if(S.page==='stats')renderStatsPage();
-}
-
-// CALCULATOR
-async function renderCalc(){
-  const page=document.getElementById('page-calc');if(!page)return;
-  page.innerHTML=`
-    <div class="calc-wrap">
-      <div class="calc-title">${t('calc_title')}</div>
-      <div class="calc-sub">${t('calc_sub')}</div>
-      <div class="rates-card">
-        <div class="rates-header">
-          <span class="rates-title">${t('rates_title')}</span>
-          <span class="rates-time" id="rates-time"></span>
-        </div>
-        <div id="rates-list"><div class="rates-loading">${t('loading_rates')}</div></div>
-      </div>
-      <div class="calc-card">
-        <div class="calc-top">
-          <div>
-            <label class="flabel">${t('from_cur')}</label>
-            <input type="number" id="calc-amount" value="100" oninput="calcConvert()" class="calc-big">
-            <select id="calc-cur" onchange="calcConvert()" class="calc-sel">
-              <option value="USD">USD $</option>
-              <option value="EUR">EUR \u20ac</option>
-              <option value="GBP">GBP \xa3</option>
-              <option value="RUB">RUB \u20bd</option>
-              <option value="TRY">TRY \u20ba</option>
-            </select>
-          </div>
-          <div class="calc-arrow">\u2192</div>
-          <div>
-            <label class="flabel">${t('to_gel')}</label>
-            <div class="calc-result-box">
-              <div class="calc-result-num" id="calc-result">\u2014</div>
-              <div class="calc-result-lbl">${t('result_sub')}</div>
-            </div>
-          </div>
-        </div>
-        <div class="sec-label">${t('quick_amounts')}</div>
-        <div class="calc-quick">
-          ${[10,50,100,500].map(a=>`<div class="calc-qbtn" onclick="setCalcAmount(${a})">${a}</div>`).join('')}
-        </div>
-      </div>
-    </div>`;
-  await loadRates();
-  calcConvert();
-}
-async function loadRates(){
-  try{
-    const r=await fetch('https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json');
-    const data=await r.json();
-    const currencies=data[0]?.currencies||[];
-    const wanted={USD:{flag:'\ud83c\uddfa\ud83c\uddf8',name:'US Dollar'},EUR:{flag:'\ud83c\uddea\ud83c\uddfa',name:'Euro'},GBP:{flag:'\ud83c\uddec\ud83c\udde7',name:'Pound Sterling'},RUB:{flag:'\ud83c\uddf7\ud83c\uddfa',name:'\u0420\u043e\u0441. \u0440\u0443\u0431\u043b\u044c'},TRY:{flag:'\ud83c\uddf9\ud83c\uddf7',name:'\u0422\u0443\u0440. \u043b\u0438\u0440\u0430'}};
-    S.rates={};
-    currencies.forEach(c=>{if(wanted[c.code])S.rates[c.code]=c.rate/c.quantity;});
-    const list=document.getElementById('rates-list');
-    const timeEl=document.getElementById('rates-time');
-    if(timeEl)timeEl.textContent=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-    if(list){
-      list.innerHTML=Object.entries(wanted).filter(([k])=>S.rates[k]).map(([code,info])=>`
-        <div class="rate-row">
-          <div class="rate-left"><span class="rate-flag">${info.flag}</span><div><div class="rate-name">${code}</div><div class="rate-code">${info.name}</div></div></div>
-          <div class="rate-val">1 ${code} = ${(S.rates[code]||0).toFixed(4)} \u20be</div>
-        </div>`).join('');
-    }
-  }catch(e){
-    const list=document.getElementById('rates-list');
-    if(list)list.innerHTML=`<div class="rates-loading" style="color:var(--red)">\u041e\u0448\u0438\u0431\u043a\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438 \u043a\u0443\u0440\u0441\u043e\u0432</div>`;
-  }
-}
-function calcConvert(){
-  const amount=parseFloat(document.getElementById('calc-amount')?.value)||0;
-  const cur=document.getElementById('calc-cur')?.value||'USD';
-  const rate=S.rates[cur]||0;
-  const el=document.getElementById('calc-result');
-  if(el)el.textContent=rate>0?(amount*rate).toFixed(2)+' \u20be':'\u2014';
-}
-function setCalcAmount(a){
-  const el=document.getElementById('calc-amount');if(el){el.value=a;calcConvert();}
-}
-
-function closeModal(e){if(e.target===e.currentTarget)closeModalForce();}
-function closeModalForce(){document.getElementById('modal-root').innerHTML='';}
-
-// EXPOSE GLOBALS
-window.setPage=setPage;window.openAdd=openAdd;window.openDetail=openDetail;
-window.quickStatus=quickStatus;window.openSellPopup=openSellPopup;window.openSellOnePopup=openSellOnePopup;
-window.confirmSell=confirmSell;window.confirmSellOne=confirmSellOne;
-window.changeQty=changeQty;window.selCond=selCond;window.selStatus=selStatus;
-window.onTitleInput=onTitleInput;window.selectSugg=selectSugg;
-window.addGame=addGame;window.saveEdit=saveEdit;window.deleteGame=deleteGame;
-window.setShipStatus=setShipStatus;window.openAddShipment=openAddShipment;
-window.onShipCountChange=onShipCountChange;window.saveShipment=saveShipment;window.deleteShipment=deleteShipment;
-window.setStatPeriod=setStatPeriod;window.openAddExpense=openAddExpense;
-window.selExpType=selExpType;window.saveExpense=saveExpense;window.deleteExpense=deleteExpense;
-window.calcConvert=calcConvert;window.setCalcAmount=setCalcAmount;
-window.fetchSlotSugg=fetchSlotSugg;window.selectSlotSugg=selectSlotSugg;window.addShipToExpenses=addShipToExpenses;window.openEditShipment=openEditShipment;window.renderShipments=renderShipments;window.saveShipmentEdit=saveShipmentEdit;window.onSlotTitleInput=onSlotTitleInput;window.saveSlotData=saveSlotData;window.closeModal=closeModal;window.closeModalForce=closeModalForce;
-window.toggleLang=toggleLang;window.renderList=renderList;
-window.dismissInstall=dismissInstall;
-</script>
-</body>
-</html>
+>
