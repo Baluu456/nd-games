@@ -220,6 +220,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .loader-dots i:nth-child(3){animation-delay:.4s}
 @keyframes dot{0%,80%,100%{opacity:.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
 
+.type-switcher{display:flex;gap:6px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.type-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 4px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2);text-align:center;transition:all .15s}
+.type-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
 </style>
 </head>
 <body>
@@ -227,15 +231,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 
 <div id="root" style="display:none">
   <div class="tab-bar">
-<button class="tab active" id="tab-available" onclick="setPage('available')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span id="tl-available">available</span></button>
-<button class="tab" id="tab-transit" onclick="setPage('transit')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg><span id="tl-transit">transit</span></button>
-<button class="tab" id="tab-reserved" onclick="setPage('reserved')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="tl-reserved">reserved</span></button>
-<button class="tab" id="tab-sold" onclick="setPage('sold')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 12h.01"/></svg><span id="tl-sold">sold</span></button>
-<button class="tab" id="tab-exchange" onclick="setPage('exchange')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg><span id="tl-exchange">exchange</span></button>
-<button class="tab" id="tab-shipments" onclick="setPage('shipments')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span id="tl-shipments">shipments</span></button>
-<button class="tab" id="tab-stats" onclick="setPage('stats')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span id="tl-stats">stats</span></button>
-<button class="tab" id="tab-calc" onclick="setPage('calc')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/></svg><span id="tl-calc">calc</span></button>
-
+    <button class="tab active" id="tab-available" onclick="setPage('available')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span id="tl-available">available</span></button>
+    <button class="tab" id="tab-transit" onclick="setPage('transit')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg><span id="tl-transit">transit</span></button>
+    <button class="tab" id="tab-reserved" onclick="setPage('reserved')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="tl-reserved">reserved</span></button>
+    <button class="tab" id="tab-sold" onclick="setPage('sold')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 12h.01"/></svg><span id="tl-sold">sold</span></button>
+    <button class="tab" id="tab-exchange" onclick="setPage('exchange')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg><span id="tl-exchange">exchange</span></button>
+    <button class="tab" id="tab-shipments" onclick="setPage('shipments')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span id="tl-shipments">shipments</span></button>
+    <button class="tab" id="tab-stats" onclick="setPage('stats')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span id="tl-stats">stats</span></button>
+    <button class="tab" id="tab-calc" onclick="setPage('calc')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/></svg><span id="tl-calc">calc</span></button>
   </div>
   <div id="content-area" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
     <div class="header">
@@ -255,21 +258,25 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
       <div class="stats-row" id="stats-row"></div>
     </div>
+    <div class="type-switcher">
+      <button class="type-btn active" id="ttype-disc" onclick="setItemType('disc')">&#x1F4BF; Диски</button>
+      <button class="type-btn" id="ttype-steelbook" onclick="setItemType('steelbook')">&#x1F4E6; Стилбуки</button>
+      <button class="type-btn" id="ttype-accessory" onclick="setItemType('accessory')">&#x1F3A8; Аксессуары</button>
+    </div>
     <div class="controls" id="controls">
       <div class="search-wrap">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="white" stroke-width="1.5"/><path d="M10 10l3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
         <input type="text" id="search-inp" oninput="renderList()">
       </div>
     </div>
-<div id="page-available" class="page" style="display:none"><div class="games-grid" id="grid-available"></div></div>
-<div id="page-transit" class="page" style="display:none"><div class="games-grid" id="grid-transit"></div></div>
-<div id="page-reserved" class="page" style="display:none"><div class="games-grid" id="grid-reserved"></div></div>
-<div id="page-sold" class="page" style="display:none"><div class="games-grid" id="grid-sold"></div></div>
-<div id="page-exchange" class="page" style="display:none"><div class="games-grid" id="grid-exchange"></div></div>
-<div id="page-shipments" class="page" style="display:none"></div>
-<div id="page-stats" class="page" style="display:none"></div>
-<div id="page-calc" class="page" style="display:none"></div>
-
+    <div id="page-available" class="page" style="display:none"><div class="games-grid" id="grid-available"></div></div>
+    <div id="page-transit" class="page" style="display:none"><div class="games-grid" id="grid-transit"></div></div>
+    <div id="page-reserved" class="page" style="display:none"><div class="games-grid" id="grid-reserved"></div></div>
+    <div id="page-sold" class="page" style="display:none"><div class="games-grid" id="grid-sold"></div></div>
+    <div id="page-exchange" class="page" style="display:none"><div class="games-grid" id="grid-exchange"></div></div>
+    <div id="page-shipments" class="page" style="display:none"></div>
+    <div id="page-stats" class="page" style="display:none"></div>
+    <div id="page-calc" class="page" style="display:none"></div>
   </div>
 </div>
 
@@ -389,6 +396,19 @@ function toggleLang(){
   if(S.page==='shipments')renderShipments();
   if(S.page==='calc')renderCalc();
 }
+function setItemType(tp){
+  S.itemType=tp;
+  ['disc','steelbook','accessory'].forEach(function(t){
+    var b=document.getElementById('ttype-'+t);if(b)b.classList.toggle('active',t===tp);
+  });
+  // accessory: hide exchange/reserved tabs
+  var isAcc=tp==='accessory';
+  var exTab=document.getElementById('tab-exchange');if(exTab)exTab.style.display=isAcc?'none':'';
+  var resTab=document.getElementById('tab-reserved');if(resTab)resTab.style.display=isAcc?'none':'';
+  if(isAcc&&(S.page==='exchange'||S.page==='reserved'))setPage('available');
+  renderList();
+}
+
 function applyLang(){
   var si=document.getElementById('search-inp');if(si)si.placeholder=t('search');
   var ha=document.getElementById('hl-add');if(ha)ha.textContent=t('add');
@@ -400,7 +420,7 @@ function applyLang(){
 }
 
 // STATE
-var S={games:{},shipments:{},expenses:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null};
+var S={games:{},shipments:{},expenses:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc'};
 var STATUSES={available:{badge:'b-available'},transit:{badge:'b-transit'},reserved:{badge:'b-reserved'},reserved_exchange:{badge:'b-reserved_exchange'},sold:{badge:'b-sold'},exchange:{badge:'b-exchange'},ordered:{badge:'b-ordered'}};
 var PLATFORMS=['PS5','PS4','PS4/PS5'];
 var PAGE_ST={available:['available'],transit:['transit','ordered'],reserved:['reserved','reserved_exchange'],sold:['sold'],exchange:['exchange']};
@@ -446,7 +466,7 @@ function closeModalForce(){document.getElementById('modal-root').innerHTML='';}
 
 // STATS BAR
 function renderStats(){
-  var g=Object.values(S.games),c={total:0,av:0,tr:0,sold:0};
+  var g=Object.values(S.games).filter(function(x){return (x.itemType||'disc')===S.itemType;}),c={total:0,av:0,tr:0,sold:0};
   g.forEach(function(x){var q=parseInt(x.qty||1);c.total+=q;if(x.status==='available')c.av+=q;if(['transit','ordered'].includes(x.status))c.tr+=q;if(x.status==='sold')c.sold++;});
   var r=document.getElementById('stats-row');if(!r)return;
   r.innerHTML='<div class="stat" onclick="setPage(\'available\')"><div class="stat-num">'+c.total+'</div><div class="stat-lbl">'+t('total')+'</div></div>'
@@ -460,7 +480,10 @@ function renderList(){
   renderStats();
   var q=(document.getElementById('search-inp')||{}).value||'';
   ['available','transit','reserved','sold','exchange'].forEach(function(pid){
-    var g=Object.entries(S.games).map(function(e){return Object.assign({},e[1],{id:e[0]});}).filter(function(x){return PAGE_ST[pid].includes(x.status);});
+    var g=Object.entries(S.games).map(function(e){return Object.assign({},e[1],{id:e[0]});}).filter(function(x){
+      if(!PAGE_ST[pid].includes(x.status))return false;
+      return (x.itemType||'disc')===S.itemType;
+    });
     if(q)g=g.filter(function(x){return x.title&&x.title.toLowerCase().includes(q.toLowerCase());});
     g.sort(function(a,b){return (b.addedAt||0)-(a.addedAt||0);});
     var grid=document.getElementById('grid-'+pid);if(!grid)return;
@@ -582,11 +605,15 @@ function openAdd(editId){
     +'<div class="divider"></div><div class="sec-label">'+t('client')+'</div>'
     +'<div class="row2"><div class="field"><label>'+t('fname')+'</label><input id="inp-person" type="text" placeholder="..." value="'+(ex.person||'')+'"></div>'
     +'<div class="field"><label>'+t('phone')+'</label><input id="inp-phone" type="tel" placeholder="+995..." value="'+(ex.phone||'')+'"></div></div>'
+    +(S.itemType==='steelbook'?'<div class="field"><label>С игрой</label><div class="cond-grid"><div class="cond-opt'+(( ex.hasGame===false)?'':' sel')+'" id="sg-yes" onclick="selHasGame(true)">Да</div><div class="cond-opt'+( ex.hasGame===false?' sel':'')+'" id="sg-no" onclick="selHasGame(false)">Пустой</div></div></div>':'')
     +'<div class="field"><label>'+t('notes')+'</label><textarea id="inp-notes">'+(ex.notes||'')+'</textarea></div>'
     +'<button class="btn-primary" onclick="'+(isEdit?'saveEdit(\''+editId+'\')':'addGame()')+'">'+( isEdit?t('save'):t('add_disc'))+'</button>'
     +(isEdit?'<button class="btn-danger" onclick="deleteGame(\''+editId+'\')">'+t('delete_disc')+'</button>':'')
     +'</div></div>';
 }
+
+var _hasGame=true;
+function selHasGame(v){_hasGame=v;var y=document.getElementById("sg-yes"),n=document.getElementById("sg-no");if(y)y.classList.toggle("sel",v);if(n)n.classList.toggle("sel",!v);}
 
 function changeQty(d){S.qty=Math.max(1,S.qty+d);var el=document.getElementById('qty-display');if(el)el.textContent=S.qty;}
 function selCond(c){S.selCond=c;document.querySelectorAll('.cond-opt').forEach(function(el){el.classList.remove('sel');});var el=document.getElementById('cond-'+c);if(el)el.classList.add('sel');}
@@ -642,7 +669,9 @@ function getForm(){
     status:S.selStatus||'available',
     person:document.getElementById('inp-person').value.trim(),
     phone:document.getElementById('inp-phone').value.trim(),
-    notes:document.getElementById('inp-notes').value.trim()
+    notes:document.getElementById('inp-notes').value.trim(),
+    itemType:S.itemType,
+    hasGame:S.itemType==='steelbook'?_hasGame:undefined
   };
 }
 function addGame(){
@@ -733,7 +762,7 @@ function confirmSell(id){
 // SHIPMENTS
 function renderShipments(){
   var page=document.getElementById('page-shipments');if(!page||S.page!=='shipments')return;
-  var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (b.date||0)-(a.date||0);});
+  var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).filter(function(s){return (s.shipType||'disc')===S.itemType;}).sort(function(a,b){return (b.date||0)-(a.date||0);});
   var cardsHtml=!ships.length?'<div style="color:var(--text3);font-size:14px;text-align:center;padding:40px 0;grid-column:1/-1">'+t('no_ships')+'</div>'
     :ships.map(function(s){
       var isT=s.shipStatus!=='received';
@@ -772,20 +801,12 @@ function setShipStatus(id,status){
   }
 }
 
-function openAddShipment(){S.editShipId=null;S.shipSlots=1;S.slotData={};openShipModal();}
+function openAddShipment(){S.editShipId=null;S.shipSlots=1;S.slotData={};S.shipType=S.itemType;openShipModal();}
 function openEditShipment(id){
   var ex=S.shipments[id]||{};
   S.editShipId=id;
-  var count=parseInt(ex.discCount)||1;
-  S.shipSlots=count;
-  // Pre-fill slot data from existing linked games
-  S.slotData={};
-  var linked=Object.values(S.games).filter(function(g){return g.shipmentId===id;}).sort(function(a,b){return (a.addedAt||0)-(b.addedAt||0);});
-  linked.forEach(function(g,i){
-    if(i<count){
-      S.slotData[i]={title:g.title||'',cover:g.cover||'',plat:g.platform||'PS5',cond:g.condition||'used'};
-    }
-  });
+  S.itemType=(ex.shipType||'disc');S.shipType=S.itemType;
+  ['disc','steelbook','accessory'].forEach(function(t){var b=document.getElementById('ttype-'+t);if(b)b.classList.toggle('active',t===S.itemType);});S.shipSlots=parseInt(ex.discCount)||1;S.slotData={};
   openShipModal();
 }
 
@@ -800,6 +821,7 @@ function buildSlotHtml(i){
     +'<div id="slot-sugg-'+i+'" style="position:absolute;left:0;right:0;z-index:100"></div>'
     +(saved.cover?'<img src="'+saved.cover+'" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="slot-thumb-'+i+'">':'<span id="slot-thumb-'+i+'"></span>')
     +'<input type="hidden" class="slot-cover" value="'+(saved.cover||'')+'"></div>'
+    +(S.itemType==='accessory'?('<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><label style="font-size:11px;color:var(--text2);min-width:40px">Кол-во</label><input type="number" class="slot-qty" value="'+(saved.qty||1)+'" min="1" style="width:70px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:6px 8px;font-size:13px;outline:none"></div>'):'')
     +'<div class="disc-slot-row">'
     +'<select class="slot-plat">'+PLATFORMS.map(function(p){return '<option'+(( saved.plat||'PS5')===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'
     +'<select class="slot-cond">'
@@ -815,7 +837,7 @@ function openShipModal(){
   document.getElementById('modal-root').innerHTML=
     '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
     +'<div class="modal-handle"></div>'
-    +'<div class="modal-title">'+(S.editShipId?t('edit_btn'):t('new_ship'))+' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
+    +'<div class="modal-title">'+(S.editShipId?t('edit_btn'):t('new_ship'))+' ('+(S.itemType==='disc'?'Диски':S.itemType==='steelbook'?'Стилбуки':'Аксессуары')+') '+' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
     +'<div class="field"><label>'+t('ship_name')+'</label><input id="sh-name" type="text" placeholder="Dubai April 2025" value="'+(ex.name||'')+'"></div>'
     +'<div class="field"><label>'+t('ship_source')+'</label><input id="sh-source" type="text" placeholder="Dubai / Turkey / eBay UK" value="'+(ex.source||'')+'"></div>'
     +'<div class="row2"><div class="field"><label>'+t('ship_date')+'</label><input id="sh-date" type="date" value="'+(ex.date?new Date(ex.date).toISOString().slice(0,10):new Date().toISOString().slice(0,10))+'"></div>'
@@ -900,7 +922,7 @@ function saveShipment(){
   var totalCost=purchaseCost+deliveryCostVal;
   var perDisc=discCount>0?totalCost/discCount:0;
   var id=uid();
-  db.ref('shipments/'+id).set({id:id,name:name,source:source,date:date,discCount:discCount,purchaseCost:purchaseCost,deliveryCostVal:deliveryCostVal,totalCost:totalCost,perDisc:perDisc,notes:notes,shipStatus:'transit',inExpenses:totalCost>0});
+  db.ref('shipments/'+id).set({id:id,name:name,source:source,date:date,discCount:discCount,purchaseCost:purchaseCost,deliveryCostVal:deliveryCostVal,totalCost:totalCost,perDisc:perDisc,notes:notes,shipStatus:'transit',inExpenses:totalCost>0,shipType:S.itemType});
   if(totalCost>0){
     var eid=uid();
     db.ref('expenses/'+eid).set({id:eid,name:name||(lang==='ka'?'\u10de\u10d0\u10e0\u10e2\u10d8\u10d0':'\u041f\u0430\u0440\u0442\u0438\u044f'),to:source,amount:totalCost,date:date,type:'shipping'});
@@ -909,7 +931,7 @@ function saveShipment(){
   for(var i=0;i<n;i++){
     var d=S.slotData[i];if(!d||!d.title)continue;
     var gid=uid();
-    db.ref('games/'+gid).set({id:gid,title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null});
+    db.ref('games/'+gid).set({id:gid,title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:parseInt(d.qty)||1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null,itemType:S.itemType});
   }
   S.slotData={};S.shipSlots=1;
   showToast(t('ship_exp_added'));closeModalForce();
@@ -937,7 +959,7 @@ function deleteShipment(id){if(!confirm(t('del_ship')))return;db.ref('shipments/
 function setStatPeriod(p){S.statPeriod=p;renderStatsPage();}
 function renderStatsPage(){
   var page=document.getElementById('page-stats');if(!page)return;
-  var now=new Date(),games=Object.values(S.games),expenses=Object.values(S.expenses);
+  var now=new Date(),games=Object.values(S.games).filter(function(x){return (x.itemType||'disc')===S.itemType;}),expenses=Object.values(S.expenses);
   function inP(ts){if(!ts)return false;var d=new Date(ts);if(S.statPeriod==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();if(S.statPeriod==='week')return d>=(new Date(now-7*86400000));return d.getFullYear()===now.getFullYear();}
   var sold=games.filter(function(g){return g.status==='sold'&&inP(g.soldAt||g.addedAt);});
   var revenue=sold.reduce(function(s,g){return s+parseFloat(g.price||0);},0);
