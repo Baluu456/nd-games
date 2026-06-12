@@ -369,10 +369,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 var PIN_CORRECT='1234'; // default PIN
 var pinInput='';
 function pinKey(k){
-  var stored=localStorage.getItem('nd-pin')||PIN_CORRECT;
-  if(k==='del'){pinInput=pinInput.slice(0,-1);}
-  else if(k==='ok'||pinInput.length>=4){
-    if(k!=='ok'&&k!=='del')pinInput+=k;
+  var stored=localStorage.getItem('nd-pin')||'1234';
+  if(k==='del'){
+    pinInput=pinInput.slice(0,-1);
+  } else if(k==='ok'){
     if(pinInput===stored){
       document.getElementById('pin-overlay').style.display='none';
       pinInput='';
@@ -382,12 +382,23 @@ function pinKey(k){
       setTimeout(function(){var e=document.getElementById('pin-error');if(e)e.textContent='';},1500);
     }
   } else {
-    pinInput+=k;
+    if(pinInput.length<4) pinInput+=k;
+    if(pinInput.length===4){
+      if(pinInput===stored){
+        document.getElementById('pin-overlay').style.display='none';
+        pinInput='';
+        for(var j=0;j<4;j++){var dj=document.getElementById('pd'+j);if(dj)dj.classList.remove('filled');}
+        return;
+      } else {
+        document.getElementById('pin-error').textContent='\u041d\u0435\u0432\u0435\u0440\u043d\u044b\u0439 PIN';
+        pinInput='';
+        setTimeout(function(){var e=document.getElementById('pin-error');if(e)e.textContent='';},1500);
+      }
+    }
   }
-  // update dots
   for(var i=0;i<4;i++){var d=document.getElementById('pd'+i);if(d)d.classList.toggle('filled',i<pinInput.length);}
-  if(pinInput.length===4&&k!=='ok')pinKey('ok');
 }
+
 // Show hint about changing PIN
 var storedPin=localStorage.getItem('nd-pin');
 if(!storedPin){
