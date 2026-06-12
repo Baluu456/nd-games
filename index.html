@@ -820,7 +820,27 @@ function openEditShipment(id){
   var ex=S.shipments[id]||{};
   S.editShipId=id;
   S.itemType=(ex.shipType||'disc');S.shipType=S.itemType;
-  ['disc','steelbook','accessory'].forEach(function(t){var b=document.getElementById('ttype-'+t);if(b)b.classList.toggle('active',t===S.itemType);});S.shipSlots=parseInt(ex.discCount)||1;S.slotData={};
+  ['disc','steelbook','accessory'].forEach(function(tp){
+    var b=document.getElementById('ttype-'+tp);if(b)b.classList.toggle('active',tp===S.itemType);
+  });
+  var count=parseInt(ex.discCount)||1;
+  S.shipSlots=count;
+  S.slotData={};
+  // Pre-fill slots from ALL linked games (any status)
+  var linked=Object.values(S.games)
+    .filter(function(g){return g.shipmentId===id;})
+    .sort(function(a,b){return (a.addedAt||0)-(b.addedAt||0);});
+  linked.forEach(function(g,i){
+    if(i<count){
+      S.slotData[i]={
+        title:g.title||'',
+        cover:g.cover||'',
+        plat:g.platform||'PS5',
+        cond:g.condition||'used',
+        qty:parseInt(g.qty)||1
+      };
+    }
+  });
   openShipModal();
 }
 
