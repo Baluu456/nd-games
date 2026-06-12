@@ -927,12 +927,32 @@ function renderExchangePage(){
     .map(function(e){return Object.assign({},e[1],{id:e[0]});})
     .sort(function(a,b){return (b.date||0)-(a.date||0);});
 
+  // Also show legacy exchanged discs (status='exchange' but no exchangeId)
+  var legacyDiscs=Object.values(S.games).filter(function(g){
+    return g.status==='exchange'&&!g.exchangeId&&(g.itemType||'disc')===S.itemType;
+  }).sort(function(a,b){return (b.exchangedAt||b.addedAt||0)-(a.exchangedAt||a.addedAt||0);});
+
   var html='<div class="exchange-page">';
   html+='<button class="exchange-new-btn" onclick="openNewExchange()">+ '+t('new_exchange')+'</button>';
 
-  if(!exchanges.length){
+  if(!exchanges.length&&!legacyDiscs.length){
     html+='<div style="text-align:center;padding:40px 24px;color:var(--text3)">'+t('no_exchanges')+'</div>';
   } else {
+    // Show legacy discs as simple cards
+    legacyDiscs.forEach(function(g){
+      html+='<div class="exchange-card">';
+      html+='<div class="exchange-header"><span style="font-size:13px;font-weight:700">'+t('st_exchange')+'</span>';
+      html+='<span class="exchange-date">'+fmtDate(g.exchangedAt||g.addedAt)+'</span></div>';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:12px 13px">';
+      html+=g.cover?'<img style="width:40px;height:56px;object-fit:cover;border-radius:4px" src="'+g.cover+'" alt="">':'<div style="width:40px;height:56px;background:var(--bg3);border-radius:4px"></div>';
+      html+='<div><div style="font-size:14px;font-weight:600">'+(g.title||'—')+'</div>';
+      html+='<div style="font-size:12px;color:var(--text2)">'+(g.platform||'')+(g.condition?' · '+(g.condition==='new'?t('cond_new'):t('cond_used')):'')+'</div>';
+      if(g.price)html+='<div style="font-size:13px;font-weight:700;margin-top:2px">'+g.price+' ₾</div>';
+      html+='</div></div>';
+      html+='<div class="exchange-footer">';
+      html+='<button class="exchange-to-stock-btn" onclick="legacyToStock(''+g.id+'')">✓ '+t('exchange_to_stock')+'</button>';
+      html+='</div></div>';
+    });
     exchanges.forEach(function(ex){
       // Gave discs info
       var gaveGames=(ex.gave||[]).map(function(gid){return S.games[gid]||{title:gid,cover:'',platform:''};});
@@ -1183,6 +1203,11 @@ function exchangeToStock(exchangeId){
   (ex.got||[]).forEach(function(d){
     if(d.gameId)db.ref('games/'+d.gameId).update({status:'available'});
   });
+  showToast(t('exchange_moved'));
+}
+
+function legacyToStock(gameId){
+  db.ref('games/'+gameId).update({status:'available',exchangedAt:null});
   showToast(t('exchange_moved'));
 }
 
