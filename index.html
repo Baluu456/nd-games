@@ -224,6 +224,51 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .type-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 4px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2);text-align:center;transition:all .15s}
 .type-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
+
+.exchange-page{display:flex;flex-direction:column;gap:12px}
+.exchange-new-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:4px}
+.exchange-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.exchange-header{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--border)}
+.exchange-date{font-size:11px;color:var(--text3)}
+.exchange-body{display:grid;grid-template-columns:1fr 40px 1fr;align-items:stretch;min-height:90px}
+.exchange-side{padding:10px 12px}
+.exchange-side-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.exchange-side.gave .exchange-side-label{color:var(--red)}
+.exchange-side.got .exchange-side-label{color:var(--green)}
+.exchange-arrow{display:flex;align-items:center;justify-content:center;background:var(--bg3);font-size:18px;color:var(--text2)}
+.exchange-disc-item{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.exchange-disc-item:last-child{margin-bottom:0}
+.exchange-disc-thumb{width:28px;height:38px;object-fit:cover;border-radius:3px;background:var(--bg4);flex-shrink:0}
+.exchange-disc-info{min-width:0}
+.exchange-disc-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exchange-disc-meta{font-size:10px;color:var(--text2)}
+.exchange-footer{padding:8px 13px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.exchange-to-stock-btn{background:rgba(62,207,142,0.12);border:1px solid rgba(62,207,142,0.3);color:var(--green);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;flex:1}
+.exchange-del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:6px}
+.exchange-notes{font-size:11px;color:var(--text2);flex:1}
+/* Exchange modal */
+.exchange-select-list{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);margin-top:6px}
+.exchange-select-item{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.exchange-select-item:last-child{border-bottom:none}
+.exchange-select-item.selected{background:rgba(124,109,240,0.15);border-color:var(--accent)}
+.exchange-select-item:active{background:var(--bg4)}
+.exchange-selected-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:24px}
+.exchange-tag{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+.exchange-tag-x{cursor:pointer;color:var(--text3);font-size:14px;line-height:1}
+.received-slot{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px}
+.received-slot-header{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px}
+
+#pin-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.pin-logo{font-size:32px;font-weight:800;letter-spacing:-1px}
+.pin-logo span{color:var(--accent)}
+.pin-dots{display:flex;gap:12px;margin:8px 0}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);background:transparent;transition:background .15s}
+.pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,72px);gap:10px}
+.pin-btn{width:72px;height:72px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:22px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s}
+.pin-btn:active{background:var(--accent);color:#fff}
+.pin-hint{font-size:12px;color:var(--text3)}
+.pin-error{font-size:13px;color:var(--red);font-weight:600;min-height:18px}
 </style>
 </head>
 <body>
@@ -273,13 +318,39 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div id="page-transit" class="page" style="display:none"><div class="games-grid" id="grid-transit"></div></div>
     <div id="page-reserved" class="page" style="display:none"><div class="games-grid" id="grid-reserved"></div></div>
     <div id="page-sold" class="page" style="display:none"><div class="games-grid" id="grid-sold"></div></div>
-    <div id="page-exchange" class="page" style="display:none"><div class="games-grid" id="grid-exchange"></div></div>
+    <div id="page-exchange" class="page" style="display:none"></div>
     <div id="page-shipments" class="page" style="display:none"></div>
     <div id="page-stats" class="page" style="display:none"></div>
     <div id="page-calc" class="page" style="display:none"></div>
   </div>
 </div>
 
+<div id="pin-overlay">
+  <div class="pin-logo"><span>ND</span> Games</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-grid">
+    <button class="pin-btn" onclick="pinKey('1')">1</button>
+    <button class="pin-btn" onclick="pinKey('2')">2</button>
+    <button class="pin-btn" onclick="pinKey('3')">3</button>
+    <button class="pin-btn" onclick="pinKey('4')">4</button>
+    <button class="pin-btn" onclick="pinKey('5')">5</button>
+    <button class="pin-btn" onclick="pinKey('6')">6</button>
+    <button class="pin-btn" onclick="pinKey('7')">7</button>
+    <button class="pin-btn" onclick="pinKey('8')">8</button>
+    <button class="pin-btn" onclick="pinKey('9')">9</button>
+    <button class="pin-btn" onclick="pinKey('del')" style="font-size:16px">⌫</button>
+    <button class="pin-btn" onclick="pinKey('0')">0</button>
+    <button class="pin-btn" onclick="pinKey('ok')" style="background:var(--accent);color:#fff;border-color:var(--accent);font-size:14px">OK</button>
+  </div>
+  <div class="pin-hint" id="pin-hint"></div>
+  <button onclick="openChangePin()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;margin-top:8px;text-decoration:underline">Сменить PIN</button>
+</div>
 <div id="install-banner">
   <p>ND Games <span id="ib-sub">Установить как приложение</span></p>
   <div class="install-btns">
@@ -293,6 +364,66 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
+
+// PIN PROTECTION
+var PIN_CORRECT='1234'; // default PIN
+var pinInput='';
+function pinKey(k){
+  var stored=localStorage.getItem('nd-pin')||PIN_CORRECT;
+  if(k==='del'){pinInput=pinInput.slice(0,-1);}
+  else if(k==='ok'||pinInput.length>=4){
+    if(k!=='ok'&&k!=='del')pinInput+=k;
+    if(pinInput===stored){
+      document.getElementById('pin-overlay').style.display='none';
+      pinInput='';
+    } else {
+      document.getElementById('pin-error').textContent='\u041d\u0435\u0432\u0435\u0440\u043d\u044b\u0439 PIN';
+      pinInput='';
+      setTimeout(function(){var e=document.getElementById('pin-error');if(e)e.textContent='';},1500);
+    }
+  } else {
+    pinInput+=k;
+  }
+  // update dots
+  for(var i=0;i<4;i++){var d=document.getElementById('pd'+i);if(d)d.classList.toggle('filled',i<pinInput.length);}
+  if(pinInput.length===4&&k!=='ok')pinKey('ok');
+}
+// Show hint about changing PIN
+var storedPin=localStorage.getItem('nd-pin');
+if(!storedPin){
+  localStorage.setItem('nd-pin','1234');
+  var hint=document.getElementById('pin-hint');
+  if(hint)hint.textContent='\u0414\u0435\u0444\u043e\u043b\u0442: 1234';
+}
+
+function openChangePin(){
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">Смена PIN <button class="btn-close" onclick="closeModalForce()">×</button></div>'
+    +'<div class="field"><label>Текущий PIN</label><input id="cp-old" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="letter-spacing:8px;font-size:20px;text-align:center"></div>'
+    +'<div class="field"><label>Новый PIN (4 цифры)</label><input id="cp-new" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="letter-spacing:8px;font-size:20px;text-align:center"></div>'
+    +'<div class="field"><label>Повторите новый PIN</label><input id="cp-confirm" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="letter-spacing:8px;font-size:20px;text-align:center"></div>'
+    +'<div id="cp-error" style="color:var(--red);font-size:13px;margin-bottom:8px;min-height:18px"></div>'
+    +'<button class="btn-primary" onclick="saveNewPin()">Сохранить PIN</button>'
+    +'</div></div>';
+}
+
+function saveNewPin(){
+  var oldVal=document.getElementById('cp-old').value;
+  var newVal=document.getElementById('cp-new').value;
+  var confirmVal=document.getElementById('cp-confirm').value;
+  var stored=localStorage.getItem('nd-pin')||'1234';
+  var errEl=document.getElementById('cp-error');
+  if(oldVal!==stored){if(errEl)errEl.textContent='Неверный текущий PIN';return;}
+  if(newVal.length!==4){if(errEl)errEl.textContent='PIN должен быть из 4 цифр';return;}
+  if(newVal!==confirmVal){if(errEl)errEl.textContent='PIN не совпадает';return;}
+  localStorage.setItem('nd-pin',newVal);
+  closeModalForce();
+  showToast('✓ PIN изменён');
+}
+
+
 firebase.initializeApp({apiKey:"AIzaSyAkIxx4M7IISPWUEP4vMnQaaYazC8KGxiI",authDomain:"nd-games.firebaseapp.com",databaseURL:"https://nd-games-default-rtdb.europe-west1.firebasedatabase.app",projectId:"nd-games",storageBucket:"nd-games.firebasestorage.app",messagingSenderId:"447616051556",appId:"1:447616051556:web:c96fb5818cdf5ab7363271"});
 var db=firebase.database();
 
@@ -330,7 +461,11 @@ notes_l:'Заметки',added_l:'Добавлен',sold_l:'Продан',exchan
 quick_status:'Быстрый статус',edit_btn:'Редактировать',
 sell_title:'Финальная цена',sell_sub:'Укажите реальную сумму',sell_confirm:'Подтвердить продажу',sell_cancel:'Отмена',
 disc_added:'Диск добавлен',saved:'Сохранено',deleted:'Удалено',status_changed:'Статус изменён',sold_ok:'Продажа записана',
-new_ship:'Новая партия',ship_transit:'В пути',ship_received:'Получена',
+new_exchange:'Новый обмен',exchange_gave:'Отдал',exchange_got:'Получил',
+exchange_to_stock:'В наличие',exchange_select_gave:'Выберите диски которые отдаёте',
+exchange_received_discs:'Что получили',exchange_add_received:'+ Добавить полученный',
+no_exchanges:'Нет обменов',exchange_saved:'Обмен зафиксирован',
+del_exchange:'Удалить обмен?',exchange_moved:'Диски перенесены в наличие',new_ship:'Новая партия',ship_transit:'В пути',ship_received:'Получена',
 ship_name:'Название партии',ship_source:'Откуда',ship_date:'Дата',ship_count:'Кол-во дисков',
 ship_purchase:'Закупка (₾)',ship_delivery:'Доставка (₾)',ship_discs:'Диски в партии',ship_notes:'Заметки',
 per_disc:'₾/диск',discs:'дисков',del:'Удалить',no_ships:'Нет партий',
@@ -370,7 +505,11 @@ notes_l:'შენიშვნები',added_l:'დამატებული
 quick_status:'სწრაფი სტატუსი',edit_btn:'რედაქტირება',
 sell_title:'საბოლოო ფასი',sell_sub:'მიუთითეთ რეალური თანხა',sell_confirm:'გაყიდვის დადასტურება',sell_cancel:'გაუქმება',
 disc_added:'დისკი დამატებულია',saved:'შენახულია',deleted:'წაშლილია',status_changed:'სტატუსი შეცვლილია',sold_ok:'გაყიდვა ჩაწერილია',
-new_ship:'ახალი პარტია',ship_transit:'გზაშია',ship_received:'მიღებულია',
+new_exchange:'ახალი გაცვლა',exchange_gave:'გადაკით',exchange_got:'მიიღო',
+exchange_to_stock:'მარაგში',exchange_select_gave:'არჩევთ დისკები რომლიც იძლევთ',
+exchange_received_discs:'რა მიიღეს',exchange_add_received:'+ მიღებულის დამატება',
+no_exchanges:'გაცვლა არ არის',exchange_saved:'გაცვლა დაფიქსირდა',
+del_exchange:'წავშალოთ გაცვლა?',exchange_moved:'დისკები მარაგშია',new_ship:'ახალი პაფტია',ship_transit:'გზაშია',ship_received:'მიღებულია',
 ship_name:'პარტიის სახელი',ship_source:'საიდან',ship_date:'თარიღი',ship_count:'დისკების რაოდენობა',
 ship_purchase:'შესყიდვა (₾)',ship_delivery:'მიტანა (₾)',ship_discs:'დისკები პარტიაში',ship_notes:'შენიშვნები',
 per_disc:'₾/დისკი',discs:'დისკი',del:'წაშლა',no_ships:'პარტია არ არის',
@@ -431,13 +570,14 @@ function applyLang(){
 }
 
 // STATE
-var S={games:{},shipments:{},expenses:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc'};
+var S={games:{},shipments:{},expenses:{},exchanges:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc'};
 var STATUSES={available:{badge:'b-available'},transit:{badge:'b-transit'},reserved:{badge:'b-reserved'},reserved_exchange:{badge:'b-reserved_exchange'},sold:{badge:'b-sold'},exchange:{badge:'b-exchange'},ordered:{badge:'b-ordered'}};
 var PLATFORMS=['PS5','PS4','PS4/PS5'];
-var PAGE_ST={available:['available'],transit:['transit','ordered'],reserved:['reserved','reserved_exchange'],sold:['sold'],exchange:['exchange']};
+var PAGE_ST={available:['available'],transit:['transit','ordered'],reserved:['reserved','reserved_exchange'],sold:['sold'],exchange:[]};
 
 // FIREBASE LISTENERS
-db.ref('games').on('value',function(s){S.games=s.val()||{};renderStats();renderList();});
+db.ref('games').on('value',function(s){S.games=s.val()||{};renderStats();renderList();if(S.page==='exchange')renderExchangePage();});
+db.ref('exchanges').on('value',function(s){S.exchanges=s.val()||{};if(S.page==='exchange')renderExchangePage();});
 db.ref('shipments').on('value',function(s){S.shipments=s.val()||{};if(S.page==='shipments')renderShipments();});
 db.ref('expenses').on('value',function(s){S.expenses=s.val()||{};if(S.page==='stats')renderStatsPage();});
 db.ref('.info/connected').on('value',function(s){var d=document.getElementById('online-dot');if(d)d.style.background=s.val()?'var(--green)':'var(--red)';});
@@ -577,6 +717,7 @@ function setPage(page){
   if(page==='stats')renderStatsPage();
   if(page==='shipments')renderShipments();
   if(page==='calc')renderCalc();
+  if(page==='exchange')renderExchangePage();
 }
 
 // ADD/EDIT DISC
@@ -774,6 +915,300 @@ function confirmSell(id){
 }
 
 // SHIPMENTS
+// ═══════════════════════════════════════════════════════
+// EXCHANGE MODULE
+// ═══════════════════════════════════════════════════════
+
+function renderExchangePage(){
+  var page=document.getElementById('page-exchange');
+  if(!page||S.page!=='exchange')return;
+
+  var exchanges=Object.entries(S.exchanges||{})
+    .map(function(e){return Object.assign({},e[1],{id:e[0]});})
+    .sort(function(a,b){return (b.date||0)-(a.date||0);});
+
+  var html='<div class="exchange-page">';
+  html+='<button class="exchange-new-btn" onclick="openNewExchange()">+ '+t('new_exchange')+'</button>';
+
+  if(!exchanges.length){
+    html+='<div style="text-align:center;padding:40px 24px;color:var(--text3)">'+t('no_exchanges')+'</div>';
+  } else {
+    exchanges.forEach(function(ex){
+      // Gave discs info
+      var gaveGames=(ex.gave||[]).map(function(gid){return S.games[gid]||{title:gid,cover:'',platform:''};});
+      // Got discs info (stored inline)
+      var gotDiscs=ex.got||[];
+      // Check if got discs are all moved to stock
+      var allInStock=gotDiscs.length>0&&gotDiscs.every(function(d){
+        return d.gameId&&S.games[d.gameId]&&S.games[d.gameId].status==='available';
+      });
+
+      html+='<div class="exchange-card">';
+      // Header
+      html+='<div class="exchange-header">';
+      html+='<span style="font-size:13px;font-weight:700">'+t('tl_exchange')+'</span>';
+      html+='<span class="exchange-date">'+(ex.date?new Date(ex.date).toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}):'')+' '+fmtDate(ex.date)+'</span>';
+      html+='</div>';
+
+      // Body: gave | arrow | got
+      html+='<div class="exchange-body">';
+
+      // GAVE side
+      html+='<div class="exchange-side gave">';
+      html+='<div class="exchange-side-label">'+t('exchange_gave')+'</div>';
+      gaveGames.forEach(function(g){
+        html+='<div class="exchange-disc-item">';
+        html+=g.cover?'<img class="exchange-disc-thumb" src="'+g.cover+'" alt="">':'<div class="exchange-disc-thumb"></div>';
+        html+='<div class="exchange-disc-info"><div class="exchange-disc-name">'+(g.title||'—')+'</div>';
+        html+='<div class="exchange-disc-meta">'+(g.platform||'')+(g.condition?' · '+(g.condition==='new'?t('cond_new'):t('cond_used')):'')+'</div></div>';
+        html+='</div>';
+      });
+      html+='</div>';
+
+      // Arrow
+      html+='<div class="exchange-arrow">⇄</div>';
+
+      // GOT side
+      html+='<div class="exchange-side got">';
+      html+='<div class="exchange-side-label">'+t('exchange_got')+'</div>';
+      gotDiscs.forEach(function(d){
+        var g=d.gameId?S.games[d.gameId]:null;
+        var cover=g?g.cover:d.cover||'';
+        var title=g?g.title:d.title||'—';
+        var platform=g?g.platform:d.platform||'';
+        var condition=g?g.condition:d.condition||'';
+        html+='<div class="exchange-disc-item">';
+        html+=cover?'<img class="exchange-disc-thumb" src="'+cover+'" alt="">':'<div class="exchange-disc-thumb"></div>';
+        html+='<div class="exchange-disc-info"><div class="exchange-disc-name">'+title+'</div>';
+        html+='<div class="exchange-disc-meta">'+platform+(condition?' · '+(condition==='new'?t('cond_new'):t('cond_used')):'')+'</div></div>';
+        html+='</div>';
+      });
+      html+='</div>';
+      html+='</div>'; // exchange-body
+
+      // Footer
+      html+='<div class="exchange-footer">';
+      if(ex.notes)html+='<span class="exchange-notes">'+ex.notes+'</span>';
+      if(!allInStock&&gotDiscs.length>0){
+        html+='<button class="exchange-to-stock-btn" onclick="exchangeToStock(\''+ex.id+'\')">✓ '+t('exchange_to_stock')+'</button>';
+      } else if(allInStock){
+        html+='<span style="font-size:12px;color:var(--green);font-weight:700">✓ '+t('exchange_moved')+'</span>';
+      }
+      html+='<button class="exchange-del-btn" onclick="deleteExchange(\''+ex.id+'\')">'+t('del')+'</button>';
+      html+='</div>';
+
+      html+='</div>'; // exchange-card
+    });
+  }
+
+  html+='</div>';
+  page.innerHTML=html;
+}
+
+// State for new exchange modal
+var EX={selectedGave:[],receivedSlots:1,receivedData:{}};
+
+function openNewExchange(){
+  EX={selectedGave:[],receivedSlots:1,receivedData:{}};
+  renderExchangeModal();
+}
+
+function renderExchangeModal(){
+  // Available discs to give (available + transit, current itemType)
+  var available=Object.entries(S.games)
+    .map(function(e){return Object.assign({},e[1],{id:e[0]});})
+    .filter(function(g){
+      return ['available','transit','ordered'].includes(g.status)&&(g.itemType||'disc')===S.itemType;
+    })
+    .sort(function(a,b){return (a.title||'').localeCompare(b.title||'');});
+
+  var gaveListHtml='<div class="exchange-select-list">';
+  if(!available.length){
+    gaveListHtml+='<div style="padding:14px;font-size:13px;color:var(--text3);text-align:center">'+t('no_discs')+'</div>';
+  } else {
+    available.forEach(function(g){
+      var isSel=EX.selectedGave.indexOf(g.id)!==-1;
+      gaveListHtml+='<div class="exchange-select-item'+(isSel?' selected':'')+'" onclick="toggleGave(\''+g.id+'\')">';
+      gaveListHtml+=g.cover?'<img class="exchange-disc-thumb" src="'+g.cover+'" alt="">':'<div class="exchange-disc-thumb"></div>';
+      gaveListHtml+='<div><div style="font-size:13px;font-weight:600">'+(g.title||'—')+'</div>';
+      gaveListHtml+='<div style="font-size:11px;color:var(--text2)">'+(g.platform||'')+(g.condition?' · '+(g.condition==='new'?t('cond_new'):t('cond_used')):'')+'</div></div>';
+      if(isSel)gaveListHtml+='<span style="margin-left:auto;color:var(--accent);font-size:18px">✓</span>';
+      gaveListHtml+='</div>';
+    });
+  }
+  gaveListHtml+='</div>';
+
+  // Selected tags
+  var tagsHtml='<div class="exchange-selected-tags">';
+  EX.selectedGave.forEach(function(gid){
+    var g=S.games[gid];if(!g)return;
+    tagsHtml+='<div class="exchange-tag"><span>'+(g.title||gid)+'</span><span class="exchange-tag-x" onclick="toggleGave(\''+gid+'\')">×</span></div>';
+  });
+  if(!EX.selectedGave.length)tagsHtml+='<span style="font-size:12px;color:var(--text3)">—</span>';
+  tagsHtml+='</div>';
+
+  // Received slots
+  var receivedHtml='';
+  for(var i=0;i<EX.receivedSlots;i++){
+    var rd=EX.receivedData[i]||{};
+    receivedHtml+='<div class="received-slot" id="recv-slot-'+i+'">';
+    receivedHtml+='<div class="received-slot-header">'+(lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u0441\u043a')+' '+(i+1)+'</div>';
+    receivedHtml+='<div style="position:relative;margin-bottom:6px">';
+    receivedHtml+='<input type="text" class="recv-title" placeholder="'+t('game_name')+'..." value="'+(rd.title||'')+'"'
+      +' oninput="onRecvInput('+i+',this.value)"'
+      +' style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none">';
+    receivedHtml+='<div id="recv-sugg-'+i+'"></div>';
+    receivedHtml+=rd.cover?'<img src="'+rd.cover+'" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="recv-thumb-'+i+'">':'<span id="recv-thumb-'+i+'"></span>';
+    receivedHtml+='<input type="hidden" class="recv-cover" value="'+(rd.cover||'')+'">';
+    receivedHtml+='</div>';
+    receivedHtml+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    receivedHtml+='<select class="recv-plat" style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none">'
+      +['PS5','PS4','PS4/PS5'].map(function(p){return '<option'+(( rd.plat||'PS5')===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select>';
+    receivedHtml+='<select class="recv-cond" style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none">'
+      +'<option value="used"'+((rd.cond||'used')==='used'?' selected':'')+'>'+t('cond_used')+'</option>'
+      +'<option value="new"'+(rd.cond==='new'?' selected':'')+'>'+t('cond_new')+'</option>'
+      +'</select>';
+    receivedHtml+='</div></div>';
+  }
+
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">'+t('new_exchange')+' <button class="btn-close" onclick="closeModalForce()">×</button></div>'
+    // GAVE section
+    +'<div class="sec-label">'+t('exchange_select_gave')+'</div>'
+    +gaveListHtml
+    +tagsHtml
+    +'<div class="divider"></div>'
+    // GOT section
+    +'<div class="sec-label">'+t('exchange_received_discs')+'</div>'
+    +receivedHtml
+    +'<button onclick="addReceivedSlot()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);padding:8px;font-size:13px;cursor:pointer;margin-bottom:12px">'+t('exchange_add_received')+'</button>'
+    +'<div class="field"><label>'+t('notes')+'</label><textarea id="ex-notes" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit;outline:none;resize:none;height:60px"></textarea></div>'
+    +'<button class="btn-primary" onclick="saveExchange()">'+t('save')+'</button>'
+    +'</div></div>';
+}
+
+var recvTimers={};
+function onRecvInput(idx,val){
+  saveRecvData();
+  clearTimeout(recvTimers[idx]);
+  var box=document.getElementById('recv-sugg-'+idx);
+  if(!val||val.length<2){if(box)box.innerHTML='';return;}
+  recvTimers[idx]=setTimeout(function(){fetchRecvSugg(idx,val);},600);
+}
+
+async function fetchRecvSugg(idx,q){
+  try{
+    var r=await fetch('https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search='+encodeURIComponent(q)+'&page_size=5');
+    var data=await r.json();
+    var results=(data.results||[]).map(function(g){return {name:g.name,cover:g.background_image||''};});
+    var box=document.getElementById('recv-sugg-'+idx);if(!box)return;
+    if(!results.length){box.innerHTML='';return;}
+    var html='<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;max-height:160px;overflow-y:auto;position:absolute;left:0;right:0;z-index:100">';
+    results.forEach(function(g){
+      var sn=g.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      var sc=(g.cover||'').replace(/'/g,"\\'");
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;border-bottom:1px solid var(--border)" onclick="selectRecvSugg('+idx+',\''+sn+'\',\''+sc+'\')">';
+      html+=g.cover?'<img src="'+g.cover+'" style="width:24px;height:34px;object-fit:cover;border-radius:3px;flex-shrink:0">':'<div style="width:24px;height:34px;background:var(--bg4);border-radius:3px"></div>';
+      html+='<span style="font-size:12px">'+g.name+'</span></div>';
+    });
+    html+='</div>';
+    box.innerHTML=html;
+  }catch(e){var box=document.getElementById('recv-sugg-'+idx);if(box)box.innerHTML='';}
+}
+
+function selectRecvSugg(idx,name,cover){
+  var slot=document.getElementById('recv-slot-'+idx);if(!slot)return;
+  var ti=slot.querySelector('.recv-title');if(ti)ti.value=name;
+  var ci=slot.querySelector('.recv-cover');if(ci)ci.value=cover;
+  var th=document.getElementById('recv-thumb-'+idx);
+  if(th)th.outerHTML=cover?'<img src="'+cover+'" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="recv-thumb-'+idx+'">':'<span id="recv-thumb-'+idx+'"></span>';
+  if(!EX.receivedData[idx])EX.receivedData[idx]={};
+  EX.receivedData[idx].title=name;EX.receivedData[idx].cover=cover;
+  var box=document.getElementById('recv-sugg-'+idx);if(box)box.innerHTML='';
+}
+
+function saveRecvData(){
+  for(var i=0;i<EX.receivedSlots;i++){
+    var slot=document.getElementById('recv-slot-'+i);if(!slot)continue;
+    if(!EX.receivedData[i])EX.receivedData[i]={};
+    var ti=slot.querySelector('.recv-title');if(ti)EX.receivedData[i].title=ti.value;
+    var ci=slot.querySelector('.recv-cover');if(ci)EX.receivedData[i].cover=ci.value;
+    var pi=slot.querySelector('.recv-plat');if(pi)EX.receivedData[i].plat=pi.value;
+    var coi=slot.querySelector('.recv-cond');if(coi)EX.receivedData[i].cond=coi.value;
+  }
+}
+
+function addReceivedSlot(){
+  saveRecvData();
+  EX.receivedSlots++;
+  renderExchangeModal();
+}
+
+function toggleGave(gid){
+  saveRecvData();
+  var idx=EX.selectedGave.indexOf(gid);
+  if(idx===-1)EX.selectedGave.push(gid);
+  else EX.selectedGave.splice(idx,1);
+  renderExchangeModal();
+}
+
+function saveExchange(){
+  saveRecvData();
+  if(!EX.selectedGave.length){showToast(t('exchange_select_gave'));return;}
+  var notes=document.getElementById('ex-notes')?document.getElementById('ex-notes').value:'';
+  var id=uid();
+  var got=[];
+  // Create game records for received discs
+  for(var i=0;i<EX.receivedSlots;i++){
+    var d=EX.receivedData[i];
+    if(!d||!d.title)continue;
+    var gid=uid();
+    db.ref('games/'+gid).set({id:gid,title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:1,status:'exchange',itemType:S.itemType,addedAt:Date.now()+i,soldAt:null,exchangedAt:Date.now(),exchangeId:id});
+    got.push({gameId:gid,title:d.title,cover:d.cover||'',platform:d.plat||'PS5',condition:d.cond||'used'});
+  }
+  // Mark gave discs as exchanged
+  EX.selectedGave.forEach(function(gid){
+    db.ref('games/'+gid).update({status:'exchange',exchangedAt:Date.now(),exchangeId:id});
+  });
+  // Save exchange record
+  db.ref('exchanges/'+id).set({id:id,date:Date.now(),gave:EX.selectedGave,got:got,notes:notes,itemType:S.itemType});
+  showToast(t('exchange_saved'));
+  closeModalForce();
+}
+
+function exchangeToStock(exchangeId){
+  var ex=S.exchanges[exchangeId];if(!ex)return;
+  (ex.got||[]).forEach(function(d){
+    if(d.gameId)db.ref('games/'+d.gameId).update({status:'available'});
+  });
+  showToast(t('exchange_moved'));
+}
+
+function deleteExchange(id){
+  if(!confirm(t('del_exchange')||t('del_exp')))return;
+  // Restore gave discs to available if they're still exchange status
+  var ex=S.exchanges[id];
+  if(ex&&ex.gave){
+    ex.gave.forEach(function(gid){
+      var g=S.games[gid];
+      if(g&&g.status==='exchange'&&g.exchangeId===id){
+        db.ref('games/'+gid).update({status:'available',exchangedAt:null,exchangeId:null});
+      }
+    });
+  }
+  // Remove received games
+  if(ex&&ex.got){
+    ex.got.forEach(function(d){
+      if(d.gameId)db.ref('games/'+d.gameId).remove();
+    });
+  }
+  db.ref('exchanges/'+id).remove();
+  showToast(t('deleted'));
+}
+
+
 function renderShipments(){
   var page=document.getElementById('page-shipments');if(!page||S.page!=='shipments')return;
   var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).filter(function(s){return (s.shipType||'disc')===S.itemType;}).sort(function(a,b){return (b.date||0)-(a.date||0);});
