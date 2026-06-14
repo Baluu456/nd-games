@@ -303,7 +303,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
       <div class="stats-row" id="stats-row"></div>
     </div>
-    <div class="type-switcher">
+    <div class="type-switcher" id="type-switcher">
       <button class="type-btn active" id="ttype-disc" onclick="setItemType('disc')"><span id="tltype-disc">&#x1F4BF; Диски</span></button>
       <button class="type-btn" id="ttype-steelbook" onclick="setItemType('steelbook')"><span id="tltype-steelbook">&#x1F4E6; Стилбуки</span></button>
       <button class="type-btn" id="ttype-accessory" onclick="setItemType('accessory')"><span id="tltype-accessory">&#x1F3A8; Аксессуары</span></button>
@@ -725,6 +725,7 @@ function setPage(page){
     var tb=document.getElementById('tab-'+p);if(tb)tb.classList.toggle('active',p===page);
   });
   document.getElementById('controls').style.display=['available','transit','reserved','sold','exchange'].includes(page)?'block':'none';
+  var tsw=document.getElementById('type-switcher');if(tsw)tsw.style.display=page==='stats'?'none':'flex';
   if(page==='stats')renderStatsPage();
   if(page==='shipments')renderShipments();
   if(page==='calc')renderCalc();
