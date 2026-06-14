@@ -1545,7 +1545,7 @@ function deleteShipment(id){if(!confirm(t('del_ship')))return;db.ref('shipments/
 function setStatPeriod(p){S.statPeriod=p;renderStatsPage();}
 function renderStatsPage(){
   var page=document.getElementById('page-stats');if(!page)return;
-  var now=new Date(),games=Object.values(S.games).filter(function(x){return (x.itemType||'disc')===S.itemType;}),expenses=Object.values(S.expenses);
+  var now=new Date(),games=Object.values(S.games),expenses=Object.values(S.expenses);
   function inP(ts){if(!ts)return false;var d=new Date(ts);if(S.statPeriod==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();if(S.statPeriod==='week')return d>=(new Date(now-7*86400000));return d.getFullYear()===now.getFullYear();}
   var sold=games.filter(function(g){return g.status==='sold'&&inP(g.soldAt||g.addedAt);});
   var revenue=sold.reduce(function(s,g){return s+parseFloat(g.price||0);},0);
