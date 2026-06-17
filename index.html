@@ -303,6 +303,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
             <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
             <span id="hl-addexp">Расход</span>
           </button>
+          <button class="btn-add-exp" onclick="openSubExpense()" style="color:var(--green);border-color:rgba(62,207,142,0.3);background:rgba(62,207,142,0.08)">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 7h10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span>Расход</span>
+          </button>
           <button class="btn-add" onclick="openAdd()">
             <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
             <span id="hl-add">Добавить</span>
@@ -1638,7 +1642,7 @@ function renderStatsPage(){
     +'<div class="legend-item" style="border-top:1px solid var(--border);padding-top:7px;margin-top:4px"><div style="display:flex;align-items:center"><div class="legend-dot" style="background:var(--accent)"></div><div class="legend-label">'+t('profit')+'</div></div><div class="legend-val" style="color:'+(profit>=0?'var(--green)':'var(--red)')+'">'+(profit>=0?'+':'')+profit.toFixed(0)+' \u20be</div></div>';
 
   var expHtml=pExp.length?pExp.sort(function(a,b){return (b.date||0)-(a.date||0);}).map(function(e){
-    var isIncome=e.type==='exchange_income';
+    var isIncome=e.type==='exchange_income'||e.type==='expense_reduction';
     var amt=parseFloat(e.amount||0);
     return '<div class="exp-item"><div><div style="font-size:13px;font-weight:600">'+(e.name||'\u2014')+'</div><div style="font-size:11px;color:var(--text2)">'+(e.to?e.to+' \xb7 ':'')+fmtDate(e.date)+'</div></div>'
       +'<div style="display:flex;align-items:center;gap:8px"><span class="exp-amount" style="color:'+(isIncome?'var(--green)':'var(--red)')+'">'+(isIncome?'+':'-')+Math.abs(amt).toFixed(0)+' \u20be</span>'
@@ -1707,6 +1711,31 @@ function saveExpense(){
   db.ref('expenses/'+id).set({id:id,name:name,to:to,amount:amount,date:date,type:S.selExpType});
   showToast(t('exp_added'));closeModalForce();
 }
+function openSubExpense(){
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">− Расход <button class="btn-close" onclick="closeModalForce()">×</button></div>'
+    +'<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Вычесть из расходов — например, если за нас заплатили</p>'
+    +'<div class="field"><label>Причина</label><input id="sub-name" type="text" placeholder="Например: доставка оплачена"></div>'
+    +'<div class="row2"><div class="field"><label>Сумма (₾)</label><input id="sub-amount" type="number" placeholder="0"></div>'
+    +'<div class="field"><label>Дата</label><input id="sub-date" type="date" value="'+new Date().toISOString().slice(0,10)+'"></div></div>'
+    +'<button class="btn-primary" style="background:var(--green)" onclick="saveSubExpense()">Вычесть из расхода</button>'
+    +'</div></div>';
+}
+
+function saveSubExpense(){
+  var name=document.getElementById('sub-name').value.trim();
+  var amount=parseFloat(document.getElementById('sub-amount').value)||0;
+  var date=new Date(document.getElementById('sub-date').value).getTime();
+  if(!name||!amount){showToast(t('fill_all'));return;}
+  var id=uid();
+  // Store as negative amount so it reduces total expenses
+  db.ref('expenses/'+id).set({id:id,name:name,to:'',amount:-amount,date:date,type:'expense_reduction'});
+  showToast('− '+amount+' ₾ — учтено');
+  closeModalForce();
+}
+
 function deleteExpense(id){
   if(!confirm(t('del_exp')))return;
   db.ref('expenses/'+id).remove();
@@ -1999,6 +2028,8 @@ window.setStatPeriod=setStatPeriod;
 window.openAddExpense=openAddExpense;
 window.selExpType=selExpType;
 window.saveExpense=saveExpense;
+window.openSubExpense=openSubExpense;
+window.saveSubExpense=saveSubExpense;
 window.deleteExpense=deleteExpense;
 window.renderCalc=renderCalc;
 window.calcConvert=calcConvert;
