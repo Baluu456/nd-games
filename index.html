@@ -921,6 +921,12 @@ function addGame(){
   var data=Object.assign({},d,{id:id,addedAt:Date.now(),soldAt:null,exchangedAt:null});
   Object.keys(data).forEach(function(k){if(data[k]===undefined)delete data[k];});
   db.ref('games/'+id).set(data);
+  // Auto-create expense for cost if specified and no shipment
+  if(d.cost&&parseFloat(d.cost)>0&&!d.shipmentId){
+    var costGel=gel(d.cost,d.costCurrency||'₾');
+    var eid=uid();
+    db.ref('expenses/'+eid).set({id:eid,name:d.title,to:(lang==='ka'?'დისკის გადახდა':'Закупка диска'),amount:costGel,date:Date.now(),type:'purchase',gameId:id});
+  }
   showToast(t('disc_added'));closeModalForce();
 }
 function saveEdit(id){
@@ -929,10 +935,31 @@ function saveEdit(id){
   var data=Object.assign({},d,{soldAt:d.status==='sold'?(prev.soldAt||Date.now()):null,exchangedAt:d.status==='exchange'?(prev.exchangedAt||Date.now()):null});
   Object.keys(data).forEach(function(k){if(data[k]===undefined)delete data[k];});
   db.ref('games/'+id).update(data);
+  // Update or create expense for cost if no shipment
+  if(!d.shipmentId){
+    // Find existing purchase expense for this game
+    var existingExp=Object.values(S.expenses).find(function(e){return e.gameId===id&&e.type==='purchase';});
+    if(d.cost&&parseFloat(d.cost)>0){
+      var costGel=gel(d.cost,d.costCurrency||'₾');
+      if(existingExp){
+        db.ref('expenses/'+existingExp.id).update({amount:costGel,name:d.title});
+      } else {
+        var eid=uid();
+        db.ref('expenses/'+eid).set({id:eid,name:d.title,to:(lang==='ka'?'დისკის გადახდა':'Закупка диска'),amount:costGel,date:prev.addedAt||Date.now(),type:'purchase',gameId:id});
+      }
+    } else if(existingExp){
+      // Cost removed - delete the expense
+      db.ref('expenses/'+existingExp.id).remove();
+    }
+  }
   showToast(t('saved'));closeModalForce();
 }
 function deleteGame(id){
   if(!confirm(t('del_disc')))return;
+  // Remove associated purchase expense if exists
+  Object.values(S.expenses).forEach(function(e){
+    if(e.gameId===id&&e.type==='purchase')db.ref('expenses/'+e.id).remove();
+  });
   db.ref('games/'+id).remove();showToast(t('deleted'));closeModalForce();
 }
 
