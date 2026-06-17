@@ -922,10 +922,12 @@ function addGame(){
   Object.keys(data).forEach(function(k){if(data[k]===undefined)delete data[k];});
   db.ref('games/'+id).set(data);
   // Auto-create expense for cost if specified and no shipment
-  if(d.cost&&parseFloat(d.cost)>0&&!d.shipmentId){
-    var costGel=gel(d.cost,d.costCurrency||'₾');
+  var _cost=parseFloat(d.cost||0);
+  var _cur=d.costCurrency||'₾';
+  var _costGel=_cost>0?gel(String(_cost),_cur):0;
+  if(_costGel>0&&!d.shipmentId){
     var eid=uid();
-    db.ref('expenses/'+eid).set({id:eid,name:d.title,to:(lang==='ka'?'დისკის გადახდა':'Закупка диска'),amount:costGel,date:Date.now(),type:'purchase',gameId:id});
+    db.ref('expenses/'+eid).set({id:eid,name:d.title,to:'Закупка',amount:_costGel,date:Date.now(),type:'purchase',gameId:id});
   }
   showToast(t('disc_added'));closeModalForce();
 }
@@ -940,7 +942,7 @@ function saveEdit(id){
     // Find existing purchase expense for this game
     var existingExp=Object.values(S.expenses).find(function(e){return e.gameId===id&&e.type==='purchase';});
     if(d.cost&&parseFloat(d.cost)>0){
-      var costGel=gel(d.cost,d.costCurrency||'₾');
+      var costGel=gel(String(parseFloat(d.cost||0)),d.costCurrency||'₾');
       if(existingExp){
         db.ref('expenses/'+existingExp.id).update({amount:costGel,name:d.title});
       } else {
