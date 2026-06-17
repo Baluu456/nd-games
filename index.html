@@ -723,7 +723,12 @@ function renderList(){
           +'<div class="game-body"><div><div class="game-title">'+(x.title||'\u2014')+'</div>'
           +'<div class="game-meta">'+(x.platform||'PS4/PS5')+(x.region?' \xb7 '+x.region:'')+'</div>'+hasGameHtml+'</div><div>'
           +'<div class="game-row"><div><div class="game-price" style="display:flex;align-items:center;gap:6px">'+(x.price?x.price+' \u20be':'\u2014')+'<button onclick="event.stopPropagation();quickPrice(\"'+x.id+'\")" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0;line-height:1">✏️</button></div>'+profHtml+'</div>'
-          +'<span class="badge '+st.badge+'">'+t('st_'+x.status)+'</span></div>'+perHtml+timeHtml+'</div></div></div>';
+          +'<span class="badge '+st.badge+'">'+t('st_'+x.status)+'</span></div>'+perHtml+timeHtml
+          +'<div style="display:flex;gap:6px;padding:8px 11px 10px;border-top:1px solid var(--border);margin-top:4px" onclick="event.stopPropagation()">'
+          +'<button onclick="quickPrice(\''+x.id+'\')" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 6px;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent)">&#x270f;&#xfe0f; '+t('sale_price_l')+'</button>'
+          +'<button onclick="deleteGame(\''+x.id+'\')" style="background:rgba(240,96,96,0.08);border:1px solid rgba(240,96,96,0.25);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;color:var(--red)">&#x1f5d1;</button>'
+          +'</div>'
+          +'</div></div>';
       }
       var totalQty=0,minPrice=null,maxPrice=null,breakdown={};
       items.forEach(function(x){
