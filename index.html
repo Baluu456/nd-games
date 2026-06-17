@@ -723,7 +723,7 @@ function renderList(){
         return '<div class="game-card" onclick="openDetail(\''+x.id+'\')"><div class="game-cover">'+makeCover(grp.cover)+qtyBadge+condBadge+'</div>'
           +'<div class="game-body"><div><div class="game-title">'+(x.title||'\u2014')+'</div>'
           +'<div class="game-meta">'+(x.platform||'PS4/PS5')+(x.region?' \xb7 '+x.region:'')+'</div>'+hasGameHtml+'</div><div>'
-          +'<div class="game-row"><div><div class="game-price" style="display:flex;align-items:center;gap:6px">'+(x.price?x.price+' \u20be':'\u2014')+'<button onclick="event.stopPropagation();quickPrice(\"'+x.id+'\")" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0;line-height:1">✏️</button></div>'+profHtml+'</div>'
+          +'<div class="game-row"><div><div class="game-price">'+(x.price?x.price+' \u20be':'\u2014')+'</div>'+profHtml+'</div>'
           +'<span class="badge '+st.badge+'">'+t('st_'+x.status)+'</span></div>'+perHtml+timeHtml+'</div></div></div>';
       }
       var totalQty=0,minPrice=null,maxPrice=null,breakdown={};
