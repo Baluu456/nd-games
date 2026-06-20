@@ -284,6 +284,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .slot-type-row{display:flex;gap:6px;margin-bottom:8px}
 .slot-type-btn{flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:7px;padding:8px 4px;text-align:center;cursor:pointer;font-size:12px;font-weight:700;color:var(--text2);transition:all .15s}
 .slot-type-btn.sel{border-color:var(--accent);color:#fff;background:var(--accent)}
+
+.ship-src-switcher{display:flex;gap:6px;margin-bottom:12px}
+.ship-src-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 4px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text2);text-align:center;transition:all .15s}
+.ship-src-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.ship-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.ship-badge{font-size:10px;font-weight:700;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 6px;color:var(--text2)}
 </style>
 </head>
 <body>
@@ -619,7 +625,7 @@ function applyLang(){
 }
 
 // STATE
-var S={games:{},shipments:{},expenses:{},exchanges:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterPriceMin:'',filterPriceMax:''};
+var S={games:{},shipments:{},expenses:{},exchanges:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterPriceMin:'',filterPriceMax:'',filterShipSrc:'all'};
 var STATUSES={available:{badge:'b-available'},transit:{badge:'b-transit'},reserved:{badge:'b-reserved'},reserved_exchange:{badge:'b-reserved_exchange'},sold:{badge:'b-sold'},exchange:{badge:'b-exchange'},ordered:{badge:'b-ordered'}};
 var PLATFORMS=['PS5','PS4','PS4/PS5'];
 var PAGE_ST={available:['available'],transit:['transit','ordered'],reserved:['reserved','reserved_exchange'],sold:['sold'],exchange:[]};
@@ -1079,16 +1085,37 @@ function srcLabel(src){
 
 function renderShipments(){
   var page=document.getElementById('page-shipments');if(!page||S.page!=='shipments')return;
-  var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (b.date||0)-(a.date||0);});
+  var allShips=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (b.date||0)-(a.date||0);});
+  var ships=S.filterShipSrc==='all'?allShips:allShips.filter(function(s){return s.source===S.filterShipSrc;});
+
+  var srcSwitcher='<div class="ship-src-switcher">'
+    +'<button class="ship-src-btn'+(S.filterShipSrc==='all'?' active':'')+'" onclick="setShipSrcFilter(\'all\')">'+(lang==='ka'?'\u10e7\u10d5\u10d4\u10da\u10d0':'\u0412\u0441\u0435')+'</button>'
+    +'<button class="ship-src-btn'+(S.filterShipSrc==='Georgia'?' active':'')+'" onclick="setShipSrcFilter(\'Georgia\')">'+(lang==='ka'?'\u10e1\u10d0\u10e5\u10d0\u10e0\u10d7\u10d5\u10d4\u10da\u10dd':'\u0413\u0440\u0443\u0437\u0438\u044f')+'</button>'
+    +'<button class="ship-src-btn'+(S.filterShipSrc==='USA'?' active':'')+'" onclick="setShipSrcFilter(\'USA\')">'+(lang==='ka'?'\u10d0\u10e8\u10e8':'\u0421\u0428\u0410')+'</button>'
+    +'<button class="ship-src-btn'+(S.filterShipSrc==='Dubai'?' active':'')+'" onclick="setShipSrcFilter(\'Dubai\')">Dubai</button>'
+    +'</div>';
+
   var cardsHtml=!ships.length?'<div style="color:var(--text3);font-size:14px;text-align:center;padding:40px 0;grid-column:1/-1">'+t('no_ships')+'</div>'
     :ships.map(function(s){
       var isT=s.shipStatus!=='received';
       var purchase=parseFloat(s.purchaseCost||0),delivery=parseFloat(s.deliveryCostVal||0),total=purchase+delivery;
       var count=parseInt(s.discCount)||1,perDisc=count>0?total/count:0;
+      // Count items by type from linked games
+      var linkedGames=Object.values(S.games).filter(function(g){return g.shipmentId===s.id;});
+      var typeCounts={disc:0,steelbook:0,accessory:0};
+      linkedGames.forEach(function(g){
+        var tp=g.itemType||'disc';
+        typeCounts[tp]=(typeCounts[tp]||0)+(parseInt(g.qty)||1);
+      });
+      var badgesHtml='<div class="ship-badges">';
+      if(typeCounts.disc>0)badgesHtml+='<span class="ship-badge">\ud83d\udcbf \xd7'+typeCounts.disc+'</span>';
+      if(typeCounts.steelbook>0)badgesHtml+='<span class="ship-badge">\ud83d\udce6 \xd7'+typeCounts.steelbook+'</span>';
+      if(typeCounts.accessory>0)badgesHtml+='<span class="ship-badge">\ud83c\udfa8 \xd7'+typeCounts.accessory+'</span>';
+      badgesHtml+='</div>';
       return '<div class="ship-card">'
         +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
         +'<div><div class="ship-name">'+(s.name||t('new_ship'))+'</div>'
-        +'<div class="ship-date">'+srcLabel(s.source)+' \xb7 '+(s.date?new Date(s.date).toLocaleDateString('ru-RU'):'')+'</div></div>'
+        +'<div class="ship-date">'+srcLabel(s.source)+' \xb7 '+(s.date?new Date(s.date).toLocaleDateString('ru-RU'):'')+'</div>'+badgesHtml+'</div>'
         +'<div style="text-align:right"><div class="ship-cost">'+total.toFixed(2)+' \u20be</div>'
         +'<div class="ship-per">'+(perDisc>0?'~'+perDisc.toFixed(2)+' '+t('per_disc'):'\u2014')+'</div></div></div>'
         +'<div class="ship-status-row">'
@@ -1100,7 +1127,12 @@ function renderShipments(){
         +'<button onclick="deleteShipment(\''+s.id+'\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:6px">'+t('del')+'</button>'
         +'</div></div>';
     }).join('');
-  page.innerHTML='<button class="btn-new-ship" onclick="openAddShipment()">+ '+t('new_ship')+'</button><div class="ship-grid">'+cardsHtml+'</div>';
+  page.innerHTML='<button class="btn-new-ship" onclick="openAddShipment()">+ '+t('new_ship')+'</button>'+srcSwitcher+'<div class="ship-grid">'+cardsHtml+'</div>';
+}
+
+function setShipSrcFilter(src){
+  S.filterShipSrc=src;
+  renderShipments();
 }
 
 function setShipStatus(id,status){
@@ -1180,7 +1212,7 @@ function openShipModal(){
     '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
     +'<div class="modal-handle"></div>'
     +'<div class="modal-title">'+(S.editShipId?t('edit_btn'):t('new_ship'))+' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
-    +'<div class="field"><label>'+t('ship_name')+'</label><input id="sh-name" type="text" placeholder="Dubai April 2025" value="'+(ex.name||'')+'"></div>'
+    +'<div class="field"><label>'+t('ship_name')+'</label><input id="sh-name" type="text" placeholder="Tbilisi / Batumi / Kutaisi..." value="'+(ex.name||'')+'" onblur="autoNumberShipName()"></div>'
     +'<div class="field"><label>'+t('ship_source')+'</label>'
     +'<div class="source-grid">'
     +'<div class="source-btn'+((ex.source==='Georgia')?' sel':'')+'" onclick="selSource(\'Georgia\')" id="src-Georgia">'+(lang==='ka'?'\u10e1\u10d0\u10e5\u10d0\u10e0\u10d7\u10d5\u10d4\u10da\u10dd':'\u0413\u0440\u0443\u0437\u0438\u044f')+'</div>'
@@ -1258,6 +1290,27 @@ function selSource(src){
   ['Georgia','USA','Dubai'].forEach(function(s){
     var b=document.getElementById('src-'+s);if(b)b.classList.toggle('sel',s===src);
   });
+  autoNumberShipName();
+}
+
+function autoNumberShipName(){
+  // Only auto-number for NEW shipments (not editing), and only if name doesn't already have a number
+  if(S.editShipId)return;
+  var nameInp=document.getElementById('sh-name');if(!nameInp)return;
+  var src=document.getElementById('sh-source').value;
+  var rawName=nameInp.value.trim();
+  // Strip existing " #N" suffix to get base name
+  var baseName=rawName.replace(/\s*#\d+\s*$/,'').trim();
+  if(!baseName||!src)return;
+  // Count existing shipments with same base name AND same source
+  var existing=Object.values(S.shipments).filter(function(s){
+    if(s.source!==src)return false;
+    var sn=(s.name||'').replace(/\s*#\d+\s*$/,'').trim();
+    return sn.toLowerCase()===baseName.toLowerCase();
+  });
+  var nextNum=existing.length+1;
+  nameInp.value=baseName+' #'+nextNum;
+  nameInp.dataset.autoNumbered='1';
 }
 function clearSourceSel(){
   ['Georgia','USA','Dubai'].forEach(function(s){
@@ -2095,6 +2148,8 @@ window.openEditShipment=openEditShipment;
 window.onShipCount=onShipCount;
 window.setSlotType=setSlotType;
 window.selSource=selSource;
+window.autoNumberShipName=autoNumberShipName;
+window.setShipSrcFilter=setShipSrcFilter;
 window.clearSourceSel=clearSourceSel;
 window.onSlotInput=onSlotInput;
 window.selectSlotSugg=selectSlotSugg;
