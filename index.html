@@ -805,6 +805,11 @@ function selEditItemType(tp){
   // toggle hasGame field visibility
   var sgField=document.getElementById('sg-field');
   if(sgField)sgField.style.display=(tp==='steelbook')?'block':'none';
+  // clear suggestions if switching to accessory
+  if(tp==='accessory'){
+    var sb=document.getElementById('suggest-box');if(sb)sb.innerHTML='';
+    var ch=document.getElementById('cover-hint');if(ch)ch.textContent='';
+  }
 }
 
 function openAdd(editId){
@@ -874,6 +879,8 @@ function selStatus(k){S.selStatus=k;document.querySelectorAll('.st-opt').forEach
 
 function onTitleInput(val){
   clearTimeout(S.suggTimer);
+  var curType=_editItemType||S.itemType;
+  if(curType==='accessory'){document.getElementById('suggest-box').innerHTML='';var h=document.getElementById('cover-hint');if(h)h.textContent='';return;}
   if(!val||val.length<2){document.getElementById('suggest-box').innerHTML='';return;}
   document.getElementById('cover-hint').textContent=t('searching');
   S.suggTimer=setTimeout(function(){fetchSugg(val);},600);
@@ -1235,6 +1242,9 @@ var slotTimers={};
 function onSlotInput(idx,val){
   clearTimeout(slotTimers[idx]);
   var box=document.getElementById('slot-sugg-'+idx);
+  var slot=document.getElementById('slot-'+idx);
+  var slotType=slot&&slot.querySelector('.slot-itemtype')?slot.querySelector('.slot-itemtype').value:'disc';
+  if(slotType==='accessory'){if(box)box.innerHTML='';return;}
   if(!val||val.length<2){if(box)box.innerHTML='';return;}
   slotTimers[idx]=setTimeout(function(){fetchSlotSugg(idx,val);},600);
 }
