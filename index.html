@@ -2133,12 +2133,20 @@ function exportExcel(){
 
 function exportShipmentsExcel(source){
   var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).filter(function(s){return s.source===source;});
+  var allGames=Object.values(S.games);
   var now=new Date();
   var dateStr=now.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var sheetName=srcLabel(source);
 
-  var cols=lang==='ka'
+  // SHEET 1: Shipments summary
+  var cols1=lang==='ka'
     ?['\u10de\u10d0\u10e0\u10e2\u10d8\u10d0','\u10e1\u10e2\u10d0\u10e2\u10e3\u10e1\u10d8','\u10d7\u10d0\u10e0\u10d8\u10e6\u10d8','\u10d3\u10d8\u10e1\u10d9\u10d4\u10d1\u10d8','\u10e8\u10d4\u10e1\u10ee\u10d4\u10d1\u10d0 (\u20be)','\u10db\u10d8\u10e2\u10d0\u10dc\u10d0 (\u20be)','\u10e1\u10e3\u10da \u10e6\u10d8\u10e0\u10d4\u10d1\u10e3\u10da\u10d4\u10d1\u10d0 (\u20be)','\u20be/\u10d3\u10d8\u10e1\u10d9\u10d8','\u10e8\u10d4\u10dc\u10d8\u10e8\u10d5\u10dc\u10d4\u10d1\u10d8']
     :['\u041f\u0430\u0440\u0442\u0438\u044f','\u0421\u0442\u0430\u0442\u0443\u0441','\u0414\u0430\u0442\u0430','\u0414\u0438\u0441\u043a\u043e\u0432','\u0417\u0430\u043a\u0443\u043f\u043a\u0430 (\u20be)','\u0414\u043e\u0441\u0442\u0430\u0432\u043a\u0430 (\u20be)','\u0418\u0442\u043e\u0433\u043e (\u20be)','\u20be/\u0434\u0438\u0441\u043a','\u0417\u0430\u043c\u0435\u0442\u043a\u0438'];
+
+  // SHEET 2: Items inside shipments
+  var cols2=lang==='ka'
+    ?['\u10de\u10d0\u10e0\u10e2\u10d8\u10d0','\u10e1\u10d0\u10ee\u10d4\u10da\u10d8','\u10e2\u10d8\u10de\u10d8','\u10de\u10da\u10d0\u10e2\u10e4\u10dd\u10e0\u10db\u10d0','\u10db\u10d3\u10d2\u10dd\u10db\u10d0\u10e0\u10d4\u10dd\u10d1\u10d0','\u10e0\u10d0\u10dd\u10d3\u10d4\u10dc\u10dd\u10d1\u10d0','\u10e1\u10e2\u10d0\u10e2\u10e3\u10e1\u10d8']
+    :['\u041f\u0430\u0440\u0442\u0438\u044f','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435','\u0422\u0438\u043f','\u041f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0430','\u0421\u043e\u0441\u0442\u043e\u044f\u043d\u0438\u0435','\u041a\u043e\u043b-\u0432\u043e','\u0421\u0442\u0430\u0442\u0443\u0441'];
 
   function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function cell(v,isNum){
@@ -2146,32 +2154,62 @@ function exportShipmentsExcel(source){
     if(isNum&&s&&!isNaN(s))return '<c t="n"><v>'+s+'</v></c>';
     return '<c t="inlineStr"><is><t>'+esc(s)+'</t></is></c>';
   }
+  function typeLabel(tp){
+    if(tp==='steelbook')return lang==='ka'?'\u10e1\u10e2\u10d8\u10da\u10d1\u10e3\u10d9\u10d8':'\u0421\u0442\u0438\u043b\u0431\u0443\u043a';
+    if(tp==='accessory')return lang==='ka'?'\u10d0\u10d9\u10e1\u10d4\u10e1\u10e3\u10d0\u10e0\u10d8':'\u0410\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440';
+    return lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u0441\u043a';
+  }
+  function condLabel(c){return c==='new'?t('cond_new'):t('cond_used');}
 
-  var xml='<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
-  xml+='<row>';cols.forEach(function(c){xml+=cell(c);});xml+='</row>';
-  ships.sort(function(a,b){return (b.date||0)-(a.date||0);}).forEach(function(s){
+  var sortedShips=ships.slice().sort(function(a,b){return (b.date||0)-(a.date||0);});
+
+  // Build sheet 1 XML
+  var xml1='<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+  xml1+='<row>';cols1.forEach(function(c){xml1+=cell(c);});xml1+='</row>';
+  sortedShips.forEach(function(s){
     var purchase=parseFloat(s.purchaseCost||0),delivery=parseFloat(s.deliveryCostVal||0),total=purchase+delivery;
     var count=parseInt(s.discCount)||1,perDisc=count>0?total/count:0;
     var statusLabel=s.shipStatus==='received'?t('ship_received'):t('ship_transit');
     var dateLabel=s.date?new Date(s.date).toLocaleDateString('ru-RU'):'';
-    xml+='<row>';
-    xml+=cell(s.name);
-    xml+=cell(statusLabel);
-    xml+=cell(dateLabel);
-    xml+=cell(count,true);
-    xml+=cell(purchase,true);
-    xml+=cell(delivery,true);
-    xml+=cell(total,true);
-    xml+=cell(perDisc.toFixed(2),true);
-    xml+=cell(s.notes);
-    xml+='</row>';
+    xml1+='<row>';
+    xml1+=cell(s.name);
+    xml1+=cell(statusLabel);
+    xml1+=cell(dateLabel);
+    xml1+=cell(count,true);
+    xml1+=cell(purchase,true);
+    xml1+=cell(delivery,true);
+    xml1+=cell(total,true);
+    xml1+=cell(perDisc.toFixed(2),true);
+    xml1+=cell(s.notes);
+    xml1+='</row>';
   });
-  xml+='</sheetData></worksheet>';
+  xml1+='</sheetData></worksheet>';
 
-  var relsXml='<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>';
-  var sheetName=srcLabel(source);
-  var workbookXml='<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="'+esc(sheetName)+'" sheetId="1" r:id="rId1"/></sheets></workbook>';
-  var contentTypes='<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
+  // Build sheet 2 XML - items inside each shipment
+  var xml2='<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+  xml2+='<row>';cols2.forEach(function(c){xml2+=cell(c);});xml2+='</row>';
+  sortedShips.forEach(function(s){
+    var items=allGames.filter(function(g){return g.shipmentId===s.id;}).sort(function(a,b){return (a.addedAt||0)-(b.addedAt||0);});
+    items.forEach(function(g){
+      xml2+='<row>';
+      xml2+=cell(s.name);
+      xml2+=cell(g.title);
+      xml2+=cell(typeLabel(g.itemType||'disc'));
+      xml2+=cell(g.platform);
+      xml2+=cell(condLabel(g.condition));
+      xml2+=cell(parseInt(g.qty)||1,true);
+      xml2+=cell(t('st_'+g.status));
+      xml2+='</row>';
+    });
+  });
+  xml2+='</sheetData></worksheet>';
+
+  var sheet1Name=lang==='ka'?'\u10de\u10d0\u10e0\u10e2\u10d8\u10d4\u10d1\u10d8':'\u041f\u0430\u0440\u0442\u0438\u0438';
+  var sheet2Name=lang==='ka'?'\u10e8\u10d4\u10d8\u10ec\u10e7\u10dd\u10d1\u10d0':'\u0421\u043e\u0441\u0442\u0430\u0432';
+
+  var relsXml='<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/></Relationships>';
+  var workbookXml='<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="'+esc(sheet1Name)+'" sheetId="1" r:id="rId1"/><sheet name="'+esc(sheet2Name)+'" sheetId="2" r:id="rId2"/></sheets></workbook>';
+  var contentTypes='<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
   var pkgRels='<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
 
   function strToU8(str){return new TextEncoder().encode(str);}
@@ -2221,7 +2259,8 @@ function exportShipmentsExcel(source){
     {name:'_rels/.rels', data:strToU8(pkgRels)},
     {name:'xl/workbook.xml', data:strToU8(workbookXml)},
     {name:'xl/_rels/workbook.xml.rels', data:strToU8(relsXml)},
-    {name:'xl/worksheets/sheet1.xml', data:strToU8(xml)}
+    {name:'xl/worksheets/sheet1.xml', data:strToU8(xml1)},
+    {name:'xl/worksheets/sheet2.xml', data:strToU8(xml2)}
   ];
   var zip=makeZip(files);
   var blob=new Blob([zip],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
