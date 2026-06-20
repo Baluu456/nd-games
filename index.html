@@ -277,6 +277,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .price-inp:focus{border-color:var(--accent)}
 .price-sep{font-size:12px;color:var(--text3)}
 .quick-price-btn{background:rgba(62,207,142,0.12);border:1px solid rgba(62,207,142,0.3);color:var(--green);border-radius:var(--radius-sm);padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+
+.source-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.source-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 4px;text-align:center;cursor:pointer;font-size:12px;font-weight:700;color:var(--text2);transition:all .15s}
+.source-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(124,109,240,0.12)}
+.slot-type-row{display:flex;gap:5px;margin-bottom:6px}
+.slot-type-btn{flex:1;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:5px 2px;text-align:center;cursor:pointer;font-size:10px;font-weight:700;color:var(--text3)}
+.slot-type-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(124,109,240,0.15)}
 </style>
 </head>
 <body>
@@ -773,7 +780,7 @@ function setPage(page){
     var tb=document.getElementById('tab-'+p);if(tb)tb.classList.toggle('active',p===page);
   });
   document.getElementById('controls').style.display=['available','transit','reserved','sold','exchange'].includes(page)?'block':'none';
-  var tsw=document.getElementById('type-switcher');if(tsw)tsw.style.display=page==='stats'?'none':'flex';
+  var tsw=document.getElementById('type-switcher');if(tsw)tsw.style.display=(page==='stats'||page==='shipments')?'none':'flex';
   if(page==='stats')renderStatsPage();
   if(page==='shipments')renderShipments();
   if(page==='calc')renderCalc();
@@ -1063,9 +1070,16 @@ function confirmSell(id){
 }
 
 // SHIPMENTS (filtered by item type, with auto-expense and auto-receive)
+function srcLabel(src){
+  if(src==='Georgia')return lang==='ka'?'საქართველო':'Грузия';
+  if(src==='USA')return lang==='ka'?'აშშ':'США';
+  if(src==='Dubai')return 'Dubai';
+  return src||'';
+}
+
 function renderShipments(){
   var page=document.getElementById('page-shipments');if(!page||S.page!=='shipments')return;
-  var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).filter(function(s){return (s.shipType||'disc')===S.itemType;}).sort(function(a,b){return (b.date||0)-(a.date||0);});
+  var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (b.date||0)-(a.date||0);});
   var cardsHtml=!ships.length?'<div style="color:var(--text3);font-size:14px;text-align:center;padding:40px 0;grid-column:1/-1">'+t('no_ships')+'</div>'
     :ships.map(function(s){
       var isT=s.shipStatus!=='received';
@@ -1074,7 +1088,7 @@ function renderShipments(){
       return '<div class="ship-card">'
         +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
         +'<div><div class="ship-name">'+(s.name||t('new_ship'))+'</div>'
-        +'<div class="ship-date">'+(s.source||'')+' \xb7 '+(s.date?new Date(s.date).toLocaleDateString('ru-RU'):'')+'</div></div>'
+        +'<div class="ship-date">'+srcLabel(s.source)+' \xb7 '+(s.date?new Date(s.date).toLocaleDateString('ru-RU'):'')+'</div></div>'
         +'<div style="text-align:right"><div class="ship-cost">'+total.toFixed(2)+' \u20be</div>'
         +'<div class="ship-per">'+(perDisc>0?'~'+perDisc.toFixed(2)+' '+t('per_disc'):'\u2014')+'</div></div></div>'
         +'<div class="ship-status-row">'
@@ -1104,14 +1118,10 @@ function setShipStatus(id,status){
   }
 }
 
-function openAddShipment(){S.editShipId=null;S.shipSlots=1;S.slotData={};S.shipType=S.itemType;openShipModal();}
+function openAddShipment(){S.editShipId=null;S.shipSlots=1;S.slotData={};openShipModal();}
 function openEditShipment(id){
   var ex=S.shipments[id]||{};
   S.editShipId=id;
-  S.itemType=(ex.shipType||'disc');S.shipType=S.itemType;
-  ['disc','steelbook','accessory'].forEach(function(tp){
-    var b=document.getElementById('ttype-'+tp);if(b)b.classList.toggle('active',tp===S.itemType);
-  });
   var count=parseInt(ex.discCount)||1;
   S.shipSlots=count;
   S.slotData={};
@@ -1120,7 +1130,7 @@ function openEditShipment(id){
     .sort(function(a,b){return (a.addedAt||0)-(b.addedAt||0);});
   linked.forEach(function(g,i){
     if(i<count){
-      S.slotData[i]={title:g.title||'',cover:g.cover||'',plat:g.platform||'PS5',cond:g.condition||'used',qty:parseInt(g.qty)||1};
+      S.slotData[i]={title:g.title||'',cover:g.cover||'',plat:g.platform||'PS5',cond:g.condition||'used',qty:parseInt(g.qty)||1,itemType:g.itemType||'disc'};
     }
   });
   openShipModal();
@@ -1128,8 +1138,15 @@ function openEditShipment(id){
 
 function buildSlotHtml(i){
   var saved=S.slotData[i]||{};
+  var stype=saved.itemType||'disc';
   return '<div class="disc-slot" id="slot-'+i+'">'
-    +'<div class="disc-slot-num">'+(lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u0441\u043a')+' '+(i+1)+'</div>'
+    +'<div class="disc-slot-num">'+(i+1)+'</div>'
+    +'<div class="slot-type-row">'
+    +'<div class="slot-type-btn'+(stype==='disc'?' sel':'')+'" onclick="setSlotType('+i+',\'disc\')">\ud83d\udcbf '+(lang==='ka'?'\u10d3\u10d8\u10e1\u10d9\u10d8':'\u0414\u0438\u0441\u043a')+'</div>'
+    +'<div class="slot-type-btn'+(stype==='steelbook'?' sel':'')+'" onclick="setSlotType('+i+',\'steelbook\')">\ud83d\udce6 '+(lang==='ka'?'\u10e1\u10e2\u10d8\u10da\u10d1\u10e3\u10d9\u10d8':'\u0421\u0442\u0438\u043b\u0431\u0443\u043a')+'</div>'
+    +'<div class="slot-type-btn'+(stype==='accessory'?' sel':'')+'" onclick="setSlotType('+i+',\'accessory\')">\ud83c\udfa8 '+(lang==='ka'?'\u10d0\u10d9\u10e1\u10d4\u10e1\u10e3\u10d0\u10e0\u10d8':'\u0410\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440')+'</div>'
+    +'</div>'
+    +'<input type="hidden" class="slot-itemtype" value="'+stype+'">'
     +'<div style="position:relative;margin-bottom:6px">'
     +'<input class="slot-title" type="text" placeholder="'+t('disc_title')+'..." value="'+(saved.title||'')+'"'
     +' oninput="onSlotInput('+i+',this.value)"'
@@ -1137,7 +1154,7 @@ function buildSlotHtml(i){
     +'<div id="slot-sugg-'+i+'" style="position:absolute;left:0;right:0;z-index:100"></div>'
     +(saved.cover?'<img src="'+saved.cover+'" style="width:32px;height:44px;object-fit:cover;border-radius:4px;margin-top:4px;display:block" id="slot-thumb-'+i+'">':'<span id="slot-thumb-'+i+'"></span>')
     +'<input type="hidden" class="slot-cover" value="'+(saved.cover||'')+'"></div>'
-    +(S.itemType==='accessory'?('<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><label style="font-size:11px;color:var(--text2);min-width:40px">'+(lang==='ka'?'\u10e0\u10d0\u10dd\u10d3\u10d4\u10dd\u10d1\u10d0':'\u041a\u043e\u043b-\u0432\u043e')+'</label><input type="number" class="slot-qty" value="'+(saved.qty||1)+'" min="1" style="width:70px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:6px 8px;font-size:13px;outline:none"></div>'):'')
+    +(stype==='accessory'?('<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><label style="font-size:11px;color:var(--text2);min-width:40px">'+(lang==='ka'?'\u10e0\u10d0\u10dd\u10d3\u10d4\u10dd\u10d1\u10d0':'\u041a\u043e\u043b-\u0432\u043e')+'</label><input type="number" class="slot-qty" value="'+(saved.qty||1)+'" min="1" style="width:70px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:6px 8px;font-size:13px;outline:none"></div>'):'')
     +'<div class="disc-slot-row">'
     +'<select class="slot-plat">'+PLATFORMS.map(function(p){return '<option'+(( saved.plat||'PS5')===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'
     +'<select class="slot-cond">'
@@ -1146,17 +1163,31 @@ function buildSlotHtml(i){
     +'</select></div></div>';
 }
 
+function setSlotType(i,tp){
+  saveSlotData();
+  if(!S.slotData[i])S.slotData[i]={};
+  S.slotData[i].itemType=tp;
+  var container=document.getElementById('ship-slots');if(!container)return;
+  var html='';for(var k=0;k<S.shipSlots;k++)html+=buildSlotHtml(k);
+  container.innerHTML=html;
+}
+
 function openShipModal(){
   var ex=S.editShipId?(S.shipments[S.editShipId]||{}):{};
   var n=S.shipSlots;
   var slotsHtml='';for(var i=0;i<n;i++)slotsHtml+=buildSlotHtml(i);
-  var typeLabel=S.itemType==='disc'?'':' ('+(S.itemType==='steelbook'?(lang==='ka'?'\u10e1\u10e2\u10d8\u10da\u10d1\u10e3\u10d9\u10d8':'\u0421\u0442\u0438\u043b\u0431\u0443\u043a')+'\u044b':(lang==='ka'?'\u10d0\u10d9\u10e1\u10d4\u10e1\u10e3\u10d0\u10e0\u10d8':'\u0410\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440\u044b'))+')';
   document.getElementById('modal-root').innerHTML=
     '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
     +'<div class="modal-handle"></div>'
-    +'<div class="modal-title">'+(S.editShipId?t('edit_btn'):t('new_ship'))+typeLabel+' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
+    +'<div class="modal-title">'+(S.editShipId?t('edit_btn'):t('new_ship'))+' <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
     +'<div class="field"><label>'+t('ship_name')+'</label><input id="sh-name" type="text" placeholder="Dubai April 2025" value="'+(ex.name||'')+'"></div>'
-    +'<div class="field"><label>'+t('ship_source')+'</label><input id="sh-source" type="text" placeholder="Dubai / Turkey / eBay UK" value="'+(ex.source||'')+'"></div>'
+    +'<div class="field"><label>'+t('ship_source')+'</label>'
+    +'<div class="source-grid">'
+    +'<div class="source-btn'+((ex.source==='Georgia')?' sel':'')+'" onclick="selSource(\'Georgia\')" id="src-Georgia">'+(lang==='ka'?'\u10e1\u10d0\u10e5\u10d0\u10e0\u10d7\u10d5\u10d4\u10da\u10dd':'\u0413\u0440\u0443\u0437\u0438\u044f')+'</div>'
+    +'<div class="source-btn'+((ex.source==='USA')?' sel':'')+'" onclick="selSource(\'USA\')" id="src-USA">'+(lang==='ka'?'\u10d0\u10e8\u10e8':'\u0421\u0428\u0410')+'</div>'
+    +'<div class="source-btn'+((ex.source==='Dubai')?' sel':'')+'" onclick="selSource(\'Dubai\')" id="src-Dubai">Dubai</div>'
+    +'</div>'
+    +'<input id="sh-source" type="text" placeholder="'+(lang==='ka'?'\u10d0\u10dc \u10e8\u10d4\u10d8\u10e7\u10d5\u10d0\u10dc\u10d4\u10d7 \u10e1\u10ee\u10d5\u10d0 \u10ec\u10e7\u10d0\u10e0\u10dd':'\u0418\u043b\u0438 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0434\u0440\u0443\u0433\u043e\u0439 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a')+'" value="'+(['Georgia','USA','Dubai'].includes(ex.source)?'':(ex.source||''))+'" oninput="clearSourceSel()"></div>'
     +'<div class="row2"><div class="field"><label>'+t('ship_date')+'</label><input id="sh-date" type="date" value="'+(ex.date?new Date(ex.date).toISOString().slice(0,10):new Date().toISOString().slice(0,10))+'"></div>'
     +'<div class="field"><label>'+t('ship_count')+'</label><input id="sh-count" type="number" value="'+n+'" oninput="onShipCount(this.value)"></div></div>'
     +'<div class="row2"><div class="field"><label>'+t('ship_purchase')+'</label><input id="sh-purchase" type="number" placeholder="0" value="'+(ex.purchaseCost||'')+'"></div>'
@@ -1207,15 +1238,30 @@ function selectSlotSugg(idx,name,cover){
 
 function saveSlotData(){
   var slots=document.querySelectorAll('.disc-slot');
-  S.slotData={};
+  var newData={};
   slots.forEach(function(sl,i){
-    S.slotData[i]={
+    var prevType=(S.slotData[i]||{}).itemType||'disc';
+    newData[i]={
       title:sl.querySelector('.slot-title')?sl.querySelector('.slot-title').value:'',
       cover:sl.querySelector('.slot-cover')?sl.querySelector('.slot-cover').value:'',
       plat:sl.querySelector('.slot-plat')?sl.querySelector('.slot-plat').value:'PS5',
       cond:sl.querySelector('.slot-cond')?sl.querySelector('.slot-cond').value:'used',
-      qty:sl.querySelector('.slot-qty')?(parseInt(sl.querySelector('.slot-qty').value)||1):1
+      qty:sl.querySelector('.slot-qty')?(parseInt(sl.querySelector('.slot-qty').value)||1):1,
+      itemType:sl.querySelector('.slot-itemtype')?sl.querySelector('.slot-itemtype').value:prevType
     };
+  });
+  S.slotData=newData;
+}
+
+function selSource(src){
+  document.getElementById('sh-source').value=src;
+  ['Georgia','USA','Dubai'].forEach(function(s){
+    var b=document.getElementById('src-'+s);if(b)b.classList.toggle('sel',s===src);
+  });
+}
+function clearSourceSel(){
+  ['Georgia','USA','Dubai'].forEach(function(s){
+    var b=document.getElementById('src-'+s);if(b)b.classList.remove('sel');
   });
 }
 
@@ -1239,7 +1285,7 @@ function saveShipment(){
   var totalCost=purchaseCost+deliveryCostVal;
   var perDisc=discCount>0?totalCost/discCount:0;
   var id=uid();
-  db.ref('shipments/'+id).set({id:id,name:name,source:source,date:date,discCount:discCount,purchaseCost:purchaseCost,deliveryCostVal:deliveryCostVal,totalCost:totalCost,perDisc:perDisc,notes:notes,shipStatus:'transit',inExpenses:totalCost>0,shipType:S.itemType});
+  db.ref('shipments/'+id).set({id:id,name:name,source:source,date:date,discCount:discCount,purchaseCost:purchaseCost,deliveryCostVal:deliveryCostVal,totalCost:totalCost,perDisc:perDisc,notes:notes,shipStatus:'transit',inExpenses:totalCost>0});
   if(totalCost>0){
     var eid=uid();
     db.ref('expenses/'+eid).set({id:eid,name:name||(lang==='ka'?'\u10de\u10d0\u10e0\u10e2\u10d8\u10d0':'\u041f\u0430\u0440\u0442\u0438\u044f'),to:source,amount:totalCost,date:date,type:'shipping'});
@@ -1248,7 +1294,7 @@ function saveShipment(){
   for(var i=0;i<n;i++){
     var d=S.slotData[i];if(!d||!d.title)continue;
     var gid=uid();
-    db.ref('games/'+gid).set({id:gid,title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:parseInt(d.qty)||1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null,itemType:S.itemType});
+    db.ref('games/'+gid).set({id:gid,title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:parseInt(d.qty)||1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null,itemType:d.itemType||'disc'});
   }
   S.slotData={};S.shipSlots=1;
   showToast(t('ship_exp_added'));closeModalForce();
@@ -2047,6 +2093,9 @@ window.setPage=setPage;
 window.openAddShipment=openAddShipment;
 window.openEditShipment=openEditShipment;
 window.onShipCount=onShipCount;
+window.setSlotType=setSlotType;
+window.selSource=selSource;
+window.clearSourceSel=clearSourceSel;
 window.onSlotInput=onSlotInput;
 window.selectSlotSugg=selectSlotSugg;
 window.saveShipment=saveShipment;
