@@ -1230,7 +1230,7 @@ function openShipModal(){
     +'</div>'
     +'<input id="sh-source" type="text" placeholder="'+(lang==='ka'?'\u10d0\u10dc \u10e8\u10d4\u10d8\u10e7\u10d5\u10d0\u10dc\u10d4\u10d7 \u10e1\u10ee\u10d5\u10d0 \u10ec\u10e7\u10d0\u10e0\u10dd':'\u0418\u043b\u0438 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0434\u0440\u0443\u0433\u043e\u0439 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a')+'" value="'+(ex.source||'')+'" oninput="clearSourceSel()" style="'+(['Georgia','USA','Dubai'].includes(ex.source)?'display:none':'')+'"></div>'
     +'<div class="row2"><div class="field"><label>'+t('ship_date')+'</label><input id="sh-date" type="date" value="'+(ex.date?new Date(ex.date).toISOString().slice(0,10):new Date().toISOString().slice(0,10))+'"></div>'
-    +'<div class="field"><label>'+t('ship_count')+'</label><input id="sh-count" type="number" value="'+n+'" oninput="onShipCount(this.value)"></div></div>'
+    +'<div class="field"><label>'+t('ship_count')+'</label><input id="sh-count" type="number" value="'+n+'" oninput="onShipCount(this.value)" onchange="onShipCount(this.value)"></div></div>'
     +'<div class="row2"><div class="field"><label>'+t('ship_purchase')+'</label><input id="sh-purchase" type="number" placeholder="0" value="'+(ex.purchaseCost||'')+'"></div>'
     +'<div class="field"><label>'+t('ship_delivery')+'</label><input id="sh-delivery" type="number" placeholder="0" value="'+(ex.deliveryCostVal||'')+'"></div></div>'
     +'<div class="divider"></div><div class="sec-label">'+t('ship_discs')+'</div>'
@@ -1356,14 +1356,17 @@ function saveShipment(){
     var eid=uid();
     db.ref('expenses/'+eid).set({id:eid,name:name||(lang==='ka'?'\u10de\u10d0\u10e0\u10e2\u10d8\u10d0':'\u041f\u0430\u0440\u0442\u0438\u044f'),to:source,amount:totalCost,date:date,type:'shipping'});
   }
-  var n=S.shipSlots;
-  for(var i=0;i<n;i++){
+  // Use actual count of slot data entries (not S.shipSlots which can desync from the count input)
+  var maxIdx=Math.max(S.shipSlots,Object.keys(S.slotData).length,discCount);
+  var added=0;
+  for(var i=0;i<maxIdx;i++){
     var d=S.slotData[i];if(!d||!d.title)continue;
     var gid=uid();
     db.ref('games/'+gid).set({id:gid,title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:parseInt(d.qty)||1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null,itemType:d.itemType||'disc'});
+    added++;
   }
   S.slotData={};S.shipSlots=1;
-  showToast(t('ship_exp_added'));closeModalForce();
+  showToast(t('ship_exp_added')+' ('+added+')');closeModalForce();
 }
 
 function saveShipEdit(){
@@ -1379,7 +1382,33 @@ function saveShipEdit(){
   var totalCost=purchaseCost+deliveryCostVal;
   var perDisc=discCount>0?totalCost/discCount:0;
   db.ref('shipments/'+id).update({name:name,source:source,date:date,discCount:discCount,purchaseCost:purchaseCost,deliveryCostVal:deliveryCostVal,totalCost:totalCost,perDisc:perDisc,notes:notes});
-  showToast(t('saved'));closeModalForce();
+
+  // Sync items: existing linked games get updated, new slots create new games
+  var existingLinked=Object.entries(S.games)
+    .filter(function(e){return e[1].shipmentId===id;})
+    .sort(function(a,b){return (a[1].addedAt||0)-(b[1].addedAt||0);});
+
+  var maxIdx=Math.max(S.shipSlots,Object.keys(S.slotData).length,discCount,existingLinked.length);
+  var added=0,updated=0;
+  for(var i=0;i<maxIdx;i++){
+    var d=S.slotData[i];
+    var existingEntry=existingLinked[i];
+    if(!d||!d.title){
+      continue; // empty slot - leave any existing linked game untouched
+    }
+    if(existingEntry){
+      // Update existing game
+      var gid=existingEntry[0];
+      db.ref('games/'+gid).update({title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:parseInt(d.qty)||1,itemType:d.itemType||'disc'});
+      updated++;
+    } else {
+      // Create new game (e.g. accessory added during edit)
+      var newGid=uid();
+      db.ref('games/'+newGid).set({id:newGid,title:d.title,platform:d.plat||'PS5',condition:d.cond||'used',cover:d.cover||'',qty:parseInt(d.qty)||1,status:'transit',shipmentId:id,addedAt:Date.now()+i,soldAt:null,exchangedAt:null,itemType:d.itemType||'disc'});
+      added++;
+    }
+  }
+  showToast(t('saved')+(added>0?' (+'+added+')':''));closeModalForce();
 }
 
 function deleteShipment(id){if(!confirm(t('del_ship')))return;db.ref('shipments/'+id).remove();}
