@@ -320,6 +320,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
             <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 7h10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
             <span>Расход</span>
           </button>
+          <button class="btn-add-exp" onclick="openAddIncome()" style="color:var(--green);border-color:rgba(62,207,142,0.3);background:rgba(62,207,142,0.08)">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span>Доход</span>
+          </button>
           <button class="btn-add" onclick="openAdd()">
             <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
             <span id="hl-add">Добавить</span>
@@ -1800,9 +1804,10 @@ function renderStatsPage(){
   var sold=games.filter(function(g){return g.status==='sold'&&inP(g.soldAt||g.addedAt);});
   var revenue=sold.reduce(function(s,g){return s+parseFloat(g.price||0);},0);
   var pExp=expenses.filter(function(e){return inP(e.date);});
-  var exchangeIncome=pExp.filter(function(e){return e.type==='exchange_income';}).reduce(function(s,e){return s+Math.abs(parseFloat(e.amount||0));},0);
-  revenue+=exchangeIncome;
-  var extraExp=pExp.filter(function(e){return e.type!=='exchange_income';}).reduce(function(s,e){return s+parseFloat(e.amount||0);},0);
+  var extraIncomeTypes=['exchange_income','extra_income'];
+  var extraIncome=pExp.filter(function(e){return extraIncomeTypes.includes(e.type);}).reduce(function(s,e){return s+Math.abs(parseFloat(e.amount||0));},0);
+  revenue+=extraIncome;
+  var extraExp=pExp.filter(function(e){return !extraIncomeTypes.includes(e.type);}).reduce(function(s,e){return s+parseFloat(e.amount||0);},0);
   var profit=revenue-extraExp;
   var dd=[{label:t('revenue'),value:revenue,color:'#3ecf8e'},{label:t('extra_exp'),value:extraExp,color:'#f0a832'}];
 
@@ -1812,7 +1817,7 @@ function renderStatsPage(){
     +'<div class="legend-item" style="border-top:1px solid var(--border);padding-top:7px;margin-top:4px"><div style="display:flex;align-items:center"><div class="legend-dot" style="background:var(--accent)"></div><div class="legend-label">'+t('profit')+'</div></div><div class="legend-val" style="color:'+(profit>=0?'var(--green)':'var(--red)')+'">'+(profit>=0?'+':'')+profit.toFixed(0)+' \u20be</div></div>';
 
   var expHtml=pExp.length?pExp.sort(function(a,b){return (b.date||0)-(a.date||0);}).map(function(e){
-    var isIncome=e.type==='exchange_income'||e.type==='expense_reduction';
+    var isIncome=e.type==='exchange_income'||e.type==='expense_reduction'||e.type==='extra_income';
     var amt=parseFloat(e.amount||0);
     return '<div class="exp-item"><div><div style="font-size:13px;font-weight:600">'+(e.name||'\u2014')+'</div><div style="font-size:11px;color:var(--text2)">'+(e.to?e.to+' \xb7 ':'')+fmtDate(e.date)+'</div></div>'
       +'<div style="display:flex;align-items:center;gap:8px"><span class="exp-amount" style="color:'+(isIncome?'var(--green)':'var(--red)')+'">'+(isIncome?'+':'-')+Math.abs(amt).toFixed(0)+' \u20be</span>'
@@ -1903,6 +1908,30 @@ function saveSubExpense(){
   // Store as negative amount so it reduces total expenses
   db.ref('expenses/'+id).set({id:id,name:name,to:'',amount:-amount,date:date,type:'expense_reduction'});
   showToast('− '+amount+' ₾ — учтено');
+  closeModalForce();
+}
+
+function openAddIncome(){
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">+ Доход <button class="btn-close" onclick="closeModalForce()">×</button></div>'
+    +'<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Доход не связанный с продажей дисков — идёт в выручку</p>'
+    +'<div class="field"><label>Причина</label><input id="inc-name" type="text" placeholder="Например: возврат долга"></div>'
+    +'<div class="row2"><div class="field"><label>Сумма (₾)</label><input id="inc-amount" type="number" placeholder="0"></div>'
+    +'<div class="field"><label>Дата</label><input id="inc-date" type="date" value="'+new Date().toISOString().slice(0,10)+'"></div></div>'
+    +'<button class="btn-primary" style="background:var(--green)" onclick="saveIncome()">Добавить доход</button>'
+    +'</div></div>';
+}
+
+function saveIncome(){
+  var name=document.getElementById('inc-name').value.trim();
+  var amount=parseFloat(document.getElementById('inc-amount').value)||0;
+  var date=new Date(document.getElementById('inc-date').value).getTime();
+  if(!name||!amount){showToast(t('fill_all'));return;}
+  var id=uid();
+  db.ref('expenses/'+id).set({id:id,name:name,to:'',amount:-amount,date:date,type:'extra_income'});
+  showToast('+ '+amount+' ₾ — доход добавлен');
   closeModalForce();
 }
 
@@ -2351,6 +2380,8 @@ window.selExpType=selExpType;
 window.saveExpense=saveExpense;
 window.openSubExpense=openSubExpense;
 window.saveSubExpense=saveSubExpense;
+window.openAddIncome=openAddIncome;
+window.saveIncome=saveIncome;
 window.deleteExpense=deleteExpense;
 window.renderCalc=renderCalc;
 window.calcConvert=calcConvert;
