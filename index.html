@@ -291,6 +291,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .ship-src-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .ship-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
 .ship-badge{font-size:10px;font-weight:700;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 6px;color:var(--text2)}
+
+.lang-grid{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.lang-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;user-select:none}
+.lang-opt.sel{border-color:var(--accent);background:rgba(124,109,240,0.1)}
+.lang-opt input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.lang-opt-label{font-size:13px;font-weight:600;color:var(--text)}
+.lang-opt.sel .lang-opt-label{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -448,6 +455,9 @@ if(!storedPin){
 }
 
 function openChangePin(){
+  var showLangCode=(curType==='disc')||(curType==='steelbook'&&_hasGame);
+  var langFieldHtml=showLangCode?buildLangFields():'';
+
   document.getElementById('modal-root').innerHTML=
     '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
     +'<div class="modal-handle"></div>'
@@ -800,7 +810,42 @@ function setPage(page){
 
 // ADD/EDIT ITEM
 var _hasGame=true;
+function buildLangFields(){
+  var LANGS=[
+    {id:'ru_full',label:'Русский (озвучка + субтитры)'},
+    {id:'ru_sub', label:'Русский (только субтитры)'},
+    {id:'en',     label:'Английский'}
+  ];
+  var h='<div class="field"><label>Язык</label><div class="lang-grid">';
+  LANGS.forEach(function(l){
+    var sel=_langs.indexOf(l.id)!==-1;
+    h+='<div class="lang-opt'+(sel?' sel':'')+'" id="dlang-'+l.id+'" onclick="toggleDiscLang(&quot;'+l.id+'&quot;)">'
+      +'<input type="checkbox" id="dcb-'+l.id+'"'+(sel?' checked':'')+' onclick="event.stopPropagation()">'
+      +'<span class="lang-opt-label">'+l.label+'</span></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="field"><label>Код диска</label>'
+    +'<input id="inp-disccode" type="text" placeholder="PPSA-XXXXX / CUSA-XXXXX" value="'+(_discCode||'')+'">'
+    +'</div>';
+  return h;
+}
+
+
+var _langs=[];
+var _discCode='';
 var _editItemType='disc';
+function toggleDiscLang(lang){
+  var idx=_langs.indexOf(lang);
+  if(idx===-1)_langs.push(lang);
+  else _langs.splice(idx,1);
+  ['ru_full','ru_sub','en'].forEach(function(l){
+    var el=document.getElementById('dlang-'+l);
+    if(el)el.classList.toggle('sel',_langs.indexOf(l)!==-1);
+    var cb=document.getElementById('dcb-'+l);
+    if(cb)cb.checked=_langs.indexOf(l)!==-1;
+  });
+}
+
 function selHasGame(v){_hasGame=v;var y=document.getElementById("sg-yes"),n=document.getElementById("sg-no");if(y)y.classList.toggle("sel",v);if(n)n.classList.toggle("sel",!v);}
 function selEditItemType(tp){
   _editItemType=tp;
@@ -824,6 +869,8 @@ function openAdd(editId){
   S.qty=parseInt(ex.qty||1);
   _editItemType=isEdit?(ex.itemType||'disc'):S.itemType;
   _hasGame=(ex.hasGame===false)?false:true;
+  _langs=ex.langs?ex.langs.slice():[];
+  _discCode=ex.discCode||'';
   var ships=Object.entries(S.shipments).map(function(e){return Object.assign({},e[1],{id:e[0]});});
   var shipOpts=ships.map(function(s){return '<option value="'+s.id+'"'+(ex.shipmentId===s.id?' selected':'')+'>'+( s.name||s.source)+' (~'+parseFloat(s.perDisc||0).toFixed(2)+'\u20be)</option>';}).join('');
   var statusOpts=Object.keys(STATUSES).map(function(k){return '<div class="st-opt'+(S.selStatus===k?' sel':'')+'" onclick="selStatus(\''+k+'\')" id="st-'+k+'">'+t('st_'+k)+'</div>';}).join('');
@@ -872,6 +919,7 @@ function openAdd(editId){
     +'<div class="row2"><div class="field"><label>'+t('fname')+'</label><input id="inp-person" type="text" placeholder="..." value="'+(ex.person||'')+'"></div>'
     +'<div class="field"><label>'+t('phone')+'</label><input id="inp-phone" type="tel" placeholder="+995..." value="'+(ex.phone||'')+'"></div></div>'
     +hasGameField
+    +langFieldHtml
     +'<div class="field"><label>'+t('notes')+'</label><textarea id="inp-notes">'+(ex.notes||'')+'</textarea></div>'
     +'<button class="btn-primary" onclick="'+(isEdit?'saveEdit(\''+editId+'\')':'addGame()')+'">'+( isEdit?t('save'):t('add_disc'))+'</button>'
     +(isEdit?'<button class="btn-danger" onclick="deleteGame(\''+editId+'\')">'+t('delete_disc')+'</button>':'')
@@ -937,7 +985,9 @@ function getForm(){
     phone:document.getElementById('inp-phone').value.trim(),
     notes:document.getElementById('inp-notes').value.trim(),
     itemType:ft,
-    hasGame:ft==='steelbook'?_hasGame:null
+    hasGame:ft==='steelbook'?_hasGame:null,
+    langs:(_langs.length>0?_langs.slice():null),
+    discCode:(document.getElementById('inp-disccode')?document.getElementById('inp-disccode').value.trim():null)||null
   };
 }
 function addGame(){
@@ -2389,6 +2439,8 @@ window.calcConvert=calcConvert;
 window.setCalcAmount=setCalcAmount;
 window.dismissInstall=dismissInstall;
 window.selHasGame=selHasGame;
+window.toggleDiscLang=toggleDiscLang;
+window.buildLangFields=buildLangFields;
 window.selEditItemType=selEditItemType;
 window.pinKey=pinKey;
 window.openChangePin=openChangePin;
