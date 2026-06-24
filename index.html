@@ -298,6 +298,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .lang-opt input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
 .lang-opt-label{font-size:13px;font-weight:600;color:var(--text)}
 .lang-opt.sel .lang-opt-label{color:var(--accent)}
+
+#reserve-reminder{display:none;position:fixed;bottom:80px;left:12px;right:12px;background:var(--bg2);border:1.5px solid var(--amber);border-radius:var(--radius);padding:12px 14px;z-index:400;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+#reserve-reminder.show{display:block}
+.reserve-reminder-title{font-size:13px;font-weight:700;color:var(--amber);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.reserve-reminder-item{font-size:12px;color:var(--text);padding:5px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.reserve-reminder-item:last-child{border-bottom:none}
+.reserve-reminder-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1}
 </style>
 </head>
 <body>
@@ -357,6 +364,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         <button class="plat-btn active" id="pf-all" onclick="setPlatFilter('all')">&#x1F4BF; All</button>
         <button class="plat-btn" id="pf-PS5" onclick="setPlatFilter('PS5')">PS5</button>
         <button class="plat-btn" id="pf-PS4" onclick="setPlatFilter('PS4')">PS4</button>
+        <div style="width:1px;background:var(--border);margin:0 2px;align-self:stretch"></div>
+        <button class="plat-btn active" id="cf-all" onclick="setCondFilter('all')">Все</button>
+        <button class="plat-btn" id="cf-new" onclick="setCondFilter('new')">Новый</button>
+        <button class="plat-btn" id="cf-used" onclick="setCondFilter('used')">Б/У</button>
+        <div style="width:1px;background:var(--border);margin:0 2px;align-self:stretch"></div>
+        <button class="plat-btn" id="sort-btn" onclick="toggleSort()">A–Z</button>
         <div class="price-range">
           <input class="price-inp" id="pf-min" type="number" placeholder="♥ 0" oninput="renderList()">
           <span class="price-sep">—</span>
@@ -401,6 +414,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   </div>
   <div class="pin-hint" id="pin-hint"></div>
   <button onclick="openChangePin()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;margin-top:6px;text-decoration:underline">Сменить PIN</button>
+</div>
+<div id="reserve-reminder">
+  <button class="reserve-reminder-close" onclick="dismissReserveReminder()">&#x2715;</button>
+  <div class="reserve-reminder-title">&#x23F0; Резервы залежались</div>
+  <div id="reserve-reminder-list"></div>
 </div>
 <div id="install-banner">
   <p>ND Games <span id="ib-sub">Установить как приложение</span></p>
@@ -601,6 +619,24 @@ function toggleLang(){
   if(S.page==='calc')renderCalc();
   if(S.page==='exchange')renderExchangePage();
 }
+function setCondFilter(cond){
+  S.filterCond=cond;
+  ['all','new','used'].forEach(function(c){
+    var b=document.getElementById('cf-'+c);if(b)b.classList.toggle('active',c===cond);
+  });
+  renderList();
+}
+
+function toggleSort(){
+  S.sortOrder=S.sortOrder==='date'?'alpha':'date';
+  var btn=document.getElementById('sort-btn');
+  if(btn){
+    btn.textContent=S.sortOrder==='alpha'?'A–Z':'Дата';
+    btn.classList.toggle('active',S.sortOrder==='alpha');
+  }
+  renderList();
+}
+
 function setPlatFilter(plat){
   S.filterPlat=plat;
   ['all','PS5','PS4'].forEach(function(p){
@@ -637,13 +673,13 @@ function applyLang(){
 }
 
 // STATE
-var S={games:{},shipments:{},expenses:{},exchanges:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterPriceMin:'',filterPriceMax:'',filterShipSrc:'all'};
+var S={games:{},shipments:{},expenses:{},exchanges:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterPriceMin:'',filterPriceMax:'',filterShipSrc:'all',filterCond:'all',sortOrder:'date'};
 var STATUSES={available:{badge:'b-available'},transit:{badge:'b-transit'},reserved:{badge:'b-reserved'},reserved_exchange:{badge:'b-reserved_exchange'},sold:{badge:'b-sold'},exchange:{badge:'b-exchange'},ordered:{badge:'b-ordered'}};
 var PLATFORMS=['PS5','PS4','PS4/PS5'];
 var PAGE_ST={available:['available'],transit:['transit','ordered'],reserved:['reserved','reserved_exchange'],sold:['sold'],exchange:[]};
 
 // FIREBASE LISTENERS
-db.ref('games').on('value',function(s){S.games=s.val()||{};renderStats();renderList();if(S.page==='exchange')renderExchangePage();});
+db.ref('games').on('value',function(s){S.games=s.val()||{};renderStats();renderList();if(S.page==='exchange')renderExchangePage();checkReserveReminder();});
 db.ref('shipments').on('value',function(s){S.shipments=s.val()||{};if(S.page==='shipments')renderShipments();});
 db.ref('expenses').on('value',function(s){S.expenses=s.val()||{};if(S.page==='stats')renderStatsPage();});
 db.ref('exchanges').on('value',function(s){S.exchanges=s.val()||{};if(S.page==='exchange')renderExchangePage();});
@@ -707,6 +743,8 @@ function renderList(){
         if(S.filterPlat==='PS5'&&!xp.includes('PS5'))return false;
         if(S.filterPlat==='PS4'&&!xp.includes('PS4'))return false;
       }
+      // Condition filter
+      if(S.filterCond!=='all'&&x.condition!==S.filterCond)return false;
       // Price filter
       var pmin=parseFloat((document.getElementById('pf-min')||{}).value||'');
       var pmax=parseFloat((document.getElementById('pf-max')||{}).value||'');
@@ -716,7 +754,11 @@ function renderList(){
       return true;
     });
     if(q)g=g.filter(function(x){return x.title&&x.title.toLowerCase().includes(q.toLowerCase());});
-    g.sort(function(a,b){return (b.addedAt||0)-(a.addedAt||0);});
+    if(S.sortOrder==='alpha'){
+      g.sort(function(a,b){return (a.title||'').localeCompare(b.title||'','ru',{sensitivity:'base'});});
+    } else {
+      g.sort(function(a,b){return (b.addedAt||0)-(a.addedAt||0);});
+    }
     var grid=document.getElementById('grid-'+pid);if(!grid)return;
     if(!g.length){
       var noItemsLabel=S.itemType==='disc'?t('no_discs'):S.itemType==='steelbook'?(lang==='ka'?'\u10e1\u10e2\u10d8\u10da\u10d1\u10e3\u10d9\u10d8 \u10d0\u10e0 \u10d0\u10e0\u10d8\u10e1':'\u041d\u0435\u0442 \u0441\u0442\u0438\u043b\u0431\u0443\u043a\u043e\u0432'):(lang==='ka'?'\u10d0\u10d9\u10e1\u10d4\u10e1\u10e3\u10d0\u10e0\u10d8 \u10d0\u10e0 \u10d0\u10e0\u10d8\u10e1':'\u041d\u0435\u0442 \u0430\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440\u043e\u0432');
@@ -2386,10 +2428,50 @@ function exportShipmentsExcel(source){
 window.exportExcel=exportExcel;
 window.exportShipmentsExcel=exportShipmentsExcel;
 window.setPlatFilter=setPlatFilter;
+window.setCondFilter=setCondFilter;
+window.toggleSort=toggleSort;
 window.quickPrice=quickPrice;
 window.saveQuickPrice=saveQuickPrice;
 window.setQP=setQP;
 window.saveQuickPrice=saveQuickPrice;
+function checkReserveReminder(){
+  var now=Date.now();
+  var SIX_DAYS=6*24*60*60*1000;
+  var SEVEN_DAYS=7*24*60*60*1000;
+  var alerts=[];
+  Object.values(S.games).forEach(function(g){
+    if(g.status!=='reserved'&&g.status!=='reserved_exchange')return;
+    var since=now-(g.addedAt||now);
+    if(since>=SIX_DAYS){
+      var days=Math.floor(since/(24*60*60*1000));
+      alerts.push({title:g.title||'—',person:g.person||'',phone:g.phone||'',days:days,id:g.id,isWeek:since>=SEVEN_DAYS});
+    }
+  });
+  var banner=document.getElementById('reserve-reminder');
+  var list=document.getElementById('reserve-reminder-list');
+  if(!banner||!list)return;
+  if(!alerts.length){banner.classList.remove('show');return;}
+  alerts.sort(function(a,b){return b.days-a.days;});
+  list.innerHTML=alerts.map(function(a){
+    var label=a.isWeek
+      ?'<span style="color:var(--red);font-weight:700">Свыше недели! ('+a.days+'д)</span>'
+      :'<span style="color:var(--amber)">Завтра неделя (6д)</span>';
+    var person=a.person?(' — '+a.person+(a.phone?' <a href="tel:'+a.phone+'" style="color:var(--accent)">'+a.phone+'</a>':'')):'';
+    return '<div class="reserve-reminder-item">'
+      +'<div><div style="font-weight:600">'+a.title+'</div>'
+      +'<div style="font-size:11px;color:var(--text2)">'+person+'</div></div>'
+      +label+'</div>';
+  }).join('');
+  banner.classList.add('show');
+}
+
+function dismissReserveReminder(){
+  var b=document.getElementById('reserve-reminder');
+  if(b)b.classList.remove('show');
+}
+
+
+window.dismissReserveReminder=dismissReserveReminder;
 window.toggleLang=toggleLang;
 window.setItemType=setItemType;
 window.openAdd=openAdd;
