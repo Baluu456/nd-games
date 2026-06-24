@@ -455,10 +455,7 @@ if(!storedPin){
 }
 
 function openChangePin(){
-  var showLangCode=(curType==='disc')||(curType==='steelbook'&&_hasGame);
-  var langFieldHtml=showLangCode?buildLangFields():'';
-
-  document.getElementById('modal-root').innerHTML=
+    document.getElementById('modal-root').innerHTML=
     '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
     +'<div class="modal-handle"></div>'
     +'<div class="modal-title">\u0421\u043c\u0435\u043d\u0430 PIN <button class="btn-close" onclick="closeModalForce()">\xd7</button></div>'
@@ -875,6 +872,8 @@ function openAdd(editId){
   var shipOpts=ships.map(function(s){return '<option value="'+s.id+'"'+(ex.shipmentId===s.id?' selected':'')+'>'+( s.name||s.source)+' (~'+parseFloat(s.perDisc||0).toFixed(2)+'\u20be)</option>';}).join('');
   var statusOpts=Object.keys(STATUSES).map(function(k){return '<div class="st-opt'+(S.selStatus===k?' sel':'')+'" onclick="selStatus(\''+k+'\')" id="st-'+k+'">'+t('st_'+k)+'</div>';}).join('');
   var curType=_editItemType;
+  var showLangCode=(curType==='disc')||(curType==='steelbook'&&_hasGame);
+  var langFieldHtml=showLangCode?buildLangFields():'';
   var typeSelectorHtml=isEdit?(
     '<div class="field"><label>'+t('category')+'</label><div class="status-grid" style="grid-template-columns:repeat(3,1fr)">'
     +'<div class="st-opt'+(curType==='disc'?' sel':'')+'" onclick="selEditItemType(\'disc\')" id="eit-disc">'+t('type_disc')+'</div>'
