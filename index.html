@@ -556,12 +556,11 @@ async function getIGDBToken(){
 async function searchIGDB(q,pageSize){
   pageSize=pageSize||6;
   try{
-    var token=await getIGDBToken();
-    if(!token)return[];
-    var r=await fetch('https://api.igdb.com/v4/games',{
+    // Token handled by proxy
+    var r=await fetch('https://igdbproxy.mrdarkers980.workers.dev/',{
       method:'POST',
-      headers:{'Client-ID':IGDB_CLIENT_ID,'Authorization':'Bearer '+token,'Content-Type':'text/plain'},
-      body:'search "'+q.replace(/"/g,'')+'"; fields name,cover.image_id; where platforms=(48,167); limit '+pageSize+';'
+      headers:{'Content-Type':'text/plain'},
+      body:'search "'+q.replace(/"/g,'')+'"'+'; fields name,cover.image_id; where platforms=(48,167); limit '+pageSize+';'
     });
     var games=await r.json();
     if(!Array.isArray(games))return[];
