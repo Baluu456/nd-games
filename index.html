@@ -550,7 +550,7 @@ window.addEventListener('appinstalled',function(){document.getElementById('insta
 // TRANSLATIONS
 var TR={
 ru:{add:'Добавить',addexp:'Расход',search:'Поиск по названию...',total:'Всего',instock:'Наличие',reserves:'Резерв',sold_s:'Продано',transit_c:'В пути',
-tl_available:'Наличие',tl_transit:'В пути',tl_reserved:'Резервы',tl_sold:'Продажи',tl_exchange:'Обмен',tl_shipments:'Партии',tl_stats:'Финансы',tl_calc:'Курс',
+tl_available:'Наличие',tl_transit:'В пути',tl_reserved:'Резервы',tl_sold:'Продажи',tl_exchange:'Обмен',tl_shipments:'Партии',tl_stats:'Финансы',tl_calc:'Курс',tl_clients:'Клиенты',tl_wishlist:'Вишлист',tl_gamestats:'Топ',
 st_available:'В наличии',st_reserved:'Резерв',st_reserved_exchange:'Рез/Обмен',st_sold:'Продан',st_exchange:'Обменян',st_ordered:'Заказан',st_transit:'В пути',
 no_discs:'Нет дисков',add_disc:'Добавить диск',edit_disc:'Редактировать',game_name:'Название игры',
 searching:'Ищем...',cover_found:'Обложка найдена ✓',no_conn:'Нет соединения — введите URL вручную',
@@ -595,7 +595,7 @@ no_exchanges:'Нет обменов',exchange_saved:'Обмен зафиксир
 del_exchange:'Удалить обмен?',exchange_moved:'Диски перенесены в наличие',
 surcharge_us:'Мы доплачиваем (₾)',surcharge_them:'Они доплачивают (₾)',surcharge_optional:'Доплата (необязательно)'},
 ka:{add:'დამატება',addexp:'ხარჯი',search:'ძებნა სახელით...',total:'სულ',instock:'მარაგი',reserves:'რეზერვი',sold_s:'გაყიდული',transit_c:'გზაში',
-tl_available:'მარაგი',tl_transit:'გზაში',tl_reserved:'რეზერვი',tl_sold:'გაყიდვები',tl_exchange:'გაცვლა',tl_shipments:'პარტიები',tl_stats:'ფინანსები',tl_calc:'კურსი',
+tl_available:'მარაგი',tl_transit:'გზაში',tl_reserved:'რეზერვი',tl_sold:'გაყიდვები',tl_exchange:'გაცვლა',tl_shipments:'პარტიები',tl_stats:'ფინანსები',tl_calc:'კურსი',tl_clients:'კლიენტები',tl_wishlist:'ვიშლისტი',tl_gamestats:'ტოპი',
 st_available:'მარაგშია',st_reserved:'რეზერვი',st_reserved_exchange:'რეზ/გაცვლა',st_sold:'გაიყიდა',st_exchange:'გაიცვალა',st_ordered:'შეკვეთილია',st_transit:'გზაშია',
 no_discs:'დისკი არ არის',add_disc:'დისკის დამატება',edit_disc:'რედაქტირება',game_name:'თამაშის სახელი',
 searching:'ვეძებთ...',cover_found:'ყდა ნაპოვნია ✓',no_conn:'კავშირი არ არის — URL ხელით',
@@ -876,7 +876,7 @@ function renderList(){
 // PAGE NAVIGATION
 function setPage(page){
   S.page=page;
-  ['available','transit','reserved','sold','exchange','shipments','stats','calc'].forEach(function(p){
+  ['available','transit','reserved','sold','exchange','shipments','stats','calc','clients','wishlist','gamestats'].forEach(function(p){
     var pg=document.getElementById('page-'+p);if(pg)pg.style.display=p===page?'block':'none';
     var tb=document.getElementById('tab-'+p);if(tb)tb.classList.toggle('active',p===page);
   });
