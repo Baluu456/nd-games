@@ -533,6 +533,47 @@ function saveNewPin(){
   showToast('\u2713 PIN \u0438\u0437\u043c\u0435\u043d\u0451\u043d');
 }
 
+
+// ═══════════════════════════════════════
+// IGDB Cover Search
+// ═══════════════════════════════════════
+var IGDB_CLIENT_ID='l4fal22k92dqvrh84wzwxo7z0n48t8';
+var IGDB_CLIENT_SECRET='e7zpxucqx77kzt1qyqqg4tdcn5sdoh';
+var _igdbToken=null;
+var _igdbTokenExp=0;
+
+async function getIGDBToken(){
+  if(_igdbToken&&Date.now()<_igdbTokenExp)return _igdbToken;
+  try{
+    var r=await fetch('https://id.twitch.tv/oauth2/token?client_id='+IGDB_CLIENT_ID+'&client_secret='+IGDB_CLIENT_SECRET+'&grant_type=client_credentials',{method:'POST'});
+    var d=await r.json();
+    _igdbToken=d.access_token;
+    _igdbTokenExp=Date.now()+(d.expires_in-60)*1000;
+    return _igdbToken;
+  }catch(e){return null;}
+}
+
+async function searchIGDB(q,pageSize){
+  pageSize=pageSize||6;
+  try{
+    var token=await getIGDBToken();
+    if(!token)return[];
+    var r=await fetch('https://api.igdb.com/v4/games',{
+      method:'POST',
+      headers:{'Client-ID':IGDB_CLIENT_ID,'Authorization':'Bearer '+token,'Content-Type':'text/plain'},
+      body:'search "'+q.replace(/"/g,'')+'"; fields name,cover.image_id; where platforms=(48,167); limit '+pageSize+';'
+    });
+    var games=await r.json();
+    if(!Array.isArray(games))return[];
+    return games.filter(function(g){return g.cover&&g.cover.image_id;}).map(function(g){
+      return {
+        name:g.name,
+        cover:'https://images.igdb.com/igdb/image/upload/t_cover_big/'+g.cover.image_id+'.jpg'
+      };
+    });
+  }catch(e){return[];}
+}
+
 firebase.initializeApp({apiKey:"AIzaSyAkIxx4M7IISPWUEP4vMnQaaYazC8KGxiI",authDomain:"nd-games.firebaseapp.com",databaseURL:"https://nd-games-default-rtdb.europe-west1.firebasedatabase.app",projectId:"nd-games",storageBucket:"nd-games.firebasestorage.app",messagingSenderId:"447616051556",appId:"1:447616051556:web:c96fb5818cdf5ab7363271"});
 var db=firebase.database();
 
@@ -1025,9 +1066,8 @@ function onTitleInput(val){
 }
 async function fetchSugg(q){
   try{
-    var r=await fetch('https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search='+encodeURIComponent(q)+'&page_size=6');
-    var data=await r.json();
-    S.sugg=(data.results||[]).map(function(g){return {name:g.name,cover:g.background_image||'',year:g.released?g.released.slice(0,4):''};});
+    var results=await searchIGDB(q,6);
+    S.sugg=results;
     var h=document.getElementById('cover-hint');if(h)h.textContent='';
     var box=document.getElementById('suggest-box');if(!box)return;
     if(!S.sugg.length){box.innerHTML='';return;}
@@ -1035,7 +1075,7 @@ async function fetchSugg(q){
     S.sugg.forEach(function(g,i){
       html+='<div class="suggest-item" onclick="selectSugg('+i+')">';
       html+=g.cover?'<img class="sug-thumb" src="'+g.cover+'" alt="" loading="lazy">':'<div class="sug-thumb"></div>';
-      html+='<div><div class="sug-name">'+g.name+'</div><div class="sug-year">'+g.year+'</div></div></div>';
+      html+='<div><div class="sug-name">'+g.name+'</div></div></div>';
     });
     html+='</div>';
     box.innerHTML=html;
@@ -1394,9 +1434,7 @@ function onSlotInput(idx,val){
 
 async function fetchSlotSugg(idx,q){
   try{
-    var r=await fetch('https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search='+encodeURIComponent(q)+'&page_size=5');
-    var data=await r.json();
-    var results=(data.results||[]).map(function(g){return {name:g.name,cover:g.background_image||''};});
+    var results=await searchIGDB(q,5);
     var box=document.getElementById('slot-sugg-'+idx);if(!box)return;
     if(!results.length){box.innerHTML='';return;}
     var html='<div class="slot-sugg-box">';
@@ -1767,9 +1805,7 @@ function onRecvInput(idx,val){
 
 async function fetchRecvSugg(idx,q){
   try{
-    var r=await fetch('https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search='+encodeURIComponent(q)+'&page_size=5');
-    var data=await r.json();
-    var results=(data.results||[]).map(function(g){return {name:g.name,cover:g.background_image||''};});
+    var results=await searchIGDB(q,5);
     var box=document.getElementById('recv-sugg-'+idx);if(!box)return;
     if(!results.length){box.innerHTML='';return;}
     var html='<div class="slot-sugg-box">';
@@ -2723,9 +2759,8 @@ function onWishInput(val){
 }
 async function fetchWishSugg(q){
   try{
-    var r=await fetch('https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search='+encodeURIComponent(q)+'&page_size=5');
-    var data=await r.json();
-    var results=(data.results||[]);
+    var results=await searchIGDB(q,5);
+    results=results;
     var box=document.getElementById('wish-sugg');if(!box)return;
     if(!results.length){box.innerHTML='';return;}
     var html='<div class="suggest-list">';
