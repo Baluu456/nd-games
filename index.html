@@ -773,7 +773,12 @@ function renderList(){
       groups[key].items.push(x);
       if((x.addedAt||0)>groups[key].latestAt){groups[key].latestAt=x.addedAt||0;if(x.cover)groups[key].cover=x.cover;}
     });
-    var cards=Object.values(groups).sort(function(a,b){return b.latestAt-a.latestAt;});
+    var cards=Object.values(groups);
+    if(S.sortOrder==='alpha'){
+      cards.sort(function(a,b){return (a.title||'').localeCompare(b.title||'','ru',{sensitivity:'base'});});
+    } else {
+      cards.sort(function(a,b){return b.latestAt-a.latestAt;});
+    }
     grid.innerHTML=cards.map(function(grp){
       var items=grp.items;
       if(items.length===1){
@@ -1050,7 +1055,7 @@ function addGame(){
 function saveEdit(id){
   var d=getForm();if(!d.title){showToast(t('game_name'));return;}
   var prev=S.games[id]||{};
-  var data=Object.assign({},d,{soldAt:d.status==='sold'?(prev.soldAt||Date.now()):null,exchangedAt:d.status==='exchange'?(prev.exchangedAt||Date.now()):null});
+  var data=Object.assign({},d,{soldAt:d.status==='sold'?(prev.soldAt||Date.now()):null,exchangedAt:d.status==='exchange'?(prev.exchangedAt||Date.now()):null,reservedAt:(d.status==='reserved'||d.status==='reserved_exchange')?(prev.reservedAt||Date.now()):null});
   Object.keys(data).forEach(function(k){if(data[k]===undefined)delete data[k];});
   db.ref('games/'+id).update(data);
   // Update or create expense for cost if no shipment
@@ -1151,7 +1156,7 @@ function saveQuickPrice(){
 
 function quickStatus(id,status){
   if(status==='sold'){var g=S.games[id];if(g&&parseInt(g.qty||1)>1)openSellOnePopup(id);else openSellPopup(id);}
-  else{db.ref('games/'+id).update({status:status,soldAt:null,exchangedAt:status==='exchange'?Date.now():null});showToast(t('status_changed'));closeModalForce();}
+  else{db.ref('games/'+id).update({status:status,soldAt:null,exchangedAt:status==='exchange'?Date.now():null,reservedAt:(status==='reserved'||status==='reserved_exchange')?Date.now():null});showToast(t('status_changed'));closeModalForce();}
 }
 function openSellOnePopup(id){
   var g=S.games[id];if(!g)return;closeModalForce();
@@ -2434,14 +2439,19 @@ window.quickPrice=quickPrice;
 window.saveQuickPrice=saveQuickPrice;
 window.setQP=setQP;
 window.saveQuickPrice=saveQuickPrice;
+var _reminderShown=false;
 function checkReserveReminder(){
+  // Only show once per session
+  if(_reminderShown)return;
   var now=Date.now();
   var SIX_DAYS=6*24*60*60*1000;
   var SEVEN_DAYS=7*24*60*60*1000;
   var alerts=[];
   Object.values(S.games).forEach(function(g){
     if(g.status!=='reserved'&&g.status!=='reserved_exchange')return;
-    var since=now-(g.addedAt||now);
+    // Use reservedAt if available, otherwise soldAt timestamp logic, else skip if addedAt is too recent
+    var reservedAt=g.reservedAt||g.addedAt||now;
+    var since=now-reservedAt;
     if(since>=SIX_DAYS){
       var days=Math.floor(since/(24*60*60*1000));
       alerts.push({title:g.title||'—',person:g.person||'',phone:g.phone||'',days:days,id:g.id,isWeek:since>=SEVEN_DAYS});
@@ -2463,11 +2473,13 @@ function checkReserveReminder(){
       +label+'</div>';
   }).join('');
   banner.classList.add('show');
+  _reminderShown=true;
 }
 
 function dismissReserveReminder(){
   var b=document.getElementById('reserve-reminder');
   if(b)b.classList.remove('show');
+  _reminderShown=false;
 }
 
 
