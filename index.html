@@ -1039,7 +1039,8 @@ function getForm(){
 function addGame(){
   var d=getForm();if(!d.title){showToast(t('game_name'));return;}
   var id=uid();
-  var data=Object.assign({},d,{id:id,addedAt:Date.now(),soldAt:null,exchangedAt:null});
+  var isRes=d.status==='reserved'||d.status==='reserved_exchange';
+  var data=Object.assign({},d,{id:id,addedAt:Date.now(),soldAt:null,exchangedAt:null,reservedAt:isRes?Date.now():null});
   Object.keys(data).forEach(function(k){if(data[k]===undefined)delete data[k];});
   db.ref('games/'+id).set(data);
   // Auto-create expense for cost if specified and no shipment
@@ -2450,7 +2451,9 @@ function checkReserveReminder(){
   Object.values(S.games).forEach(function(g){
     if(g.status!=='reserved'&&g.status!=='reserved_exchange')return;
     // Use reservedAt if available, otherwise soldAt timestamp logic, else skip if addedAt is too recent
-    var reservedAt=g.reservedAt||g.addedAt||now;
+    // Only count if reservedAt is explicitly set - skip old reserves without it
+    if(!g.reservedAt)return;
+    var reservedAt=g.reservedAt;
     var since=now-reservedAt;
     if(since>=SIX_DAYS){
       var days=Math.floor(since/(24*60*60*1000));
