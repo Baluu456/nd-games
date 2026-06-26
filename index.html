@@ -556,20 +556,13 @@ async function getIGDBToken(){
 async function searchIGDB(q,pageSize){
   pageSize=pageSize||6;
   try{
-    // Token handled by proxy
-    var r=await fetch('https://igdbproxy.mrdarkers980.workers.dev/',{
-      method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:'search "'+q.replace(/"/g,'')+'"'+'; fields name,cover.image_id; where platforms=(48,167); limit '+pageSize+';'
+    var r=await fetch('https://igdbproxy.mrdarkers980.workers.dev/?q='+encodeURIComponent(q),{
+      method:'GET',
+      headers:{'X-Source':'sgdb'}
     });
-    var games=await r.json();
-    if(!Array.isArray(games))return[];
-    return games.filter(function(g){return g.cover&&g.cover.image_id;}).map(function(g){
-      return {
-        name:g.name,
-        cover:'https://images.igdb.com/igdb/image/upload/t_cover_big/'+g.cover.image_id+'.jpg'
-      };
-    });
+    var results=await r.json();
+    if(!Array.isArray(results))return[];
+    return results;
   }catch(e){return[];}
 }
 
