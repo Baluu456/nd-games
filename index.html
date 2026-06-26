@@ -305,6 +305,34 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .reserve-reminder-item{font-size:12px;color:var(--text);padding:5px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .reserve-reminder-item:last-child{border-bottom:none}
 .reserve-reminder-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1}
+
+/* Clients */
+.client-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.client-name{font-size:15px;font-weight:700;margin-bottom:3px}
+.client-meta{font-size:12px;color:var(--text2)}
+.client-discount{background:rgba(124,109,240,0.15);border:1px solid var(--accent);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
+.client-actions{display:flex;gap:6px;margin-top:8px}
+.client-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;font-size:12px;cursor:pointer;color:var(--text2)}
+.client-list-dropdown{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;max-height:200px;overflow-y:auto;position:absolute;left:0;right:0;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4)}
+.client-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.client-list-item:last-child{border-bottom:none}
+.client-list-item:active{background:var(--bg3)}
+/* Wishlist */
+.wish-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;display:flex;align-items:center;gap:12px}
+.wish-cover{width:44px;height:62px;object-fit:cover;border-radius:5px;background:var(--bg3);flex-shrink:0}
+.wish-info{flex:1;min-width:0}
+.wish-title{font-size:14px;font-weight:600;margin-bottom:3px}
+.wish-meta{font-size:11px;color:var(--text2)}
+.wish-actions{display:flex;gap:6px;flex-shrink:0}
+.wish-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text2)}
+.wish-btn.found{background:rgba(62,207,142,0.1);border-color:var(--green);color:var(--green)}
+/* Game stats */
+.gstat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:12px}
+.gstat-cover{width:44px;height:62px;object-fit:cover;border-radius:5px;background:var(--bg3);flex-shrink:0}
+.gstat-info{flex:1;min-width:0}
+.gstat-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gstat-nums{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap}
+.gstat-num{font-size:11px;font-weight:700;background:var(--bg3);border-radius:5px;padding:2px 7px}
 </style>
 </head>
 <body>
@@ -320,6 +348,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <button class="tab" id="tab-shipments" onclick="setPage('shipments')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span id="tl-shipments">shipments</span></button>
     <button class="tab" id="tab-stats" onclick="setPage('stats')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span id="tl-stats">stats</span></button>
     <button class="tab" id="tab-calc" onclick="setPage('calc')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/></svg><span id="tl-calc">calc</span></button>
+    <button class="tab" id="tab-clients" onclick="setPage('clients')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span id="tl-clients">Клиенты</span></button>
+    <button class="tab" id="tab-wishlist" onclick="setPage('wishlist')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><span id="tl-wishlist">Вишлист</span></button>
+    <button class="tab" id="tab-gamestats" onclick="setPage('gamestats')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="tl-gamestats">Топ</span></button>
   </div>
   <div id="content-area" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
     <div class="header">
@@ -386,6 +417,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div id="page-shipments" class="page" style="display:none"></div>
     <div id="page-stats" class="page" style="display:none"></div>
     <div id="page-calc" class="page" style="display:none"></div>
+    <div id="page-clients" class="page" style="display:none"></div>
+    <div id="page-wishlist" class="page" style="display:none"></div>
+    <div id="page-gamestats" class="page" style="display:none"></div>
   </div>
 </div>
 
@@ -667,13 +701,13 @@ function applyLang(){
     var el=document.getElementById('tltype-'+tp);
     if(el)el.innerHTML=t('type_'+tp);
   });
-  ['available','transit','reserved','sold','exchange','shipments','stats','calc'].forEach(function(p){
+  ['available','transit','reserved','sold','exchange','shipments','stats','calc','clients','wishlist','gamestats'].forEach(function(p){
     var el=document.getElementById('tl-'+p);if(el)el.textContent=t('tl_'+p);
   });
 }
 
 // STATE
-var S={games:{},shipments:{},expenses:{},exchanges:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterPriceMin:'',filterPriceMax:'',filterShipSrc:'all',filterCond:'all',sortOrder:'date'};
+var S={games:{},shipments:{},expenses:{},exchanges:{},clients:{},wishlist:{},page:'available',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterPriceMin:'',filterPriceMax:'',filterShipSrc:'all',filterCond:'all',sortOrder:'date'};
 var STATUSES={available:{badge:'b-available'},transit:{badge:'b-transit'},reserved:{badge:'b-reserved'},reserved_exchange:{badge:'b-reserved_exchange'},sold:{badge:'b-sold'},exchange:{badge:'b-exchange'},ordered:{badge:'b-ordered'}};
 var PLATFORMS=['PS5','PS4','PS4/PS5'];
 var PAGE_ST={available:['available'],transit:['transit','ordered'],reserved:['reserved','reserved_exchange'],sold:['sold'],exchange:[]};
@@ -683,6 +717,8 @@ db.ref('games').on('value',function(s){S.games=s.val()||{};renderStats();renderL
 db.ref('shipments').on('value',function(s){S.shipments=s.val()||{};if(S.page==='shipments')renderShipments();});
 db.ref('expenses').on('value',function(s){S.expenses=s.val()||{};if(S.page==='stats')renderStatsPage();});
 db.ref('exchanges').on('value',function(s){S.exchanges=s.val()||{};if(S.page==='exchange')renderExchangePage();});
+db.ref('clients').on('value',function(s){S.clients=s.val()||{};if(S.page==='clients')renderClients();});
+db.ref('wishlist').on('value',function(s){S.wishlist=s.val()||{};if(S.page==='wishlist')renderWishlist();});
 db.ref('.info/connected').on('value',function(s){var d=document.getElementById('online-dot');if(d)d.style.background=s.val()?'var(--green)':'var(--red)';});
 
 // BOOT
@@ -845,11 +881,14 @@ function setPage(page){
     var tb=document.getElementById('tab-'+p);if(tb)tb.classList.toggle('active',p===page);
   });
   document.getElementById('controls').style.display=['available','transit','reserved','sold','exchange'].includes(page)?'block':'none';
-  var tsw=document.getElementById('type-switcher');if(tsw)tsw.style.display=(page==='stats'||page==='shipments')?'none':'flex';
+  var tsw=document.getElementById('type-switcher');if(tsw)tsw.style.display=['stats','shipments','clients','wishlist','gamestats'].includes(page)?'none':'flex';
   if(page==='stats')renderStatsPage();
   if(page==='shipments')renderShipments();
   if(page==='calc')renderCalc();
   if(page==='exchange')renderExchangePage();
+  if(page==='clients')renderClients();
+  if(page==='wishlist')renderWishlist();
+  if(page==='gamestats')renderGameStats();
 }
 
 // ADD/EDIT ITEM
@@ -2487,6 +2526,309 @@ function dismissReserveReminder(){
 
 
 window.dismissReserveReminder=dismissReserveReminder;
+// ═══════════════════════════════════════════════════════
+// CLIENTS MODULE
+// ═══════════════════════════════════════════════════════
+
+function renderClients(){
+  var page=document.getElementById('page-clients');
+  if(!page||S.page!=='clients')return;
+  var clients=Object.entries(S.clients||{}).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ru');});
+  var html='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<button class="btn-new-ship" onclick="openAddClient()">+ Добавить клиента</button>';
+  if(!clients.length){
+    html+='<div style="text-align:center;padding:40px;color:var(--text3)">Клиентов пока нет</div>';
+  } else {
+    // Search
+    html+='<div style="position:relative"><input type="text" id="client-search" placeholder="Поиск по имени..." oninput="filterClients()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:9px 12px;font-size:14px;outline:none"></div>';
+    html+='<div id="clients-list">';
+    html+=buildClientsList(clients);
+    html+='</div>';
+  }
+  html+='</div>';
+  page.innerHTML=html;
+}
+
+function buildClientsList(clients){
+  var html='';
+  clients.forEach(function(c){
+    var sales=Object.values(S.games).filter(function(g){return g.status==='sold'&&(g.person===c.name||(g.phone&&g.phone===c.phone));});
+    var total=sales.reduce(function(s,g){return s+parseFloat(g.price||0);},0);
+    html+='<div class="client-card">';
+    html+='<div style="flex:1"><div class="client-name">'+c.name+'</div>';
+    html+='<div class="client-meta">'+(c.phone?'📞 '+c.phone:'')+(c.note?' · '+c.note:'')+'</div>';
+    if(sales.length)html+='<div class="client-meta" style="margin-top:4px">'+sales.length+' покупок · '+total.toFixed(0)+' ₾</div>';
+    html+='<div class="client-actions">';
+    html+='<button class="client-btn" onclick="openEditClient(\''+c.id+'\')">✏️ Редактировать</button>';
+    html+='<button class="client-btn" style="color:var(--red)" onclick="deleteClient(\''+c.id+'\')">Удалить</button>';
+    html+='</div></div>';
+    if(c.discount)html+='<div class="client-discount">'+c.discount+'% скидка</div>';
+    html+='</div>';
+  });
+  return html;
+}
+
+function filterClients(){
+  var q=(document.getElementById('client-search')||{value:''}).value.toLowerCase();
+  var clients=Object.entries(S.clients||{}).map(function(e){return Object.assign({},e[1],{id:e[0]});}).filter(function(c){
+    return !q||(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q);
+  }).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ru');});
+  var list=document.getElementById('clients-list');
+  if(list)list.innerHTML=buildClientsList(clients);
+}
+
+function openAddClient(){
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">Новый клиент <button class="btn-close" onclick="closeModalForce()">×</button></div>'
+    +'<div class="field"><label>Имя</label><input id="cl-name" type="text" placeholder="Имя клиента"></div>'
+    +'<div class="field"><label>Телефон</label><input id="cl-phone" type="tel" placeholder="+995..."></div>'
+    +'<div class="field"><label>Скидка (%)</label><input id="cl-discount" type="number" placeholder="0" min="0" max="100"></div>'
+    +'<div class="field"><label>Заметка</label><input id="cl-note" type="text" placeholder="VIP, постоянный..."></div>'
+    +'<button class="btn-primary" onclick="saveClient()">Сохранить</button>'
+    +'</div></div>';
+}
+
+function openEditClient(id){
+  var c=S.clients[id];if(!c)return;
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">Редактировать клиента <button class="btn-close" onclick="closeModalForce()">×</button></div>'
+    +'<div class="field"><label>Имя</label><input id="cl-name" type="text" value="'+(c.name||'')+'"></div>'
+    +'<div class="field"><label>Телефон</label><input id="cl-phone" type="tel" value="'+(c.phone||'')+'"></div>'
+    +'<div class="field"><label>Скидка (%)</label><input id="cl-discount" type="number" value="'+(c.discount||0)+'" min="0" max="100"></div>'
+    +'<div class="field"><label>Заметка</label><input id="cl-note" type="text" value="'+(c.note||'')+'"></div>'
+    +'<button class="btn-primary" onclick="saveClient(\''+id+'\')">Сохранить</button>'
+    +'<button class="btn-danger" onclick="deleteClient(\''+id+'\')">Удалить клиента</button>'
+    +'</div></div>';
+}
+
+function saveClient(id){
+  var name=document.getElementById('cl-name').value.trim();
+  if(!name){showToast('Введите имя');return;}
+  var data={name:name,phone:document.getElementById('cl-phone').value.trim(),discount:parseFloat(document.getElementById('cl-discount').value)||0,note:document.getElementById('cl-note').value.trim()};
+  var cid=id||uid();
+  data.id=cid;
+  db.ref('clients/'+cid).set(data);
+  showToast('Клиент сохранён');closeModalForce();
+}
+
+function deleteClient(id){
+  if(!confirm('Удалить клиента?'))return;
+  db.ref('clients/'+id).remove();
+  showToast('Удалено');closeModalForce();
+}
+
+// Pick client from dropdown in reserve form
+function pickClient(name, phone, discount){
+  var ni=document.getElementById('inp-person');if(ni)ni.value=name;
+  var pi=document.getElementById('inp-phone');if(pi)pi.value=phone||'';
+  // Apply discount to price
+  if(discount>0){
+    var priceInp=document.getElementById('inp-price');
+    if(priceInp&&priceInp.value){
+      var orig=parseFloat(priceInp.value)||0;
+      var discounted=Math.round(orig*(1-discount/100));
+      priceInp.value=discounted;
+      showToast('Скидка '+discount+'%: '+discounted+' ₾');
+    }
+  }
+  // Close dropdown
+  var dd=document.getElementById('client-dropdown');if(dd)dd.remove();
+}
+
+function onPersonInput(val){
+  var dd=document.getElementById('client-dropdown');if(dd)dd.remove();
+  if(!val||val.length<1)return;
+  var matches=Object.values(S.clients||{}).filter(function(c){
+    return (c.name||'').toLowerCase().includes(val.toLowerCase())||(c.phone||'').includes(val);
+  }).slice(0,6);
+  if(!matches.length)return;
+  var wrap=document.getElementById('inp-person').parentNode;
+  var ddEl=document.createElement('div');
+  ddEl.id='client-dropdown';
+  ddEl.className='client-list-dropdown';
+  ddEl.innerHTML=matches.map(function(c){
+    var disc=c.discount>0?(' <span style="color:var(--accent);font-size:10px">-'+c.discount+'%</span>'):'';
+    return '<div class="client-list-item" onclick="pickClient(\''+c.name.replace(/'/g,"\\'")+'\',\''+(c.phone||'').replace(/'/g,"\\'")+'\','+( c.discount||0)+')">'
+      +'<div><div style="font-size:13px;font-weight:600">'+c.name+disc+'</div>'
+      +'<div style="font-size:11px;color:var(--text2)">'+(c.phone||'')+'</div></div>'
+      +'</div>';
+  }).join('');
+  wrap.style.position='relative';
+  wrap.appendChild(ddEl);
+}
+
+// ═══════════════════════════════════════════════════════
+// WISHLIST MODULE
+// ═══════════════════════════════════════════════════════
+
+function renderWishlist(){
+  var page=document.getElementById('page-wishlist');
+  if(!page||S.page!=='wishlist')return;
+  var items=Object.entries(S.wishlist||{}).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (b.addedAt||0)-(a.addedAt||0);});
+  var inStock=0;
+  items.forEach(function(w){
+    var found=Object.values(S.games).some(function(g){return g.status==='available'&&(g.title||'').toLowerCase().includes((w.title||'').toLowerCase());});
+    if(found)inStock++;
+  });
+  var html='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<button class="btn-new-ship" onclick="openAddWish()">+ Добавить в вишлист</button>';
+  if(inStock>0)html+='<div style="background:rgba(62,207,142,0.1);border:1px solid var(--green);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--green);font-weight:700">✓ '+inStock+' позиций из вишлиста есть в наличии!</div>';
+  if(!items.length){
+    html+='<div style="text-align:center;padding:40px;color:var(--text3)">Вишлист пуст</div>';
+  } else {
+    items.forEach(function(w){
+      var inStock=Object.values(S.games).some(function(g){return g.status==='available'&&(g.title||'').toLowerCase().includes((w.title||'').toLowerCase());});
+      html+='<div class="wish-card">';
+      html+=w.cover?'<img class="wish-cover" src="'+w.cover+'" alt="">':'<div class="wish-cover"></div>';
+      html+='<div class="wish-info"><div class="wish-title">'+w.title+'</div>';
+      html+='<div class="wish-meta">'+(w.platform||'')+(w.note?' · '+w.note:'')+'</div>';
+      if(inStock)html+='<div style="font-size:11px;color:var(--green);font-weight:700;margin-top:3px">✓ Есть в наличии!</div>';
+      html+='</div>';
+      html+='<div class="wish-actions">';
+      if(inStock)html+='<button class="wish-btn found" onclick="setPage(\'available\')">Показать</button>';
+      html+='<button class="wish-btn" onclick="deleteWish(\''+w.id+'\')">✕</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='</div>';
+  page.innerHTML=html;
+}
+
+function openAddWish(){
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
+    +'<div class="modal-handle"></div>'
+    +'<div class="modal-title">Добавить в вишлист <button class="btn-close" onclick="closeModalForce()">×</button></div>'
+    +'<div class="field"><label>Название игры</label>'
+    +'<div style="position:relative"><input id="wish-title" type="text" placeholder="Название..." oninput="onWishInput(this.value)">'
+    +'<div id="wish-sugg"></div>'
+    +'<div style="margin-top:6px"><input type="hidden" id="wish-cover" value=""></div>'
+    +'<div id="wish-thumb-wrap"></div></div></div>'
+    +'<div class="field"><label>Платформа</label><select id="wish-plat"><option>PS5</option><option>PS4</option><option>PS4/PS5</option></select></div>'
+    +'<div class="field"><label>Заметка (кто просил, контакт)</label><input id="wish-note" type="text" placeholder="Например: клиент Гиоргий просил"></div>'
+    +'<button class="btn-primary" onclick="saveWish()">Добавить</button>'
+    +'</div></div>';
+}
+
+var wishTimer=null;
+function onWishInput(val){
+  clearTimeout(wishTimer);
+  var box=document.getElementById('wish-sugg');if(box)box.innerHTML='';
+  if(!val||val.length<2)return;
+  wishTimer=setTimeout(function(){fetchWishSugg(val);},600);
+}
+async function fetchWishSugg(q){
+  try{
+    var r=await fetch('https://api.rawg.io/api/games?key=65ce323e7413493980cdf795a14073c5&search='+encodeURIComponent(q)+'&page_size=5');
+    var data=await r.json();
+    var results=(data.results||[]);
+    var box=document.getElementById('wish-sugg');if(!box)return;
+    if(!results.length){box.innerHTML='';return;}
+    var html='<div class="suggest-list">';
+    results.forEach(function(g){
+      var sn=g.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      var sc=(g.background_image||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      html+='<div class="suggest-item" onclick="selectWishSugg(&quot;'+sn+'&quot;,&quot;'+sc+'&quot;)">';
+      html+=g.background_image?'<img class="sug-thumb" src="'+g.background_image+'" alt="">':'<div class="sug-thumb"></div>';
+      html+='<div><div class="sug-name">'+g.name+'</div></div></div>';
+    });
+    html+='</div>';
+    box.innerHTML=html;
+  }catch(e){var box=document.getElementById('wish-sugg');if(box)box.innerHTML='';}
+}
+function selectWishSugg(name,cover){
+  var ti=document.getElementById('wish-title');if(ti)ti.value=name;
+  var ci=document.getElementById('wish-cover');if(ci)ci.value=cover;
+  var tw=document.getElementById('wish-thumb-wrap');
+  if(tw)tw.innerHTML=cover?'<img src="'+cover+'" style="width:40px;height:56px;object-fit:cover;border-radius:5px;margin-top:4px">':'';
+  var box=document.getElementById('wish-sugg');if(box)box.innerHTML='';
+}
+function saveWish(){
+  var title=document.getElementById('wish-title').value.trim();
+  if(!title){showToast('Введите название');return;}
+  var id=uid();
+  db.ref('wishlist/'+id).set({id:id,title:title,cover:document.getElementById('wish-cover').value||'',platform:document.getElementById('wish-plat').value,note:document.getElementById('wish-note').value.trim(),addedAt:Date.now()});
+  showToast('Добавлено в вишлист');closeModalForce();
+}
+function deleteWish(id){
+  db.ref('wishlist/'+id).remove();
+}
+
+// ═══════════════════════════════════════════════════════
+// GAME STATS MODULE
+// ═══════════════════════════════════════════════════════
+
+function renderGameStats(){
+  var page=document.getElementById('page-gamestats');
+  if(!page||S.page!=='gamestats')return;
+  var games=Object.values(S.games);
+  // Build stats per title
+  var stats={};
+  games.forEach(function(g){
+    var key=(g.title||'').toLowerCase().trim();
+    if(!key)return;
+    if(!stats[key])stats[key]={title:g.title,cover:g.cover||'',sold:0,inStock:0,inTransit:0,revenue:0,prices:[],avgDays:0,daysArr:[]};
+    var s=stats[key];
+    if(g.status==='sold'){
+      s.sold++;
+      var price=parseFloat(g.price||0);
+      if(price>0){s.revenue+=price;s.prices.push(price);}
+      if(g.addedAt&&g.soldAt){s.daysArr.push(Math.round((g.soldAt-g.addedAt)/(86400000)));}
+    }
+    if(g.status==='available')s.inStock++;
+    if(g.status==='transit'||g.status==='ordered')s.inTransit++;
+  });
+  // Compute averages
+  Object.values(stats).forEach(function(s){
+    s.avgPrice=s.prices.length?Math.round(s.prices.reduce(function(a,b){return a+b;},0)/s.prices.length):0;
+    s.avgDays=s.daysArr.length?Math.round(s.daysArr.reduce(function(a,b){return a+b;},0)/s.daysArr.length):null;
+  });
+  // Sort by sold desc
+  var sorted=Object.values(stats).filter(function(s){return s.sold>0||s.inStock>0;}).sort(function(a,b){return b.sold-a.sold||b.inStock-a.inStock;});
+
+  var html='<div style="display:flex;flex-direction:column;gap:8px">';
+  html+='<div style="font-size:12px;color:var(--text2);margin-bottom:4px">Топ игр по количеству продаж</div>';
+  if(!sorted.length){
+    html+='<div style="text-align:center;padding:40px;color:var(--text3)">Данных пока нет</div>';
+  } else {
+    sorted.forEach(function(s,i){
+      html+='<div class="gstat-card">';
+      html+='<div style="font-size:16px;font-weight:800;color:var(--text3);min-width:24px;text-align:center">'+(i+1)+'</div>';
+      html+=s.cover?'<img class="gstat-cover" src="'+s.cover+'" alt="">':'<div class="gstat-cover"></div>';
+      html+='<div class="gstat-info"><div class="gstat-title">'+s.title+'</div>';
+      html+='<div class="gstat-nums">';
+      if(s.sold)html+='<span class="gstat-num" style="color:var(--green)">✓ '+s.sold+' продано</span>';
+      if(s.inStock)html+='<span class="gstat-num" style="color:var(--accent)">'+s.inStock+' в наличии</span>';
+      if(s.inTransit)html+='<span class="gstat-num" style="color:var(--blue)">'+s.inTransit+' в пути</span>';
+      if(s.avgPrice)html+='<span class="gstat-num">~'+s.avgPrice+' ₾</span>';
+      if(s.avgDays!==null)html+='<span class="gstat-num">~'+s.avgDays+' дн</span>';
+      if(s.revenue)html+='<span class="gstat-num" style="color:var(--amber)">'+s.revenue.toFixed(0)+' ₾</span>';
+      html+='</div></div></div>';
+    });
+  }
+  html+='</div>';
+  page.innerHTML=html;
+}
+
+window.renderClients=renderClients;
+window.renderWishlist=renderWishlist;
+window.renderGameStats=renderGameStats;
+window.openAddClient=openAddClient;
+window.openEditClient=openEditClient;
+window.saveClient=saveClient;
+window.deleteClient=deleteClient;
+window.filterClients=filterClients;
+window.pickClient=pickClient;
+window.onPersonInput=onPersonInput;
+window.openAddWish=openAddWish;
+window.onWishInput=onWishInput;
+window.selectWishSugg=selectWishSugg;
+window.saveWish=saveWish;
+window.deleteWish=deleteWish;
 window.toggleLang=toggleLang;
 window.setItemType=setItemType;
 window.openAdd=openAdd;
