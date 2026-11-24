@@ -4511,6 +4511,7 @@ function openDetail(id){
     +(['transit','ordered'].includes(g.status)?'<button class="btn-primary" style="margin-top:10px;background:var(--red)" onclick="openMarkLostItem(\''+id+'\')">\ud83d\udea8 '+t('mark_lost')+'</button>':'')
     +(['transit','ordered'].includes(g.status)?'<button class="btn-primary" style="margin-top:8px;background:var(--amber)" onclick="openMarkReturnedItem(\''+id+'\')">\u21a9\ufe0f '+t('mark_returned')+'</button>':'')
     +(g.saleGroupId&&g.status==='sold'?'<button class="btn-secondary" style="margin-top:12px;width:100%;color:var(--green);border-color:var(--green)" onclick="openRegroup(\''+g.saleGroupId+'\')">🔁 Перераспределить комплект</button>':'')
+    +(g.status==='sold'&&!g.selfBuy?'<button class="btn-secondary" style="margin-top:10px;width:100%;color:var(--amber);border-color:var(--amber)" onclick="openRevertSale(\''+id+'\')">↩ Откатить продажу'+(g.saleGroupId?' (комплект)':'')+'</button>':'')
     +'<div style="display:flex;gap:8px;margin-top:12px">'
     +'<button class="btn-primary" style="flex:1" onclick="closeModalForce();openAdd(\''+id+'\')">'+t('edit_btn')+'</button>'
     +'<button class="btn-secondary" onclick="printItemDetail(\''+id+'\')" style="padding:10px 16px">\ud83d\udda8\ufe0f</button>'
@@ -5084,7 +5085,7 @@ function msFmt(c){return (c/100).toFixed(2);}
 function msAvail(){
   var q=(MS.q||'').trim().toLowerCase();
   return Object.values(S.games).filter(function(g){
-    if(g.status!=='available'||g.itemType==='bundle'||g.itemType==='console')return false;
+    if((g.status!=='available'&&!MS.sel[g.id])||g.itemType==='bundle'||g.itemType==='console')return false;
     if(!q)return true;
     return ((g.title||'')+' '+(g.platform||'')+' '+(g.discCode||'')).toLowerCase().indexOf(q)>=0;
   }).sort(function(a,b){return (a.title||'').localeCompare(b.title||'');}).slice(0,80);
@@ -5240,6 +5241,71 @@ function confirmRegroup(){
   r.items.forEach(function(g){db.ref('games/'+g.id).update({price:String(r.cents[g.id]/100)});});
   logAction('Комплект пересчитан',r.items.length+' шт. · '+msFmt(r.total)+' ₾');
   closeModalForce();showToast('✅ Комплект пересчитан');
+}
+
+// ── ОТКАТ ПРОДАЖИ: вернуть проданное в наличие (по одной игре, комплектом, бандл) ──
+function rvDoc(g){
+  var u={status:'available',soldAt:null,saleGroupId:null,saleGroupN:null,saleGroupTotal:null,buyerName:null,buyerPhone:null,listPrice:null,soldInBundle:null,priceBeforeBundle:null};
+  if(g.listPrice)u.price=String(g.listPrice);
+  else if(g.soldInBundle&&g.priceBeforeBundle)u.price=String(g.priceBeforeBundle);
+  db.ref('games/'+g.id).update(u);
+}
+function rvBlock(g){
+  if(g.selfBuy){closeModalForce();undoSelfBuy(g.id);return true;}
+  if(g.debtSettled||(g.payments&&g.payments.length)){alert('Это долг/рассрочка — откатывай через раздел «Долги».');return true;}
+  return false;
+}
+function openRevertSale(id){
+  var g=S.games[id];if(!g||g.status!=='sold')return;
+  if(rvBlock(g))return;
+  if(g.saleGroupId){
+    var items=Object.values(S.games).filter(function(x){return x.saleGroupId===g.saleGroupId&&x.status==='sold';}).sort(function(a,b){return (a.title||'').localeCompare(b.title||'');});
+    window.RV={gid:g.saleGroupId,ids:items.map(function(x){return x.id;})};
+    closeModalForce();
+    document.getElementById('modal-root').innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()" style="max-height:92vh;overflow-y:auto">'
+      +'<div class="modal-handle"></div><h3>↩ Откатить продажу комплекта</h3>'
+      +'<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Отметь игры, которые вернуть в наличие. Остальные останутся проданными.'
+      +(items[0].buyerName||items[0].buyerPhone?'<br>👤 '+esc2([items[0].buyerName,items[0].buyerPhone].filter(Boolean).join(' · ')):'')+'</div>'
+      +items.map(function(x){return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer"><input type="checkbox" class="rv-ck" value="'+x.id+'" checked><span style="flex:1;font-size:13px">'+esc2(x.title||'')+' <span style="color:var(--text3)">'+esc2(x.platform||'')+'</span></span><span style="font-size:12px;color:var(--text2)">'+fmtGel(x.price||0)+' ₾</span></label>';}).join('')
+      +'<label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;cursor:pointer"><input type="checkbox" id="rv-redo" checked> Сразу открыть «Комплектом» с этими играми (добавить/убрать и продать заново)</label>'
+      +'<button class="btn-primary" style="width:100%;margin-top:12px;background:var(--amber)" onclick="confirmRevertGroup()">↩ Вернуть в наличие</button>'
+      +'<button class="btn-secondary" style="width:100%;margin-top:8px" onclick="closeModalForce()">Отмена</button></div></div>';
+    return;
+  }
+  var extra='';
+  if(g.itemType==='bundle')extra='\nИгры из бандла тоже вернутся в наличие.';
+  if(g.itemType==='console')extra='\nИгры, проданные вместе с приставкой, нужно вернуть отдельно.';
+  if(!confirm('Откатить продажу «'+(g.title||'')+'»? Вернётся в наличие, продажа и прибыль уберутся.'+extra))return;
+  if(g.itemType==='bundle'){
+    (g.bundledGames||[]).forEach(function(gid){var x=S.games[gid];if(x&&x.status==='sold'&&x.soldInBundle===id)rvDoc(x);});
+    db.ref('games/'+id).update({status:'available',soldAt:null,cost:null,bundleCostFull:null});
+  }else rvDoc(g);
+  logAction('Откат продажи',g.title||id);
+  closeModalForce();showToast('↩ Возвращено в наличие');
+}
+function confirmRevertGroup(){
+  var ids=[].slice.call(document.querySelectorAll('.rv-ck:checked')).map(function(e){return e.value;});
+  if(!ids.length){alert('Отметь хотя бы одну игру');return;}
+  var redo=!!(document.getElementById('rv-redo')||{}).checked,gid=window.RV.gid;
+  var all=Object.values(S.games).filter(function(x){return x.saleGroupId===gid&&x.status==='sold';});
+  var first=all[0]||{},name=first.buyerName||'',phone=first.buyerPhone||'',total=first.saleGroupTotal||0;
+  var back=all.filter(function(x){return ids.indexOf(x.id)>=0;}),rest=all.filter(function(x){return ids.indexOf(x.id)<0;});
+  back.forEach(rvDoc);
+  if(rest.length===1){db.ref('games/'+rest[0].id).update({saleGroupId:null,saleGroupN:null,saleGroupTotal:null,listPrice:null});}
+  else if(rest.length>1){
+    var sum=rest.reduce(function(a,x){return a+(parseFloat(x.price)||0);},0);
+    rest.forEach(function(x){db.ref('games/'+x.id).update({saleGroupN:rest.length,saleGroupTotal:Math.round(sum*100)/100});});
+  }
+  logAction('Откат комплекта',back.length+' из '+all.length+' шт.'+(name?' · '+name:''));
+  closeModalForce();
+  if(redo){
+    openMultiSell();
+    ids.forEach(function(id){MS.sel[id]=1;MS.order.push(id);});
+    var n=document.getElementById('ms-name'),p=document.getElementById('ms-phone'),t=document.getElementById('ms-total');
+    if(n)n.value=name;if(p)p.value=phone;if(t&&!rest.length&&total)t.value=total;
+    msRenderList();msRenderRows();
+    showToast('↩ Игры возвращены — собери комплект заново');
+  }else showToast('↩ Возвращено в наличие: '+back.length+' шт.');
 }
 // SHIPMENTS (filtered by item type, with auto-expense and auto-receive)
 function srcLabel(src){
