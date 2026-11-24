@@ -1236,19 +1236,9 @@ function openBannersModal(){
     +'<div class="modal-handle"></div><h3>🖼 '+(ka?'ბანერები საიტზე':'Баннеры на сайте')+'</h3>'
     +'<div style="font-size:12px;color:var(--text2);line-height:1.5;margin:6px 0 4px">'+(ka?'გადამრთველი მოქმედებს საიტის კარუსელზე მაშინვე. თუ ყველა გამორთულია — ბლოკი იმალება.':'Переключатель сразу действует на карусель сайта. Если выключить все — блок скрывается целиком.')+'</div>'
     +rows
-    +(function(){var off=!!S.introOff;return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">'
-      +'<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">🎬 '+(ka?'ინტრო შესვლისას':'Интро при входе на сайт')+'</div>'
-      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+(ka?'გეიმერი, დისკი, ლოგო. ერთხელ სესიაზე':'геймер → выстрел диском → лого, один раз за сессию')+'</div></div>'
-      +'<button class="btn-secondary" style="min-width:104px;'+(off?'color:var(--text3)':'color:var(--green);border-color:var(--green)')+'" onclick="toggleIntro()">'+(off?(ka?'⏸ გამორთული':'⏸ Выкл'):(ka?'✅ ჩართული':'✅ Вкл'))+'</button></div>';})()
     +'<div style="font-size:11px;color:var(--text3);margin:10px 0 0">'+(ka?'დიდი ბანერები «აქცია» და «ახალი წელი» იმართება თავიანთი ღილაკებით.':'Большие баннеры «Акция» и «Новый год» управляются своими кнопками.')+'</div>'
     +'<button class="btn-secondary" style="width:100%;margin-top:12px" onclick="closeModalForce()">'+(ka?'დახურვა':'Закрыть')+'</button>'
     +'</div></div>';
-}
-function toggleIntro(){
-  var off=!!S.introOff;
-  var op=off?db.ref('settings/introOff').remove():db.ref('settings/introOff').set(true);
-  op.then(function(){S.introOff=!off;if(typeof logAction==='function')logAction('Интро сайта',off?'включено':'выключено');openBannersModal();})
-   .catch(function(err){alert('Не удалось переключить интро: '+(err&&err.message||err));});
 }
 function toggleBanner(id){
   var off=bnOff(id);
@@ -2985,7 +2975,6 @@ function startApp(){
   db.ref('settings/newYear').on('value',function(s){S.newYear=s.val()||null;updateNewYearBtn();applyPortalNY();});
   db.ref('settings/winter').on('value',function(s){S.winter=s.val()||null;updateWinterBtn();});
   db.ref('settings/bannersOff').on('value',function(s){S.bannersOff=s.val()||{};});
-  db.ref('settings/introOff').on('value',function(s){S.introOff=!!s.val();});
   db.ref('settings/music').on('value',function(s){S.music=s.val()||null;if(document.getElementById('modal-root')&&document.getElementById('modal-root').querySelector('[onclick*="mxStop"]')&&!MX.aud)mxRender();});
 db.ref('settings/sale').on('value',function(s){S.sale=s.val()||null;});
 db.ref('settings/genres').on('value',function(s){S.genreDefs=s.val()||{};computeGenres();try{buildGenreFilterButtons();if(S.filterGenre&&S.filterGenre!=='all'&&GENRES.indexOf(S.filterGenre)===-1)S.filterGenre='all';setGenreFilter(S.filterGenre||'all');}catch(e){}try{if(S.page==='settings')renderSettings();}catch(e){}},function(){});
