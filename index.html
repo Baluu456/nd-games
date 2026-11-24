@@ -557,7 +557,6 @@ html,body{height:100%;background:var(--bg);background-image:radial-gradient(elli
     <button class="tab" id="tab-gamestats" onclick="setPage('gamestats')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="tl-gamestats">Топ</span></button>
     <button class="tab" id="tab-loyalty" onclick="setPage('loyalty')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span id="tl-loyalty">Карты</span></button>
     <button class="tab" id="tab-orders" onclick="setPage('orders')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span id="tl-orders">Заказы</span><span id="orders-badge" style="display:none;background:#ff006e;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:3px">0</span></button>
-    <button class="tab" id="tab-auction" onclick="setPage('auction')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 6H4a2 2 0 002 4M17 6h3a2 2 0 01-2 4"/></svg><span id="tl-auction">Аукцион</span></button>
     <button class="tab" id="tab-kassa" onclick="setPage('kassa')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2H10a2 2 0 00-2 2v16"/><circle cx="12" cy="14" r="2"/></svg><span id="tl-kassa">Касса</span></button>
     <button class="tab" id="tab-bundles" onclick="setPage('bundles')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 010-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 010 5"/></svg><span id="tl-bundles">Бандлы</span></button>
     <button class="tab" id="tab-gifts" onclick="setPage('gifts')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg><span id="tl-gifts">Купоны</span></button>
@@ -730,7 +729,6 @@ html,body{height:100%;background:var(--bg);background-image:radial-gradient(elli
     <div id="page-wishlist" class="page" style="display:none"></div>
     <div id="page-gamestats" class="page" style="display:none"></div>
     <div id="page-orders" class="page" style="display:none"></div>
-    <div id="page-auction" class="page" style="display:none"></div>
     <div id="page-loyalty" class="page" style="display:none"></div>
     <div id="page-kassa" class="page" style="display:none"></div>
     <div id="page-bundles" class="page" style="display:none"></div>
@@ -1004,7 +1002,7 @@ platform_l:'Платформа',region_l:'Регион',qty_l:'Количест�
 sale_price_l:'Цена продажи',cost_l:'Себестоимость',delivery_l:'Доставка клиенту',
 ship_part:'Доля доставки партии',profit_l:'Прибыль',client_l:'Клиент',phone_l:'Телефон',
 notes_l:'Заметки',added_l:'Добавлен',sold_l:'Продан',exchanged_l:'Обменян',
-quick_status:'Быстрый статус',edit_btn:'Редактировать',save_btn:'Сохранить',tl_arrived:'Приехало',arrived_pending:'Не подтверждено',arrived_confirmed:'подтверждено',arrived_no_items:'Нет одиночных дисков',arrived_single_items:'Одиночные диски',tl_auction:'Аукцион',
+quick_status:'Быстрый статус',edit_btn:'Редактировать',save_btn:'Сохранить',tl_arrived:'Приехало',arrived_pending:'Не подтверждено',arrived_confirmed:'подтверждено',arrived_no_items:'Нет одиночных дисков',arrived_single_items:'Одиночные диски',
 sell_title:'Финальная цена',sell_sub:'Укажите реальную сумму',sell_confirm:'Подтвердить продажу',sell_cancel:'Отмена',
 disc_added:'Диск добавлен',saved:'Сохранено',deleted:'Удалено',status_changed:'Статус изменён',sold_ok:'Продажа записана',
 new_ship:'Новая партия',ship_transit:'В пути',ship_received:'Получена',
@@ -1074,7 +1072,7 @@ platform_l:'პლატფორმა',region_l:'რეგიონი',qty_l:
 sale_price_l:'გაყიდვის ფასი',cost_l:'თვითღირებულება',delivery_l:'კლიენტამდე მიტანა',
 ship_part:'პარტიის მიტანის წილი',profit_l:'მოგება',client_l:'კლიენტი',phone_l:'ტელეფონი',
 notes_l:'შენიშვნები',added_l:'დამატებულია',sold_l:'გაიყიდა',exchanged_l:'გაიცვალა',
-quick_status:'სწრაფი სტატუსი',edit_btn:'რედაქტირება',save_btn:'შენახვა',tl_arrived:'ჩამოვიდა',arrived_pending:'დაუდასტურებელი',arrived_confirmed:'დადასტურებულია',arrived_no_items:'ცალკეული დისკები არ არის',arrived_single_items:'ცალკეული დისკები',tl_auction:'აუქციონი',
+quick_status:'სწრაფი სტატუსი',edit_btn:'რედაქტირება',save_btn:'შენახვა',tl_arrived:'ჩამოვიდა',arrived_pending:'დაუდასტურებელი',arrived_confirmed:'დადასტურებულია',arrived_no_items:'ცალკეული დისკები არ არის',arrived_single_items:'ცალკეული დისკები',
 sell_title:'საბოლოო ფასი',sell_sub:'მიუთითეთ რეალური თანხა',sell_confirm:'გაყიდვის დადასტურება',sell_cancel:'გაუქმება',
 disc_added:'დისკი დამატებულია',saved:'შენახულია',deleted:'წაშლილია',status_changed:'სტატუსი შეცვლილია',sold_ok:'გაყიდვა ჩაწერილია',
 new_ship:'ახალი პარტია',ship_transit:'გზაშია',ship_received:'მიღებულია',
@@ -1513,7 +1511,7 @@ function bundleRefsFor(gid){
 function bundleEligible(g,editId){
   if(!g||g.status!=='available')return false;
   var it=g.itemType||'disc';if(it!=='disc'&&it!=='steelbook')return false;
-  if(g.auctionId||g.bundledWithConsoleId)return false;
+  if(g.bundledWithConsoleId)return false;
   var refs=findPackageRefsForGame(g.id);
   if(refs.some(function(r){return r.bundleId!==editId;}))return false;
   if(bundleRefsFor(g.id).some(function(b){return b.id!==editId;}))return false;
@@ -2671,7 +2669,7 @@ function applyLang(){
     var el=document.getElementById('tltype-'+tp);
     if(el)el.innerHTML=t('type_'+tp);
   });
-  ['available','transit','reserved','sold','exchange','lost','returned','shipments','arrived','stats','calc','clients','wishlist','gamestats','orders','auction','loyalty','settings'].forEach(function(p){
+  ['available','transit','reserved','sold','exchange','lost','returned','shipments','arrived','stats','calc','clients','wishlist','gamestats','orders','loyalty','settings'].forEach(function(p){
     var el=document.getElementById('tl-'+p);if(el)el.textContent=t('tl_'+p);
   });
   ['plat','cond','sort','price','genre'].forEach(function(k){
@@ -2940,7 +2938,7 @@ function closePkgGamesPickerCancel(){
   _pkgPickerIdx=null;
   document.getElementById('modal-root-2').innerHTML='';
 }
-var S={giftProducts:{},giftcards:{},giftIssued:{},games:{},shipments:{},expenses:{},exchanges:{},clients:{},wishlist:{},orders:{},auctions:{},kassaShifts:{},page:'dashboard',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',statView:'overview',trendPeriod:'week',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterGenre:'all',filterPriceMin:'',filterPriceMax:'',filterShipSrc:'Georgia',filterCond:'all',filterOrderedBy:'all',filterOrderedByTransit:'all',filterItemStage:'all',filterCarrier:'all',filterStage:'all',filterShipReceived:'all',arrivedFilterAll:false,sortOrder:'date',gstatsView:'top',cardCompact:false,groupBy:'none',expSearch:'',salesSearch:''};
+var S={giftProducts:{},giftcards:{},giftIssued:{},games:{},shipments:{},expenses:{},exchanges:{},clients:{},wishlist:{},orders:{},kassaShifts:{},page:'dashboard',selStatus:'available',selCond:'used',selExpType:'other',statPeriod:'month',statView:'overview',trendPeriod:'week',sugg:[],suggTimer:null,qty:1,rates:{},shipSlots:1,slotData:{},editShipId:null,itemType:'disc',shipType:'disc',filterPlat:'all',filterGenre:'all',filterPriceMin:'',filterPriceMax:'',filterShipSrc:'Georgia',filterCond:'all',filterOrderedBy:'all',filterOrderedByTransit:'all',filterItemStage:'all',filterCarrier:'all',filterStage:'all',filterShipReceived:'all',arrivedFilterAll:false,sortOrder:'date',gstatsView:'top',cardCompact:false,groupBy:'none',expSearch:'',salesSearch:''};
 buildGenreFilterButtons();
 var STATUSES={available:{badge:'b-available'},transit:{badge:'b-transit'},reserved:{badge:'b-reserved'},reserved_exchange:{badge:'b-reserved_exchange'},sold:{badge:'b-sold'},exchange:{badge:'b-exchange'},ordered:{badge:'b-ordered'},lost:{badge:'b-lost'},returned:{badge:'b-returned'},debt:{badge:'b-debt'}};
 var PLATFORMS=['PS5','PS4','PS4/PS5','PS3','PS2','PS1','PS Vita','PSP','Xbox Series','Xbox One','Xbox 360','Xbox','Switch 2','Switch'];
@@ -2974,14 +2972,13 @@ function startApp(){
     var db2=document.getElementById('debt-badge');if(db2){db2.textContent=dCount;db2.style.display=dCount>0?'inline-flex':'none';}
   });
   db.ref('shipments').on('value',function(s){S.shipments=s.val()||{};if(S.page==='shipments')renderShipments();});
-  db.ref('auctions').on('value',function(s){S.auctions=s.val()||{};if(S.page==='auction')renderAuctionPage();});
   db.ref('personalDebts').on('value',function(s){S.personalDebts=s.val()||{};if(S.page==='debt')renderDebtPage();});
   db.ref('expenses').on('value',function(s){S.expenses=s.val()||{};if(S.page==='stats')renderStatsPage();setTimeout(function(){if(typeof gfSyncIncome==='function')gfSyncIncome();},400);});
   db.ref('meta/deletedGames').on('value',function(sn){S.deletedGames=sn.val()||{};},function(){S.deletedGames={};});
   db.ref('exchanges').on('value',function(s){S.exchanges=s.val()||{};if(S.page==='exchange')renderExchangePage();});
   db.ref('clients').on('value',function(s){S.clients=s.val()||{};if(S.page==='clients')renderClients();});
   db.ref('wishlist').on('value',function(s){S.wishlist=s.val()||{};if(S.page==='wishlist')renderWishlist();});
-  db.ref('orders').on('value',function(s){S.orders=s.val()||{};if(S.page==='orders')renderOrders();syncAuctionIncomeToExpenses();if(S.page==='gifts')renderGiftsPage();setTimeout(function(){if(typeof gfAutoIssue==='function')gfAutoIssue();},300);var n=Object.values(S.orders).filter(function(o){return o.status==='new'&&!orderKind(o)&&!isUnpaidCard(o);}).length;var b=document.getElementById('orders-badge');if(b){b.textContent=n;b.style.display=n>0?'inline-flex':'none';}});
+  db.ref('orders').on('value',function(s){S.orders=s.val()||{};if(S.page==='orders')renderOrders();if(S.page==='gifts')renderGiftsPage();setTimeout(function(){if(typeof gfAutoIssue==='function')gfAutoIssue();},300);var n=Object.values(S.orders).filter(function(o){return o.status==='new'&&!orderKind(o)&&!isUnpaidCard(o);}).length;var b=document.getElementById('orders-badge');if(b){b.textContent=n;b.style.display=n>0?'inline-flex':'none';}});
   db.ref('kassaShifts').on('value',function(s){S.kassaShifts=s.val()||{};if(S.page==='kassa')renderKassaPage();});
   db.ref('.info/connected').on('value',function(s){var d=document.getElementById('online-dot');if(d)d.style.background=s.val()?'var(--green)':'var(--red)';});
   db.ref('site/maintenance').on('value',function(s){S.maintenance=!!s.val();updateMaintenanceBtn();});
@@ -3440,13 +3437,13 @@ function renderList(){
 // PAGE NAVIGATION
 function setPage(page){
   S.page=page;
-  ['available','transit','reserved','sold','selfbuy','exchange','lost','returned','debt','shipments','arrived','stats','calc','clients','wishlist','gamestats','orders','auction','loyalty','settings','warehouse','dashboard','kassa','bundles','gifts'].forEach(function(p){
+  ['available','transit','reserved','sold','selfbuy','exchange','lost','returned','debt','shipments','arrived','stats','calc','clients','wishlist','gamestats','orders','loyalty','settings','warehouse','dashboard','kassa','bundles','gifts'].forEach(function(p){
     var pg=document.getElementById('page-'+p);if(pg)pg.style.display=p===page?'block':'none';
     var tb=document.getElementById('tab-'+p);if(tb)tb.classList.toggle('active',p===page);
   });
   var isCatalog=['available','transit','reserved','sold','selfbuy','exchange','lost','returned'].includes(page);
   document.getElementById('controls').style.display=isCatalog?'block':'none';
-  var tsw=document.getElementById('type-switcher');if(tsw)tsw.style.display=['stats','shipments','arrived','clients','wishlist','gamestats','orders','auction','loyalty','debt','settings','warehouse','dashboard','kassa','bundles','gifts'].includes(page)?'none':'flex';
+  var tsw=document.getElementById('type-switcher');if(tsw)tsw.style.display=['stats','shipments','arrived','clients','wishlist','gamestats','orders','loyalty','debt','settings','warehouse','dashboard','kassa','bundles','gifts'].includes(page)?'none':'flex';
   var cl=document.getElementById('catalog-layout');if(cl)cl.style.display=isCatalog?'flex':'none';
   var obg=document.getElementById('orderedby-filter-group'),obd=document.getElementById('orderedby-filter-divider');
   if(obg)obg.style.display=page==='transit'?'flex':'none';
@@ -3459,7 +3456,6 @@ function setPage(page){
   if(page==='stats')renderStatsPage();
   if(page==='shipments')renderShipments();
   if(page==='arrived')renderArrivedPage();
-  if(page==='auction')renderAuctionPage();
   if(page==='calc')renderCalc();
   if(page==='exchange')renderExchangePage();
   if(page==='clients')renderClients();
@@ -4981,7 +4977,6 @@ function openSelfBuy(id){
 }
 function confirmSelfBuy(id){
   var g=S.games[id];if(!g)return;
-  if(g.auctionId){showToast('⚠ Товар сейчас в аукционе');closeModalForce();return;}
   var amt=parseFloat((document.getElementById('sb-amt')||{}).value);
   if(isNaN(amt)||amt<0){alert('Введи сумму (0 или больше).');return;}
   var whoEl=document.querySelector('input[name="sb-who"]:checked'),who=whoEl?whoEl.value:'dato';
@@ -5020,7 +5015,6 @@ function renderSelfBuySummary(){
 function confirmSellOne(id){
   if(bundleSellAbort(id))return;
   var g=S.games[id];if(!g)return;
-  if(g.auctionId){showToast('\u26a0 \u0422\u043e\u0432\u0430\u0440 \u0441\u0435\u0439\u0447\u0430\u0441 \u0432 \u0430\u0443\u043a\u0446\u0438\u043e\u043d\u0435');closeModalForce();return;}
   var inp=document.getElementById('sell-price-inp'),price=inp?inp.value:g.price||'';
   var newQty=parseInt(g.qty||1)-1;
   var soldId=id;
@@ -5081,7 +5075,6 @@ function confirmSellWithPackage(id){
 function confirmSell(id){
   if(bundleSellAbort(id))return;
   var g=S.games[id];
-  if(g&&g.auctionId){showToast('\u26a0 \u0422\u043e\u0432\u0430\u0440 \u0441\u0435\u0439\u0447\u0430\u0441 \u0432 \u0430\u0443\u043a\u0446\u0438\u043e\u043d\u0435');closeModalForce();return;}
   var inp=document.getElementById('sell-price-inp'),price=inp?inp.value:(S.games[id]&&S.games[id].price)||'';
   db.ref('games/'+id).update({status:'sold',price:price,soldAt:Date.now()});
   if(g&&g.itemType==='bundle')bundleSettle(id,price,Date.now());
@@ -5102,7 +5095,7 @@ function msFmt(c){return (c/100).toFixed(2);}
 function msAvail(){
   var q=(MS.q||'').trim().toLowerCase();
   return Object.values(S.games).filter(function(g){
-    if(g.status!=='available'||g.auctionId||g.itemType==='bundle'||g.itemType==='console')return false;
+    if(g.status!=='available'||g.itemType==='bundle'||g.itemType==='console')return false;
     if(!q)return true;
     return ((g.title||'')+' '+(g.platform||'')+' '+(g.discCode||'')).toLowerCase().indexOf(q)>=0;
   }).sort(function(a,b){return (a.title||'').localeCompare(b.title||'');}).slice(0,80);
@@ -5881,460 +5874,6 @@ function renderArrivedPage(){
     +'<div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;margin:18px 0 8px">\ud83d\udcbf '+t('arrived_single_items')+'</div>'+itemsHtml;
 }
 
-function auctionParticipantCount(a){
-  return Object.keys(a.tickets||{}).length;
-}
-function auctionStatus(a){
-  if(!a.published)return'draft';
-  var now=Date.now();
-  if(now>=a.endsAt)return'ended';
-  if(now<a.startsAt)return'scheduled';
-  var minP=parseInt(a.minParticipants)||20;
-  if(auctionParticipantCount(a)<minP)return'waiting_quorum';
-  return'live';
-}
-function auctionStatusLabel(st){
-  var ru={draft:'\u270f\ufe0f \u0427\u0435\u0440\u043d\u043e\u0432\u0438\u043a',scheduled:'\u23f3 \u0417\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d',waiting_quorum:'\u23f8 \u0416\u0434\u0451\u043c \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432',live:'\ud83d\udd34 \u0418\u0434\u0451\u0442',ended:'\ud83c\udfc1 \u0417\u0430\u0432\u0435\u0440\u0448\u0451\u043d'};
-  var ka={draft:'\u270f\ufe0f მონახაზი',scheduled:'\u23f3 დაგეგმილი',waiting_quorum:'\u23f8 ველოდებით მონაწილეებს',live:'\ud83d\udd34 მიმდინარეობს',ended:'\ud83c\udfc1 დასრულდა'};
-  return (lang==='ka'?ka:ru)[st]||st;
-}
-function fmtDT(ts){
-  if(!ts)return'\u2014';
-  var d=new Date(ts);
-  var loc=lang==='ka'?'ka-GE':'ru-RU';
-  return d.toLocaleDateString(loc,{day:'numeric',month:'short'})+' '+d.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit'});
-}
-var AUCTION_PACKAGES=[
-  {key:'p5',gel:5,price:5,label:lang==='ka'?'+5 \u20be \u10d1\u10d0\u10da\u10d0\u10dc\u10e1\u10e8\u10d8':'+5 \u20be \u043d\u0430 \u0431\u0430\u043b\u0430\u043d\u0441'},
-  {key:'p10',gel:10,price:10,label:lang==='ka'?'+10 \u20be \u10d1\u10d0\u10da\u10d0\u10dc\u10e1\u10e8\u10d8':'+10 \u20be \u043d\u0430 \u0431\u0430\u043b\u0430\u043d\u0441'},
-  {key:'p20',gel:20,price:20,label:lang==='ka'?'+20 \u20be \u10d1\u10d0\u10da\u10d0\u10dc\u10e1\u10e8\u10d8':'+20 \u20be \u043d\u0430 \u0431\u0430\u043b\u0430\u043d\u0441'},
-  {key:'monthly',gel:0,monthly:true,price:100,label:lang==='ka'?'\u10d7\u10d5\u10d8\u10e3\u10e0\u10d8 \u10e3\u10da\u10d8\u10db\u10d8\u10e2\u10dd':'\u041c\u0435\u0441\u044f\u0446 \u0431\u0435\u0437\u043b\u0438\u043c\u0438\u0442'}
-];
-// Custom-amount top-ups (person typed their own sum) aren't one of the fixed tiers
-// above, so resolve them on the fly: gel added = price paid, 1:1, no lookup needed.
-function getAuctionPackage(o){
-  if(o.packageKey==='custom')return{key:'custom',gel:parseFloat(o.total)||0,price:parseFloat(o.total)||0,monthly:false,label:(lang==='ka'?'\u10d1\u10d0\u10da\u10d0\u10dc\u10e1\u10d8\u10e1 \u10e8\u10d4\u10d5\u10e1\u10d4\u10d1\u10d0':'\u041f\u043e\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u0435 \u0431\u0430\u043b\u0430\u043d\u0441\u0430')+' ('+(parseFloat(o.total)||0).toFixed(2).replace(/\.00$/,'')+' \u20be)'};
-  return AUCTION_PACKAGES.find(function(p){return p.key===o.packageKey;});
-}
-// Package/ticket payments never touch a game record, so unlike normal sales they'd
-// otherwise never show up anywhere in Финансы. Whenever an order lands or updates,
-// log any newly-approved auction payment as income exactly once (guarded by
-// incomeLogged), mirroring the same 'extra_income' pattern used for manual income.
-function syncAuctionIncomeToExpenses(){
-  Object.entries(S.orders||{}).forEach(function(e){
-    var oid=e[0],o=e[1];
-    if((o.type==='auction_ticket'||o.type==='auction_package')&&o.paymentStatus==='approved'&&!o.incomeLogged){
-      var label=o.type==='auction_package'?(function(){
-        var pkg=getAuctionPackage(o);
-        return pkg?pkg.label:(lang==='ka'?'\u10d0\u10e3\u10e5\u10ea\u10d8\u10dd\u10dc\u10d8\u10e1 \u10de\u10d0\u10d9\u10d4\u10e2\u10d8':'\u041f\u0430\u043a\u0435\u0442 \u0430\u0443\u043a\u0446\u0438\u043e\u043d\u0430');
-      })():(lang==='ka'?'\u10d0\u10e3\u10e5\u10ea\u10d8\u10dd\u10dc\u10d8\u10e1 \u10d1\u10d8\u10da\u10d4\u10d7\u10d8':'\u0411\u0438\u043b\u0435\u0442 \u0430\u0443\u043a\u0446\u0438\u043e\u043d\u0430');
-      var eid=uid();
-      db.ref('expenses/'+eid).set({id:eid,name:'\ud83c\udfc6 '+label+' \u2014 '+(o.name||o.userEmail||''),to:'',amount:-(parseFloat(o.total||0)),date:o.createdAt||Date.now(),type:'extra_income'});
-      db.ref('orders/'+oid+'/incomeLogged').set(true);
-    }
-  });
-}
-function renderAuctionPage(){
-  var page=document.getElementById('page-auction');
-  if(!page||S.page!=='auction')return;
-  var list=Object.entries(S.auctions).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
-  var html='<button class="btn-new-ship" onclick="openNewAuctionModal()">+ \ud83c\udfc6 '+(lang==='ka'?'ახალი აუქციონი':'\u041d\u043e\u0432\u044b\u0439 \u0430\u0443\u043a\u0446\u0438\u043e\u043d')+'</button>';
-  var pendingPackages=Object.values(S.orders||{}).filter(function(o){return o.type==='auction_package'&&o.paymentMethod==='transfer'&&o.paymentStatus!=='approved';});
-  if(pendingPackages.length){
-    html+='<div class="expenses-section" style="margin-bottom:14px;border:1px solid rgba(0,212,255,0.4)"><div class="exp-title">\ud83d\udcb3 '+(lang==='ka'?'ელოდება გადარიცხვის დადასტურებას პაკეტისთვის':'\u041e\u0436\u0438\u0434\u0430\u044e\u0442 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f \u043f\u0435\u0440\u0435\u0432\u043e\u0434\u0430 \u0437\u0430 \u043f\u0430\u043a\u0435\u0442')+' ('+pendingPackages.length+')</div>'
-      +pendingPackages.map(function(o){
-        var pkg=getAuctionPackage(o)||{};
-        return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border)"><span>'+(o.name||o.userEmail||o.uid||'')+' \u2014 '+(pkg.label||'')+' ('+parseFloat(o.total||0).toFixed(2).replace(/\.00$/,'')+' \u20be)</span><button class="btn-secondary" style="font-size:11px;padding:4px 8px;color:var(--green)" onclick="approvePackagePayment(\''+o.id+'\')">\u2713 '+(lang==='ka'?'დადასტურება':'\u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044c')+'</button></div>';
-      }).join('')
-      +'</div>';
-  }
-  var packageHistory=Object.values(S.orders||{}).filter(function(o){return (o.type==='auction_ticket'||o.type==='auction_package')&&o.paymentStatus==='approved';}).sort(function(x,y){return (y.createdAt||0)-(x.createdAt||0);});
-  var byClient={};
-  packageHistory.forEach(function(o){
-    var key=o.uid||o.userEmail||o.name||'?';
-    if(!byClient[key])byClient[key]={name:o.name||o.userEmail||'?',total:0,purchases:[]};
-    byClient[key].total+=parseFloat(o.total||0);
-    byClient[key].purchases.push(o);
-  });
-  var clientList=Object.values(byClient).sort(function(x,y){return y.total-x.total;});
-  html+='<details style="margin-bottom:14px" class="expenses-section"><summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--text2)">\ud83d\udcb0 '+(lang==='ka'?'ვინ რა იყიდა':'\u041a\u0442\u043e \u0447\u0442\u043e \u043f\u043e\u043a\u0443\u043f\u0430\u043b')+' ('+(lang==='ka'?'კლიენტი':'\u043a\u043b\u0438\u0435\u043d\u0442\u043e\u0432')+': '+clientList.length+', '+(lang==='ka'?'სულ':'\u0432\u0441\u0435\u0433\u043e')+': '+packageHistory.reduce(function(s,o){return s+parseFloat(o.total||0);},0).toFixed(2).replace(/\.00$/,'')+' \u20be)</summary>'
-    +'<div style="margin-top:8px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">'
-    +(clientList.length?clientList.map(function(c){
-      var purchasesHtml=c.purchases.map(function(o){
-        var pkg=o.type==='auction_package'?(getAuctionPackage(o)||{}):{label:lang==='ka'?'ბილეთი (ძველი)':'\u0411\u0438\u043b\u0435\u0442 (\u0441\u0442\u0430\u0440\u044b\u0439)'};
-        return '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;color:var(--text2)"><span>'+(pkg.label||'')+'</span><span>'+(o.paymentMethod==='card'?'\ud83d\udcb3':'\ud83c\udfe6')+' '+parseFloat(o.total||0).toFixed(2).replace(/\.00$/,'')+' \u20be \u00b7 '+fmtDT(o.createdAt)+'</span></div>';
-      }).join('');
-      return '<div style="background:var(--bg3);border-radius:8px;padding:8px 10px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700"><span>\ud83d\udc64 '+c.name+'</span><span style="color:var(--green)">'+c.total.toFixed(2).replace(/\.00$/,'')+' \u20be</span></div>'
-        +'<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">'+purchasesHtml+'</div>'
-        +'</div>';
-    }).join(''):'<div style="color:var(--text3);font-size:12px;padding:4px 0">'+(lang==='ka'?'ჯერ ცარიელია':'\u041f\u043e\u043a\u0430 \u043f\u0443\u0441\u0442\u043e')+'</div>')
-    +'</div></details>';
-  if(!list.length){
-    html+='<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px 0">'+(lang==='ka'?'აუქციონები ჯერ არ არის':'\u0410\u0443\u043a\u0446\u0438\u043e\u043d\u043e\u0432 \u043f\u043e\u043a\u0430 \u043d\u0435\u0442')+'</div>';
-    page.innerHTML=html;
-    return;
-  }
-  list.forEach(function(a){
-    var st=auctionStatus(a);
-    var lots=Object.entries(a.lots||{}).map(function(e){return Object.assign({},e[1],(a.lotBids&&a.lotBids[e[0]])||{},{id:e[0]});});
-    var pCount=auctionParticipantCount(a);
-    var minP=parseInt(a.minParticipants)||20,maxP=parseInt(a.maxParticipants)||50;
-    var pendingTickets=Object.values(S.orders||{}).filter(function(o){return o.type==='auction_ticket'&&o.auctionId===a.id&&o.paymentMethod==='transfer'&&o.paymentStatus!=='approved';});
-    html+='<div class="expenses-section" style="margin-bottom:14px;'+(st==='ended'&&!a.finalized?'border:1px solid rgba(240,168,50,0.5)':'')+'">'
-      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">'
-      +'<div><div style="font-weight:700;font-size:16px">'+(a.name||(lang==='ka'?'აუქციონი':'\u0410\u0443\u043a\u0446\u0438\u043e\u043d'))+'</div>'
-      +'<div style="font-size:11px;color:var(--text2);margin-top:2px">'+auctionStatusLabel(st)+'</div>'
-      +'<div style="font-size:12px;font-weight:700;margin-top:3px;color:'+(pCount<minP?'var(--amber)':'var(--green)')+'">\ud83d\udc65 '+pCount+' / '+maxP+' '+(lang==='ka'?'მონაწილე':'\u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432')+(pCount<minP?(' ('+(lang==='ka'?'საჭიროა მინიმუმ':'\u043d\u0443\u0436\u043d\u043e \u043c\u0438\u043d\u0438\u043c\u0443\u043c')+' '+minP+')'):'')+'</div>'
-      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+(lang==='ka'?'დაწყება':'\u0421\u0442\u0430\u0440\u0442')+': '+fmtDT(a.startsAt)+' \u00b7 '+(lang==='ka'?'დასრულება':'\u041a\u043e\u043d\u0435\u0446')+': '+fmtDT(a.endsAt)+'</div></div>'
-      +'<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">'
-      +(st==='draft'?'<button class="btn-secondary" style="font-size:11px;padding:6px 10px;color:var(--green)" onclick="publishAuction(\''+a.id+'\')">\u2705 '+(lang==='ka'?'გამოქვეყნება':'\u041e\u043f\u0443\u0431\u043b\u0438\u043a\u043e\u0432\u0430\u0442\u044c')+'</button>':'')
-      +(!lots.length?'<button class="btn-secondary" style="font-size:11px;padding:6px 10px;color:var(--red)" onclick="deleteAuctionConfirm(\''+a.id+'\')">\ud83d\uddd1</button>':'')
-      +'</div></div>';
-    if(st==='ended'&&!a.finalized){
-      html+='<button class="btn-secondary" style="width:100%;padding:10px;margin:8px 0;color:var(--amber);border-color:var(--amber);font-weight:700" onclick="finalizeAuctionConfirm(\''+a.id+'\')">\ud83c\udfc1 '+(lang==='ka'?'შეჯამება და გაყიდვების გაფორმება':'\u041f\u043e\u0434\u0432\u0435\u0441\u0442\u0438 \u0438\u0442\u043e\u0433\u0438 \u0438 \u043e\u0444\u043e\u0440\u043c\u0438\u0442\u044c \u043f\u0440\u043e\u0434\u0430\u0436\u0438')+'</button>';
-    }
-    if(pendingTickets.length){
-      html+='<div style="margin:8px 0;padding:8px;background:var(--bg3);border-radius:8px">'
-        +'<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">'+(lang==='ka'?'ელოდება გადარიცხვის დადასტურებას':'\u041e\u0436\u0438\u0434\u0430\u044e\u0442 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f \u043f\u0435\u0440\u0435\u0432\u043e\u0434\u0430')+' ('+pendingTickets.length+')</div>'
-        +pendingTickets.map(function(o){return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0"><span>'+(o.name||o.userEmail||o.uid||'')+'</span><button class="btn-secondary" style="font-size:11px;padding:4px 8px;color:var(--green)" onclick="approveTicketPayment(\''+o.id+'\')">\u2713 '+(lang==='ka'?'დადასტურება':'\u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044c')+'</button></div>';}).join('')
-        +'</div>';
-    }
-    var ticketList=Object.entries(a.tickets||{}).map(function(e){return Object.assign({uid:e[0]},e[1]);}).filter(function(tk){return tk.paid;}).sort(function(x,y){return (x.name||'').localeCompare(y.name||'','ru');});
-    html+='<details style="margin:8px 0"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text2)">\ud83c\udfab '+(lang==='ka'?'მონაწილეები, ვინც იყიდა ბილეთი':'\u0423\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u0438, \u043a\u0443\u043f\u0438\u0432\u0448\u0438\u0435 \u0431\u0438\u043b\u0435\u0442')+' ('+ticketList.length+')</summary>'
-      +'<div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">'
-      +(ticketList.length?ticketList.map(function(tk){
-        return '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border-radius:6px;padding:5px 8px;font-size:11.5px"><span>'+(tk.name||tk.uid)+'</span><span style="color:var(--text3)">'+({card:'\ud83d\udcb3',transfer:'\ud83c\udfe6',balance:'\ud83d\udcb0',monthly:'\u267e\ufe0f'}[tk.method]||'\ud83c\udfab')+' '+fmtDT(tk.paidAt)+'</span></div>';
-      }).join(''):'<div style="color:var(--text3);font-size:12px;padding:4px 0">'+(lang==='ka'?'ჯერ არავის უყიდია ბილეთი':'\u041f\u043e\u043a\u0430 \u043d\u0438\u043a\u0442\u043e \u043d\u0435 \u043a\u0443\u043f\u0438\u043b \u0431\u0438\u043b\u0435\u0442')+'</div>')
-      +'</div></details>';
-    html+='<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">';
-    lots.forEach(function(l){
-      var bidCount=l.bidCount||0;
-      var gameList=(l.gameIds||[]).map(function(gid){return Object.assign({},S.games[gid]||{},{id:gid});});
-      var lotCostTotal=gameList.reduce(function(s,g){var c=estCostGel(g);return s+(c!==null?c:0);},0);
-      html+='<div style="background:var(--bg3);border-radius:8px;padding:10px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
-        +'<div><div style="font-weight:700;font-size:13px">'+(l.title||'')+'</div>'
-        +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+(l.gameIds||[]).length+' '+(lang==='ka'?'ნივთი':'\u0442\u043e\u0432\u0430\u0440(\u043e\u0432)')+' \u00b7 '+(lang==='ka'?'საწყისი':'\u0441\u0442\u0430\u0440\u0442')+': '+parseFloat(l.startPrice||0).toFixed(2)+' \u20be</div>'
-        +'<div style="font-size:11px;color:var(--amber);margin-top:2px">\ud83d\udce6 '+(lang==='ka'?'ლოტის თვითღირებულება':'\u0421\u0435\u0431\u0435\u0441\u0442\u043e\u0438\u043c\u043e\u0441\u0442\u044c \u043b\u043e\u0442\u0430')+': '+lotCostTotal.toFixed(2)+' \u20be</div>'
-        +'<div style="font-size:12px;margin-top:4px">'+(bidCount>0?('\ud83d\udd25 '+(lang==='ka'?'მიმდინარე':'\u0422\u0435\u043a\u0443\u0449\u0430\u044f')+': <b>'+parseFloat(l.currentBid||0).toFixed(2)+' \u20be</b> \u2014 '+(l.currentBidName||'?')+' ('+bidCount+' '+(lang==='ka'?'ბიდი':'\u0441\u0442\u0430\u0432\u043e\u043a')+')'):'<span style="color:var(--text3)">'+(lang==='ka'?'ბიდები ჯერ არ არის':'\u0421\u0442\u0430\u0432\u043e\u043a \u0435\u0449\u0451 \u043d\u0435\u0442')+'</span>')+'</div>'
-        +(l.resultStatus?('<div style="font-size:12px;margin-top:4px;color:'+(l.resultStatus==='sold'?'var(--green)':'var(--text3)')+'">'+(l.resultStatus==='sold'?('\u2713 '+(lang==='ka'?'გაიყიდა':'\u041f\u0440\u043e\u0434\u0430\u043d\u043e')):('\u2014 '+(lang==='ka'?'ბიდი არ ყოფილა':'\u0421\u0442\u0430\u0432\u043e\u043a \u043d\u0435 \u0431\u044b\u043b\u043e')))+'</div>'):'')
-        +'</div>'
-        +'<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">'
-        +(l.resultStatus!=='sold'?'<button class="btn-secondary" style="font-size:11px;padding:4px 8px;color:var(--text2)" onclick="openAddLotModal(\''+a.id+'\',\''+l.id+'\')" title="'+(lang==='ka'?'ლოტის რედაქტირება':'\u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043b\u043e\u0442')+'">\u270f\ufe0f</button>':'')
-        +'<button class="btn-secondary" style="font-size:11px;padding:4px 8px;color:var(--cyan)" onclick="openLotPhotosEditModal(\''+a.id+'\',\''+l.id+'\')" title="'+(lang==='ka'?'დისკების ცოცხალი ფოტო':'\u0416\u0438\u0432\u044b\u0435 \u0444\u043e\u0442\u043e \u0434\u0438\u0441\u043a\u043e\u0432')+'">\ud83d\udcf7 '+((l.photos||[]).length||'')+'</button>'
-        +'<button class="btn-secondary" style="font-size:11px;padding:4px 8px;color:var(--amber)" onclick="removeLotConfirm(\''+a.id+'\',\''+l.id+'\')" title="'+(lang==='ka'?'მთელი ლოტის დაბრუნება მარაგში':'\u041e\u0442\u043a\u0430\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u043b\u043e\u0442 \u0432 \u043d\u0430\u043b\u0438\u0447\u0438\u0435')+'">\u21a9\ufe0f</button>'
-        +'</div>'
-        +'</div>'
-        +(( l.photos&&l.photos.length)?('<div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">'+l.photos.map(function(p){return '<img src="'+p+'" style="width:44px;height:44px;object-fit:cover;border-radius:6px">';}).join('')+'</div>'):'');
-      html+='<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">'+gameList.map(function(g){
-        var c=estCostGel(g);
-        return '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border-radius:6px;padding:5px 8px;font-size:11px">'
-          +'<span>'+(g.title||'')+' <span style="color:var(--text3)">\xb7 '+(lang==='ka'?'ღირ.':'\u0441\u0435\u0431.')+': '+(c!==null?c.toFixed(2)+' \u20be':'\u2014')+'</span>'+(l.resultStatus==='sold'?' \u2014 <b style="color:var(--green)">'+parseFloat(g.price||0).toFixed(2)+' \u20be</b>':'')+'</span>'
-          +'<button class="btn-secondary" style="font-size:10px;padding:2px 7px;color:var(--amber)" onclick="revertSingleGameConfirm(\''+a.id+'\',\''+l.id+'\',\''+g.id+'\')" title="'+(lang==='ka'?'მხოლოდ ამ ნივთის დაბრუნება':'\u041e\u0442\u043a\u0430\u0442\u0438\u0442\u044c \u0442\u043e\u043b\u044c\u043a\u043e \u044d\u0442\u043e\u0442 \u0442\u043e\u0432\u0430\u0440')+'">\u21a9\ufe0f</button></div>';
-      }).join('')+'</div>';
-      var bidHistory=Object.values(l.bidHistory||{}).sort(function(x,y){return (y.at||0)-(x.at||0);});
-      if(bidHistory.length){
-        html+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:10.5px;color:var(--text3)">\ud83d\udcdc '+(lang==='ka'?'ყველა ბიდი':'\u0412\u0441\u0435 \u0441\u0442\u0430\u0432\u043a\u0438')+' ('+bidHistory.length+')</summary>'
-          +'<div style="margin-top:5px;display:flex;flex-direction:column;gap:3px;max-height:160px;overflow-y:auto">'
-          +bidHistory.map(function(b){return '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 6px;background:var(--bg2);border-radius:5px"><span>'+(b.name||'?')+'</span><span style="color:var(--text2)">'+parseFloat(b.amount||0).toFixed(2)+' \u20be \u00b7 '+fmtDT(b.at)+'</span></div>';}).join('')
-          +'</div></details>';
-      }
-      html+='</div>';
-    });
-    html+='</div>';
-    if(st==='draft'||st==='scheduled'||st==='waiting_quorum'){
-      html+='<button class="btn-secondary" style="width:100%;margin-top:10px;font-size:12px;padding:9px" onclick="openAddLotModal(\''+a.id+'\')">+ '+(lang==='ka'?'ლოტის დამატება':'\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043b\u043e\u0442')+'</button>';
-    }
-    html+='</div>';
-  });
-  page.innerHTML=html;
-}
-function openNewAuctionModal(){
-  var now=new Date(),plus3=new Date(now.getTime()+3*86400000),plus4=new Date(now.getTime()+4*86400000);
-  function toLocalInput(d){var p=function(n){return String(n).padStart(2,'0');};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());}
-  document.getElementById('modal-root').innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
-    +'<div class="modal-handle"></div><h3>\ud83c\udfc6 '+(lang==='ka'?'\u10d0\u10ee\u10d0\u10da\u10d8 \u10d0\u10e3\u10e5\u10ea\u10d8\u10dd\u10dc\u10d8':'\u041d\u043e\u0432\u044b\u0439 \u0430\u0443\u043a\u0446\u0438\u043e\u043d')+'</h3>'
-    +'<div class="field"><label>'+(lang==='ka'?'\u10d3\u10d0\u10e1\u10d0\u10ee\u10d4\u10da\u10d4\u10d1\u10d0':'\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')+'</label><input id="auc-name" type="text" placeholder="'+(lang==='ka'?'\u10db\u10d0\u10d2\u10d0\u10da\u10d8\u10d7\u10d0\u10d3: \u10e8\u10d4\u10db\u10dd\u10d3\u10d2\u10dd\u10db\u10d8\u10e1 \u10d0\u10e3\u10e5\u10ea\u10d8\u10dd\u10dc\u10d8 #1':'\u041d\u0430\u043f\u0440\u0438\u043c\u0435\u0440: \u041e\u0441\u0435\u043d\u043d\u0438\u0439 \u0430\u0443\u043a\u0446\u0438\u043e\u043d #1')+'"></div>'
-    +'<div class="row2"><div class="field"><label>'+(lang==='ka'?'დაწყება':'\u041d\u0430\u0447\u0430\u043b\u043e')+'</label><input id="auc-start" type="datetime-local" value="'+toLocalInput(plus3)+'"></div>'
-    +'<div class="field"><label>'+(lang==='ka'?'\u10d3\u10d0\u10e1\u10e0\u10e3\u10da\u10d4\u10d1\u10d0':'\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435')+'</label><input id="auc-end" type="datetime-local" value="'+toLocalInput(plus4)+'"></div></div>'
-    +'<div class="row2"><div class="field"><label>'+(lang==='ka'?'მინ. მონაწილე დასაწყებად':'Мин. участников для старта')+'</label><input id="auc-min-p" type="number" step="1" value="20"></div>'
-    +'<div class="field"><label>'+(lang==='ka'?'მაქს. მონაწილე':'Макс. участников')+'</label><input id="auc-max-p" type="number" step="1" value="50"></div></div>'
-    +'<div style="font-size:11px;color:var(--text2);margin-top:-4px">'+(lang==='ka'?'სანამ მინიმალური რაოდენობა არ შეივსება — აუქციონი არ დაიწყება, თუნდაც დრო უკვე დამდგარიყოს. შესვლა — პაკეტებით (გლობალურად ეს პარამეტრები დაშვებებშია).':'Пока не наберётся минимум участников — аукцион не стартует, даже если время уже пришло. Вход — через пакеты доступа (настраивается глобально в Настройках).')+'</div>'
-    +'<button class="btn-primary" style="width:100%;margin-top:10px" onclick="saveNewAuction()">'+(lang==='ka'?'\u10e8\u10d4\u10dc\u10d0\u10ee\u10d5\u10d0':'\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c')+'</button>'
-    +'</div></div>';
-}
-function saveNewAuction(){
-  var name=(document.getElementById('auc-name')||{}).value.trim();
-  var startVal=(document.getElementById('auc-start')||{}).value;
-  var endVal=(document.getElementById('auc-end')||{}).value;
-  var minParticipants=parseInt((document.getElementById('auc-min-p')||{}).value)||20;
-  var maxParticipants=parseInt((document.getElementById('auc-max-p')||{}).value)||50;
-  if(!name||!startVal||!endVal){showToast('\u26a0 \u0417\u0430\u043f\u043e\u043b\u043d\u0438 \u0432\u0441\u0435 \u043f\u043e\u043b\u044f');return;}
-  var startsAt=new Date(startVal).getTime(),endsAt=new Date(endVal).getTime();
-  if(endsAt<=startsAt){showToast('\u26a0 \u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u043b\u0436\u043d\u043e \u0431\u044b\u0442\u044c \u043f\u043e\u0437\u0436\u0435 \u043d\u0430\u0447\u0430\u043b\u0430');return;}
-  if(maxParticipants<minParticipants){showToast('\u26a0 \u041c\u0430\u043a\u0441\u0438\u043c\u0443\u043c \u043d\u0435 \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u043c\u0435\u043d\u044c\u0448\u0435 \u043c\u0438\u043d\u0438\u043c\u0443\u043c\u0430');return;}
-  var id='auction_'+Date.now();
-  db.ref('auctions/'+id).set({id:id,name:name,startsAt:startsAt,endsAt:endsAt,minParticipants:minParticipants,maxParticipants:maxParticipants,createdAt:Date.now(),published:false,finalized:false});
-  closeModalForce();
-  showToast('\u2713 \u0410\u0443\u043a\u0446\u0438\u043e\u043d \u0441\u043e\u0437\u0434\u0430\u043d (\u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a)');
-}
-function publishAuction(id){
-  db.ref('auctions/'+id).update({published:true});
-  showToast('\u2705 \u0410\u0443\u043a\u0446\u0438\u043e\u043d \u043e\u043f\u0443\u0431\u043b\u0438\u043a\u043e\u0432\u0430\u043d, \u0432\u0438\u0434\u0435\u043d \u043d\u0430 \u0441\u0430\u0439\u0442\u0435');
-}
-function deleteAuctionConfirm(id){
-  if(!confirm('\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0430\u0443\u043a\u0446\u0438\u043e\u043d \u043f\u043e\u043b\u043d\u043e\u0441\u0442\u044c\u044e?'))return;
-  db.ref('auctions/'+id).remove();
-  showToast('\u0423\u0434\u0430\u043b\u0435\u043d\u043e');
-}
-var _lotPickerAuctionId=null,_lotPickerSelected=[],_lotPickerEditId=null;
-function openAddLotModal(auctionId,editLotId){
- try{
-  _lotPickerAuctionId=auctionId;_lotPickerEditId=editLotId||null;_lotPickerPhotos=[];
-  var editingLot=editLotId?((S.auctions[auctionId]&&S.auctions[auctionId].lots&&S.auctions[auctionId].lots[editLotId])||null):null;
-  _lotPickerSelected=editingLot?(editingLot.gameIds||[]).slice():[];
-  if(editingLot&&editingLot.photos)_lotPickerPhotos=editingLot.photos.slice();
-  var pool=Object.entries(S.games).filter(function(e){return e[1].status==='available'&&e[1].itemType!=='bundle'&&(!e[1].auctionId||e[1].auctionLotId===editLotId);}).map(function(e){return Object.assign({},e[1],{id:e[0]});}).sort(function(a,b){return (a.title||'').localeCompare(b.title||'','ru');});
-  document.getElementById('modal-root').innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
-    +'<div class="modal-handle"></div><h3>'+(editingLot?'\u270f\ufe0f \u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043b\u043e\u0442':'+ \u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043b\u043e\u0442')+'</h3>'
-    +'<div style="font-size:11px;color:var(--text2);margin-bottom:8px">'+(lang==='ka'?'აირჩიეთ ერთი ნივთი (ცალკეული ლოტი) ან რამდენიმე (ბანდლი)':'Выбери один товар (одиночный лот) или несколько (бандл)')+'</div>'
-    +'<input type="text" id="lot-picker-search" placeholder="\ud83d\udd0d '+(lang==='ka'?'ძებნა':'Поиск')+'..." oninput="renderLotPickerList(this.value)" style="width:100%;box-sizing:border-box;margin-bottom:8px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text1);font-size:13px">'
-    +'<div id="lot-picker-list" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:8px"></div>'
-    +'<div id="lot-picker-cost-total" style="font-size:12px;font-weight:700;color:var(--amber);margin-top:6px;text-align:right"></div>'
-    +'<div class="field" style="margin-top:12px"><label>'+(lang==='ka'?'ლოტის დასახელება':'Название лота')+'</label><input id="lot-title" type="text" data-touched="'+(editingLot?'1':'')+'" value="'+(editingLot?String(editingLot.title||'').replace(/"/g,'&quot;'):'')+'" placeholder="'+(lang==='ka'?'ავტომატურად შეივსება არჩეულით':'Авто-заполнится по выбранным')+'"></div>'
-    +'<div class="field"><label>'+(lang==='ka'?'საწყისი ფასი':'Стартовая цена')+' (\u20be)</label><input id="lot-start-price" type="number" step="0.01" value="'+(editingLot?parseFloat(editingLot.startPrice||0):0)+'"></div>'
-    +'<div class="field" id="lot-photos-section" style="display:'+(_lotPickerSelected.length>1?'block':'none')+'">'
-    +'<label>\ud83d\udcf7 '+(lang==='ka'?'დისკების ცოცხალი ფოტო (არასავალდებულო)':'Живые фото дисков (необязательно)')+'</label>'
-    +'<input type="file" accept="image/*" multiple id="lot-photos-file" onchange="handleLotPhotosUpload(this)">'
-    +'<div id="lot-photos-hint" class="hint"></div>'
-    +'<div id="lot-photos-preview" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>'
-    +'</div>'
-    +'<button class="btn-primary" style="width:100%;margin-top:8px" onclick="saveNewLot()">'+(editingLot?(lang==='ka'?'ცვლილებების შენახვა':'Сохранить изменения'):(lang==='ka'?'ლოტის შენახვა':'Сохранить лот'))+'</button>'
-    +'</div></div>';
-  window._lotPickerPool=pool;
-  renderLotPickerList('');
-  renderLotPhotosPreview();
- }catch(e){
-  console.error('openAddLotModal error:',e);
-  alert('\u041e\u0448\u0438\u0431\u043a\u0430 \u043f\u0440\u0438 \u043e\u0442\u043a\u0440\u044b\u0442\u0438\u0438 \u043e\u043a\u043d\u0430 \u043b\u043e\u0442\u0430: '+(e&&e.message?e.message:e));
- }
-}
-var _lotPickerPhotos=[];
-function renderLotPhotosPreview(){
-  var box=document.getElementById('lot-photos-preview');if(!box)return;
-  box.innerHTML=_lotPickerPhotos.map(function(url,i){
-    return '<div style="position:relative"><img src="'+url+'" style="width:52px;height:52px;object-fit:cover;border-radius:6px"><button type="button" onclick="removeLotPickerPhoto('+i+')" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:11px;cursor:pointer;line-height:1">\u00d7</button></div>';
-  }).join('');
-}
-function removeLotPickerPhoto(i){
-  _lotPickerPhotos.splice(i,1);
-  renderLotPhotosPreview();
-}
-function handleLotPhotosUpload(inp){
-  if(!inp.files||!inp.files.length)return;
-  var files=Array.prototype.slice.call(inp.files);
-  var hint=document.getElementById('lot-photos-hint');
-  if(hint)hint.textContent=(lang==='ka'?'\u10d8\u10d2\u10e0\u10d3\u10d4\u10d1\u10d0 '+files.length+' \u10e4\u10dd\u10e2\u10dd...':'\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430 '+files.length+' \u0444\u043e\u0442\u043e...');
-  Promise.all(files.map(function(f){return uploadAccessoryPhoto(f);})).then(function(urls){
-    _lotPickerPhotos=_lotPickerPhotos.concat(urls);
-    renderLotPhotosPreview();
-    if(hint)hint.textContent=(lang==='ka'?'\u10d0\u10e2\u10d5\u10d8\u10e0\u10d7\u10e3\u10da\u10d8\u10d0 \u2713':'\u0417\u0430\u0433\u0440\u0443\u0436\u0435\u043d\u043e \u2713');
-    inp.value='';
-  }).catch(function(){
-    if(hint)hint.textContent=(lang==='ka'?'\u10e8\u10d4\u10ea\u10d3\u10dd\u10db\u10d0':'\u041e\u0448\u0438\u0431\u043a\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438');
-  });
-}
-function renderLotPickerList(q){
-  var box=document.getElementById('lot-picker-list');if(!box)return;
-  q=(q||'').toLowerCase().trim();
-  var pool=(window._lotPickerPool||[]).filter(function(g){return !q||(g.title||'').toLowerCase().includes(q);}).slice(0,60);
-  box.innerHTML=pool.map(function(g){
-    var checked=_lotPickerSelected.indexOf(g.id)!==-1;
-    var c=estCostGel(g);
-    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--border);cursor:pointer" onclick="toggleLotPickerItem(\''+g.id+'\')">'
-      +'<input type="checkbox" '+(checked?'checked':'')+' style="pointer-events:none">'
-      +'<span style="font-size:12.5px;flex:1">'+(g.title||'')+' <span style="color:var(--text3)">'+(g.platform||'')+' \u00b7 '+(g.condition==='new'?t('cond_new'):t('cond_used'))+'</span></span>'
-      +'<span style="font-size:11px;color:var(--amber);flex-shrink:0">'+(c!==null?c.toFixed(2)+' \u20be':'\u2014')+'</span></div>';
-  }).join('')||'<div style="padding:14px;text-align:center;color:var(--text3);font-size:12px">'+(lang==='ka'?'ვერაფერი მოიძებნა':'\u041d\u0438\u0447\u0435\u0433\u043e \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e')+'</div>';
-  updateLotPickerCostTotal();
-}
-function updateLotPickerCostTotal(){
-  var el=document.getElementById('lot-picker-cost-total');if(!el)return;
-  var total=_lotPickerSelected.reduce(function(s,gid){var c=estCostGel(S.games[gid]||{});return s+(c!==null?c:0);},0);
-  el.textContent=_lotPickerSelected.length?('\ud83d\udce6 '+t('cost')+' ('+_lotPickerSelected.length+'): '+total.toFixed(2)+' \u20be'):'';
-}
-function toggleLotPickerItem(gid){
-  var idx=_lotPickerSelected.indexOf(gid);
-  if(idx===-1)_lotPickerSelected.push(gid);else _lotPickerSelected.splice(idx,1);
-  renderLotPickerList((document.getElementById('lot-picker-search')||{}).value||'');
-  var titleInp=document.getElementById('lot-title');
-  if(titleInp&&!titleInp.dataset.touched){
-    var titles=_lotPickerSelected.map(function(id){return (S.games[id]||{}).title;}).filter(Boolean);
-    titleInp.value=titles.join(' + ');
-  }
-  var photoSec=document.getElementById('lot-photos-section');
-  if(photoSec)photoSec.style.display=_lotPickerSelected.length>1?'block':'none';
-}
-function saveNewLot(){
-  if(!_lotPickerSelected.length){showToast('\u26a0 '+(lang==='ka'?'აირჩიეთ თუნდაც ერთი ნივთი':'Выбери хотя бы один товар'));return;}
-  var title=(document.getElementById('lot-title')||{}).value.trim()||_lotPickerSelected.map(function(id){return (S.games[id]||{}).title;}).join(' + ');
-  var startPrice=parseFloat((document.getElementById('lot-start-price')||{}).value)||0;
-  var auctionId=_lotPickerAuctionId;
-  var cover=(S.games[_lotPickerSelected[0]]||{}).cover||'';
-  if(_lotPickerEditId){
-    var lotId=_lotPickerEditId;
-    var oldLot=(S.auctions[auctionId]&&S.auctions[auctionId].lots&&S.auctions[auctionId].lots[lotId])||{};
-    var oldIds=oldLot.gameIds||[];
-    oldIds.forEach(function(gid){if(_lotPickerSelected.indexOf(gid)===-1)revertGameFromAuction(gid);});
-    _lotPickerSelected.forEach(function(gid){
-      if(oldIds.indexOf(gid)===-1)db.ref('games/'+gid).update({auctionId:auctionId,auctionLotId:lotId,preAuctionPrice:(S.games[gid]||{}).price||null});
-    });
-    db.ref('auctions/'+auctionId+'/lots/'+lotId).update({title:title,cover:cover,gameIds:_lotPickerSelected,startPrice:startPrice,photos:_lotPickerPhotos.length?_lotPickerPhotos:null});
-    closeModalForce();
-    showToast('\u2713 '+(lang==='ka'?'ლოტი განახლდა':'Лот обновлён'));
-    return;
-  }
-  var newLotId='lot_'+Date.now();
-  db.ref('auctions/'+auctionId+'/lots/'+newLotId).set({id:newLotId,title:title,cover:cover,gameIds:_lotPickerSelected,startPrice:startPrice,resultStatus:null,photos:_lotPickerPhotos.length?_lotPickerPhotos:null});
-  db.ref('auctions/'+auctionId+'/lotBids/'+newLotId).set({currentBid:0,currentBidUid:null,currentBidName:null,bidCount:0});
-  _lotPickerSelected.forEach(function(gid){db.ref('games/'+gid).update({auctionId:auctionId,auctionLotId:newLotId,preAuctionPrice:(S.games[gid]||{}).price||null});});
-  closeModalForce();
-  showToast('\u2713 '+(lang==='ka'?'ლოტი დაემატა':'Лот добавлен'));
-}
-function removeLotConfirm(auctionId,lotId){
-  if(!confirm(lang==='ka'?'მთელი ლოტი დაბრუნდეს მარაგში? თუ უკვე გაყიდულია — გაყიდვა გაუქმდება.':'Откатить весь лот в наличие? Если лот уже продан — продажа отменится.'))return;
-  var lot=(S.auctions[auctionId]&&S.auctions[auctionId].lots&&S.auctions[auctionId].lots[lotId])||{};
-  (lot.gameIds||[]).forEach(function(gid){revertGameFromAuction(gid);});
-  db.ref('auctions/'+auctionId+'/lots/'+lotId).remove();
-  db.ref('auctions/'+auctionId+'/lotBids/'+lotId).remove();
-  sendTelegramMessage('\u21a9\ufe0f <b>\u041b\u043e\u0442 \u0432\u0435\u0440\u043d\u0443\u0442 \u0432 \u043d\u0430\u043b\u0438\u0447\u0438\u0435</b>\n\n'+(lot.title||''));
-  showToast(lang==='ka'?'წაშლილია, ნივთები მარაგშია':'Удалено, товары в наличии');
-}
-function revertSingleGameConfirm(auctionId,lotId,gameId){
-  var g=S.games[gameId]||{};
-  if(!confirm(lang==='ka'?('«'+(g.title||'')+'» დაბრუნდეს მარაგში? თუ გაყიდული იყო — ამ კონკრეტული ნივთის გაყიდვა გაუქმდება, დანარჩენი ნივთები არ დაიკარგება.'):('Вернуть «'+(g.title||'')+'» в наличие? Если был продан — продажа этого конкретного товара отменится, остальные товары лота не затронутся.')))return;
-  revertGameFromAuction(gameId);
-  var lot=(S.auctions[auctionId]&&S.auctions[auctionId].lots&&S.auctions[auctionId].lots[lotId]);
-  if(lot){
-    var remaining=(lot.gameIds||[]).filter(function(id){return id!==gameId;});
-    if(remaining.length){
-      db.ref('auctions/'+auctionId+'/lots/'+lotId+'/gameIds').set(remaining);
-    } else {
-      db.ref('auctions/'+auctionId+'/lots/'+lotId).remove();
-      db.ref('auctions/'+auctionId+'/lotBids/'+lotId).remove();
-    }
-  }
-  sendTelegramMessage('\u21a9\ufe0f <b>\u0422\u043e\u0432\u0430\u0440 \u0432\u0435\u0440\u043d\u0443\u0442 \u0432 \u043d\u0430\u043b\u0438\u0447\u0438\u0435</b>\n\n'+(g.title||''));
-  showToast(lang==='ka'?'დაბრუნდა მარაგში':'\u0412\u043e\u0437\u0432\u0440\u0430\u0449\u0451\u043d \u0432 \u043d\u0430\u043b\u0438\u0447\u0438\u0435');
-}
-function revertGameFromAuction(gameId){
-  var g=S.games[gameId];if(!g)return;
-  db.ref('games/'+gameId).update({
-    status:'available',
-    price:g.preAuctionPrice!==undefined?g.preAuctionPrice:g.price,
-    auctionId:null,auctionLotId:null,auctionWinner:null,preAuctionPrice:null,soldAt:null
-  });
-}
-var _lotPhotosEditCtx=null;
-function openLotPhotosEditModal(auctionId,lotId){
-  _lotPhotosEditCtx={auctionId:auctionId,lotId:lotId};
-  var lot=(S.auctions[auctionId]&&S.auctions[auctionId].lots&&S.auctions[auctionId].lots[lotId])||{};
-  window._lotEditPhotos=(lot.photos||[]).slice();
-  document.getElementById('modal-root').innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">'
-    +'<div class="modal-handle"></div><h3>\ud83d\udcf7 '+(lang==='ka'?'ცოცხალი ფოტო':'Живые фото')+': '+(lot.title||'')+'</h3>'
-    +'<div class="field"><input type="file" accept="image/*" multiple id="lot-edit-photos-file" onchange="handleLotEditPhotosUpload(this)">'
-    +'<div id="lot-edit-photos-hint" class="hint"></div></div>'
-    +'<div id="lot-edit-photos-preview" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px"></div>'
-    +'<button class="btn-primary" style="width:100%;margin-top:12px" onclick="saveLotPhotosEdit()">'+(lang==='ka'?'შენახვა':'Сохранить')+'</button>'
-    +'</div></div>';
-  renderLotEditPhotosPreview();
-}
-function renderLotEditPhotosPreview(){
-  var box=document.getElementById('lot-edit-photos-preview');if(!box)return;
-  box.innerHTML=(window._lotEditPhotos||[]).map(function(url,i){
-    return '<div style="position:relative"><img src="'+url+'" style="width:60px;height:60px;object-fit:cover;border-radius:6px"><button type="button" onclick="removeLotEditPhoto('+i+')" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:11px;cursor:pointer;line-height:1">\u00d7</button></div>';
-  }).join('')||'<div style="color:var(--text3);font-size:12px">'+(lang==='ka'?'ფოტო ჯერ არ არის':'Фото пока нет')+'</div>';
-}
-function removeLotEditPhoto(i){
-  window._lotEditPhotos.splice(i,1);
-  renderLotEditPhotosPreview();
-}
-function handleLotEditPhotosUpload(inp){
-  if(!inp.files||!inp.files.length)return;
-  var files=Array.prototype.slice.call(inp.files);
-  var hint=document.getElementById('lot-edit-photos-hint');
-  if(hint)hint.textContent=(lang==='ka'?'\u10d8\u10d2\u10e0\u10d3\u10d4\u10d1\u10d0...':'\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430...');
-  Promise.all(files.map(function(f){return uploadAccessoryPhoto(f);})).then(function(urls){
-    window._lotEditPhotos=(window._lotEditPhotos||[]).concat(urls);
-    renderLotEditPhotosPreview();
-    if(hint)hint.textContent=(lang==='ka'?'\u10d0\u10e2\u10d5\u10d8\u10e0\u10d7\u10e3\u10da\u10d8\u10d0 \u2713':'\u0417\u0430\u0433\u0440\u0443\u0436\u0435\u043d\u043e \u2713');
-    inp.value='';
-  }).catch(function(){
-    if(hint)hint.textContent=(lang==='ka'?'\u10e8\u10d4\u10ea\u10d3\u10dd\u10db\u10d0':'\u041e\u0448\u0438\u0431\u043a\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438');
-  });
-}
-function saveLotPhotosEdit(){
-  if(!_lotPhotosEditCtx)return;
-  var photos=window._lotEditPhotos||[];
-  db.ref('auctions/'+_lotPhotosEditCtx.auctionId+'/lots/'+_lotPhotosEditCtx.lotId+'/photos').set(photos.length?photos:null);
-  closeModalForce();
-  showToast('\u2713 '+(lang==='ka'?'ფოტო შენახულია':'Фото сохранены'));
-}
-function approveTicketPayment(orderId){
-  var o=S.orders[orderId];if(!o)return;
-  db.ref('orders/'+orderId).update({paymentStatus:'approved'});
-  db.ref('auctions/'+o.auctionId+'/tickets/'+o.uid).set({paid:true,paidAt:Date.now(),method:'transfer',name:o.name||''});
-  showToast('\u2713 '+(lang==='ka'?'გადახდა დადასტურებულია':'Оплата подтверждена'));
-}
-function approvePackagePayment(orderId){
-  var o=S.orders[orderId];if(!o)return;
-  var pkg=getAuctionPackage(o);
-  if(!pkg){showToast('\u26a0 '+(lang==='ka'?'პაკეტი ვერ მოიძებნა':'Пакет не найден'));return;}
-  db.ref('orders/'+orderId).update({paymentStatus:'approved'});
-  db.ref('userCredits/'+o.uid).once('value').then(function(snap){
-    var cur=snap.val()||{gel:0,monthlyUntil:null};
-    var upd={};
-    if(pkg.monthly){
-      var base=(cur.monthlyUntil&&cur.monthlyUntil>Date.now())?cur.monthlyUntil:Date.now();
-      upd.monthlyUntil=base+30*86400000;
-    } else {
-      upd.gel=Math.round(((parseFloat(cur.gel)||0)+pkg.gel)*100)/100;
-    }
-    db.ref('userCredits/'+o.uid).update(upd);
-  });
-  showToast('\u2713 '+(lang==='ka'?'გადახდა დადასტურებულია, ბალანსი შევსებულია':'Оплата подтверждена, баланс начислен'));
-}
-function finalizeAuctionConfirm(auctionId){
-  if(!confirm(lang==='ka'?'შეჯამდეს? ბიდიანი ლოტები მოინიშნება გაყიდულად, დანარჩენები დაბრუნდება მარაგში.':'Подвести итоги? Лоты со ставками будут отмечены проданными, остальные вернутся в наличие.'))return;
-  var a=S.auctions[auctionId];if(!a)return;
-  var lots=Object.entries(a.lots||{}).map(function(e){return Object.assign({},e[1],(a.lotBids&&a.lotBids[e[0]])||{},{id:e[0]});});
-  var summaryLines=[];
-  lots.forEach(function(l){
-    var gameIds=l.gameIds||[];
-    if((l.bidCount||0)>0){
-      var total=parseFloat(l.currentBid||0);
-      var n=gameIds.length||1;
-      var base=Math.floor((total/n)*100)/100;
-      var remainder=Math.round((total-base*n)*100)/100;
-      gameIds.forEach(function(gid,i){
-        var share=i===gameIds.length-1?Math.round((base+remainder)*100)/100:base;
-        var upd={status:'sold',soldAt:Date.now(),auctionId:null,auctionLotId:null,auctionWinner:l.currentBidName||'',preAuctionPrice:null,price:share};
-        db.ref('games/'+gid).update(upd);
-      });
-      db.ref('auctions/'+auctionId+'/lots/'+l.id).update({resultStatus:'sold'});
-      summaryLines.push('\ud83c\udfc6 '+l.title+' \u2014 '+total.toFixed(2)+' \u20be ('+(l.currentBidName||'?')+')');
-    } else {
-      gameIds.forEach(function(gid){revertGameFromAuction(gid);});
-      db.ref('auctions/'+auctionId+'/lots/'+l.id).update({resultStatus:'unsold'});
-      summaryLines.push('\u2014 '+l.title+' \u2014 \u0441\u0442\u0430\u0432\u043e\u043a \u043d\u0435 \u0431\u044b\u043b\u043e');
-    }
-  });
-  db.ref('auctions/'+auctionId+'/finalized').set(true);
-  sendTelegramMessage('\ud83c\udfc1 <b>\u0410\u0423\u041a\u0426\u0418\u041e\u041d \u0417\u0410\u0412\u0415\u0420\u0428\u0401\u041d</b>\n\n'+(a.name||'')+'\n\n'+summaryLines.join('\n'));
-  showToast('\ud83c\udfc1 \u0418\u0442\u043e\u0433\u0438 \u043f\u043e\u0434\u0432\u0435\u0434\u0435\u043d\u044b');
-}
-
 function toggleUsWarehouse(id){
   var s=S.shipments[id];if(!s)return;
   db.ref('shipments/'+id).update({atUsWarehouse:!s.atUsWarehouse});
@@ -7040,7 +6579,7 @@ function renderExchangeModal(){
   var available=Object.entries(S.games)
     .map(function(e){return Object.assign({},e[1],{id:e[0]});})
     .filter(function(g){
-      return (g.status==='available'||EX.selectedGave.indexOf(g.id)!==-1)&&!g.auctionId&&(g.itemType||'disc')===S.itemType;
+      return (g.status==='available'||EX.selectedGave.indexOf(g.id)!==-1)&&(g.itemType||'disc')===S.itemType;
     })
     .filter(function(g){
       var q=(EX.gaveSearch||'').toLowerCase().trim();
@@ -10661,14 +10200,6 @@ function orderKind(o){
   if(!o)return null;
   var paid=o.paymentStatus==='approved';
   var how=o.paymentMethod==='transfer'?'🏦 перевод':o.paymentMethod==='card'?'💳 карта':(o.paymentMethod||'—');
-  if(o.type==='auction_package'){
-    var pkg=(typeof getAuctionPackage==='function')?getAuctionPackage(o):null;
-    var what=o.packageKey==='custom'?('Пополнение баланса на '+(parseFloat(o.total)||0)+' ₾ (своя сумма)'):(pkg&&pkg.label?pkg.label:'Пакет аукциона');
-    return {icon:'💰',what:what,how:how,paid:paid,hint:paid?'Оплата подтверждена, баланс клиента пополнен.':(o.paymentMethod==='transfer'?'Клиент выбрал перевод. Когда деньги придут, подтверди в разделе «Аукцион».':'Клиент начал оплату картой, но оплата не подтверждена (мог закрыть страницу). Если деньги не пришли — удали запись.')};
-  }
-  if(o.type==='auction_ticket'){
-    return {icon:'🎟',what:'Билет на аукцион',how:how,paid:paid,hint:paid?'Оплачено.':'Оплата ещё не подтверждена.'};
-  }
   return null;
 }
 function orderKindHtml(o){
