@@ -8581,6 +8581,20 @@ function exportStockCostExcel(){
   var rowsS=sums.map(function(x){return [x[0],x[1],x[2]];});
   rowsS.push(['ИТОГО',total,Math.round(sums.reduce(function(a,x){return a+x[2];},0)*100)/100]);
   sheets.push({name:'Итого',cols:[{header:'Платформа',width:16},{header:'Количество, шт.',width:18},{header:'Себестоимость, ₾',width:18}],rows:rowsS});
+  var skipped=[],skN=0;
+  Object.values(S.games).forEach(function(g){
+    if(g.status!=='available')return;
+    var isDisc=(g.itemType||'disc')==='disc'&&g.hasGame!==false;
+    if(isDisc)return;
+    var n=parseInt(g.qty||1)||1;skN+=n;
+    var kind=g.itemType==='console'?'Приставка':g.itemType==='bundle'?'Бандл':g.itemType==='accessory'?'Аксессуар':(g.hasGame===false?'Без игры (hasGame=false)':(g.itemType||'?'));
+    skipped.push([g.title||'',g.platform||'',kind,n]);
+  });
+  if(skipped.length){
+    rowsS.push(['Не вошло в выписку (не диски)',skN,'']);
+    rowsS.push(['В портале «В наличии» (все)',total+skN,'']);
+    sheets.push({name:'Не диски',cols:[{header:'Название',width:44},{header:'Платформа',width:12},{header:'Тип',width:26},{header:'Кол-во',width:10}],rows:skipped});
+  }
   var d=new Date(),pad=function(n){return String(n).padStart(2,'0');};
   buildMultiSheetXlsx(sheets,'ND-Games-Stock-Cost-'+pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+'.xlsx');
   showToast('Скачано ('+total+' шт.)');
