@@ -8549,6 +8549,35 @@ function exportTaxJournal(){
   ],'ND-Games-Tax-Journal-'+dateStr+'.xlsx');
   showToast('Скачано: '+entries.length+' операций');
 }
+function stockCostRows(){
+  var items=Object.values(S.games).filter(function(g){
+    return ['available','reserved','reserved_exchange'].includes(g.status)&&(g.itemType||'disc')==='disc'&&g.hasGame!==false;
+  });
+  var by={};
+  items.forEach(function(g){
+    var p=(g.platform||'—').toString().trim()||'—',c=estCostGel(g),n=Math.max(parseInt(g.qty||1)||1,1);
+    var row=[g.title||'',p,g.condition||'',c===null?'':Math.round(c*100)/100];
+    (by[p]=by[p]||[]);for(var i=0;i<n;i++)by[p].push(row);
+  });
+  return by;
+}
+function exportStockCostExcel(){
+  var by=stockCostRows(),plats=Object.keys(by).sort(function(a,b){
+    var o=['PS5','PS4'],ia=o.indexOf(a),ib=o.indexOf(b);
+    if(ia<0)ia=9;if(ib<0)ib=9;return ia-ib||a.localeCompare(b);
+  });
+  if(!plats.length){showToast('Нет товаров в наличии');return;}
+  var total=0;
+  var sheets=plats.map(function(p){
+    var rows=by[p].slice().sort(function(a,b){return a[0].localeCompare(b[0],undefined,{sensitivity:'base'})||String(a[2]).localeCompare(String(b[2]));});
+    total+=rows.length;
+    return {name:p.replace(/[\\\/\?\*\[\]:]/g,'').slice(0,31)||'Other',
+      cols:[{header:'Название',width:44},{header:'Платформа',width:12},{header:'Состояние',width:16},{header:'Себестоимость, ₾',width:18}],rows:rows};
+  });
+  var d=new Date(),pad=function(n){return String(n).padStart(2,'0');};
+  buildMultiSheetXlsx(sheets,'ND-Games-Stock-Cost-'+pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+'.xlsx');
+  showToast('Скачано ('+total+' шт.)');
+}
 function exportAllStockExcel(){
   var items=Object.values(S.games).filter(function(g){
     return ['available','transit','reserved','reserved_exchange'].includes(g.status)&&(g.itemType||'disc')==='disc'&&g.hasGame!==false;
@@ -10502,7 +10531,8 @@ function renderSettings(){
     +'<button class="btn-secondary" onclick="exportSoldHistoryExcel()" style="width:100%;font-size:12px;padding:9px">📥 Скачать историю продаж (Excel)</button></div>'
     +'<div class="expenses-section"><div class="exp-title">Экспорт списка товаров</div>'
     +'<div style="font-size:11px;color:var(--text2);margin:-4px 0 10px">Все товары «В наличии» + «В пути» (включая те, у которых описание уже есть) — удобно, чтобы обновить/дозаполнить описания массово</div>'
-    +'<button class="btn-secondary" onclick="exportAllStockExcel()" style="width:100%;font-size:12px;padding:9px">📥 Скачать Excel (Наличие + В пути)</button></div>'
+    +'<button class="btn-secondary" onclick="exportAllStockExcel()" style="width:100%;font-size:12px;padding:9px">📥 Скачать Excel (Наличие + В пути)</button>'
+    +'<button class="btn-secondary" onclick="exportStockCostExcel()" style="width:100%;font-size:12px;padding:9px;margin-top:8px">📥 Наличие с себестоимостью (по платформам, А–Я)</button></div>'
     +'</div></details>'
 
     // ── УДАЛЁННЫЕ ИГРЫ ──
