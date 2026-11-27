@@ -4260,6 +4260,21 @@ function dgNote(o){
   };
   return map[o.how]||map.plain;
 }
+function dgCand(o){
+  if(o.src!=='exp'||!o.expenseId)return null;
+  var k=dgKey(o.title),used={};
+  Object.values(S.expenses||{}).forEach(function(e){if(e&&e.type==='purchase'&&e.gameId&&S.games[e.gameId])used[e.gameId]=1;});
+  var c=Object.values(S.games).filter(function(g){return g&&dgKey(g.title)===k&&!used[g.id]&&g.status!=='lost';});
+  return c.length?c[0]:null;
+}
+function dgRelink(expId,gameId){
+  var g=S.games[gameId],e=S.expenses[expId];if(!g||!e)return;
+  if(!confirm('Привязать расход «'+(e.name||'')+'» ('+fmtGel(e.amount||0)+' ₾) к игре «'+(g.title||'')+'» ('+(g.platform||'')+', '+t('st_'+g.status)+')? Сумма расходов не изменится.'))return;
+  db.ref('expenses/'+expId).update({gameId:gameId}).then(function(){
+    logAction('Расход привязан к игре',(e.name||'')+' → '+(g.title||''));
+    setTimeout(function(){if(document.getElementById('dg-list'))dgRender(true);},350);
+  });
+}
 function dgEsc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function dgCount(){try{return dgEntries(DG.logs).length;}catch(e){return 0;}}
 function openDeletedGamesModal(){
@@ -4276,11 +4291,12 @@ function dgRender(keepSearch){
   all.forEach(function(o){if((o.how==='exp_kept'&&o.expenseId&&S.expenses[o.expenseId])){keptSum+=parseFloat(o.amount||0)||0;keptN++;}});
   var list=rows.map(function(o){
     var n=dgNote(o),d=o.ts?new Date(o.ts).toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}):'дата неизвестна';
-    var canRm=o.expenseId&&S.expenses[o.expenseId];
+    var canRm=o.expenseId&&S.expenses[o.expenseId],cd=dgCand(o);
     return '<div class="exp-item" style="flex-direction:column;align-items:stretch;gap:4px">'
       +'<div style="display:flex;gap:8px;align-items:baseline"><b style="flex:1;font-size:13px">'+dgEsc(o.title)+(o.platform?' <span style="color:var(--text3);font-weight:400">('+dgEsc(o.platform)+')</span>':'')+'</b><span style="font-size:11px;color:var(--text3);white-space:nowrap">'+d+'</span></div>'
       +'<div style="font-size:12px;color:'+n[1]+'">'+n[0]+(o.cost||o.cost===0?' <span style="color:var(--text3)">· себест. была '+fmtGel(o.cost)+' ₾</span>':'')+(o.src==='log'?' <span style="color:var(--text3)">· из журнала</span>':'')+'</div>'
-      +(canRm?'<div><button class="btn-secondary" style="padding:5px 10px;font-size:11px;color:var(--red)" onclick="dgRemoveExpense(\''+o.expenseId+'\',\''+dgEsc(o.id)+'\')">🗑 Убрать оставшийся расход</button></div>':'')
+      +(cd?'<div style="font-size:12px;color:var(--green);margin-top:2px">✅ Игра с таким названием есть в портале ('+dgEsc(cd.platform||'')+', '+dgEsc(t('st_'+cd.status))+') — возможно, это не удаление: расход просто привязан к старой записи.</div><div><button class="btn-secondary" style="padding:5px 10px;font-size:11px;color:var(--green);border-color:var(--green)" onclick="dgRelink(\''+o.expenseId+'\',\''+cd.id+'\')">🔗 Привязать расход к этой игре</button></div>':'')
+      +(canRm&&!cd?'<div><button class="btn-secondary" style="padding:5px 10px;font-size:11px;color:var(--red)" onclick="dgRemoveExpense(\''+o.expenseId+'\',\''+dgEsc(o.id)+'\')">🗑 Убрать оставшийся расход</button></div>':'')
       +'</div>';
   }).join('');
   document.getElementById('modal-root').innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()" style="max-height:90vh;overflow:auto">'
