@@ -5783,7 +5783,7 @@ function renderShipments(){
       var borderBadge=(isT&&s.source==='USA'&&s.crossedBorder)?('<span class="ship-track-badge" style="background:rgba(62,207,142,0.15);color:var(--green);border-color:rgba(62,207,142,0.3)">\ud83d\udee2\ufe0f '+(lang==='ka'?'\u10e1\u10d0\u10d6\u10e6\u10d5\u10d0\u10e0\u10d8 \u10d2\u10d0\u10d3\u10d0\u10d9\u10d5\u10d4\u10d7\u10d8\u10da\u10d8':'\u041f\u0435\u0440\u0435\u0441\u0435\u043a\u043b\u0430 \u0433\u0440\u0430\u043d\u0438\u0446\u0443')+'</span>'):'';
       var carrierBadgeShip=(isT&&s.carrier&&CARRIER_LOGOS[s.carrier])?('<div class="carrier-badge" title="'+CARRIER_NAMES[s.carrier]+'"><img src="'+CARRIER_LOGOS[s.carrier]+'"></div>'):'';
       var statusRow=isLost
-        ?'<div class="ship-status-row"><div class="ship-status-btn" style="background:rgba(240,96,96,0.15);color:var(--red);flex:1;text-align:center;cursor:default">\ud83d\udea8 '+t('mark_lost')+(s.lossAmount?' \xb7 -'+parseFloat(s.lossAmount).toFixed(2).replace(/\.00$/,'')+' \u20be':'')+'</div></div>'
+        ?'<div class="ship-status-row"><div class="ship-status-btn" style="background:rgba(240,96,96,0.15);color:var(--red);flex:1;text-align:center;cursor:default">\ud83d\udea8 '+t('mark_lost')+(s.lossAmount?' \xb7 -'+parseFloat(s.lossAmount).toFixed(2).replace(/\.00$/,'')+' \u20be':'')+'</div><div class="ship-status-btn" style="background:rgba(62,207,142,0.12);color:var(--green);cursor:pointer;white-space:nowrap" onclick="restoreLostShipment(\''+s.id+'\')">\u21a9 Вернуть из потери</div></div>'
         :'<div class="ship-status-row">'
         +'<div class="ship-status-btn'+(isT?' active-transit':'')+'" onclick="setShipStatus(\''+s.id+'\',\'transit\')">\ud83d\ude9a '+t('ship_transit')+'</div>'
         +'<div class="ship-status-btn'+(!isT?' active-received':'')+'" onclick="setShipStatus(\''+s.id+'\',\'received\')">\u2713 '+t('ship_received')+'</div></div>';
@@ -6084,6 +6084,19 @@ function confirmMarkLostShipment(){
   });
   showToast('\ud83d\udea8 '+t('mark_lost'));
   closeModalForce();
+}
+function restoreLostShipment(id){
+  var s=S.shipments[id];if(!s||s.shipStatus!=='lost')return;
+  var items=Object.entries(S.games).filter(function(e){var g=e[1];return g.shipmentId===id&&g.status==='lost'&&(!s.lostAt||!g.lostAt||Math.abs(g.lostAt-s.lostAt)<15000);});
+  var total=(parseFloat(s.purchaseCost||0)||0)+(parseFloat(s.deliveryCostVal||0)||0);
+  if(!confirm('Вернуть партию «'+(s.name||'')+'» из потерь?\n\n• Товары ('+items.length+' шт.) вернутся в «В пути»\n• Расход «потеря» удалится\n• Расход партии '+total.toFixed(2)+' ₾ восстановится'))return;
+  Object.entries(S.expenses||{}).forEach(function(e){if(e[1].shipmentId===id&&e[1].type==='loss')db.ref('expenses/'+e[0]).remove();});
+  var has=Object.values(S.expenses||{}).some(function(e){return e.shipmentId===id&&e.type==='shipping';});
+  if(!has&&total>0){var eid=uid();db.ref('expenses/'+eid).set({id:eid,name:s.name||s.source||'Партия',to:s.source||'',amount:total,date:s.date||s.createdAt||Date.now(),type:'shipping',shipmentId:id});}
+  db.ref('shipments/'+id).update({shipStatus:'transit',lossAmount:null,lostAt:null});
+  items.forEach(function(e){db.ref('games/'+e[0]).update({status:'transit',lostAt:null,lossAmount:null});});
+  logAction('Партия возвращена из потерь',(s.name||id)+' · '+items.length+' шт.');
+  showToast('\u21a9 Партия возвращена в «В пути»');
 }
 function openEditShipment(id){
   var ex=S.shipments[id]||{};
